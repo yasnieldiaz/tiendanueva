@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -54,12 +55,18 @@ const sortOptions = [
   { value: "nameDesc", label: "sortOptions.nameDesc" },
 ];
 
-export default function ProductsPage() {
+function ProductsContent() {
   const t = useTranslations("products");
   const tNav = useTranslations("nav");
   const locale = useLocale();
+  const searchParams = useSearchParams();
   const { formatPrice } = useCurrency();
   const { addItem } = useCart();
+
+  // Get initial values from URL params
+  const urlSearch = searchParams.get("search") || "";
+  const urlCategory = searchParams.get("category") || "";
+  const urlBrand = searchParams.get("brand") || "";
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -68,10 +75,10 @@ export default function ProductsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  // Filters
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedBrand, setSelectedBrand] = useState("");
+  // Filters - initialize from URL params
+  const [search, setSearch] = useState(urlSearch);
+  const [selectedCategory, setSelectedCategory] = useState(urlCategory);
+  const [selectedBrand, setSelectedBrand] = useState(urlBrand);
   const [sort, setSort] = useState("newest");
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
 
@@ -128,6 +135,14 @@ export default function ProductsPage() {
   useEffect(() => {
     fetchFilters();
   }, []);
+
+  // Update filters when URL params change
+  useEffect(() => {
+    setSearch(urlSearch);
+    setSelectedCategory(urlCategory);
+    setSelectedBrand(urlBrand);
+    setPage(1);
+  }, [urlSearch, urlCategory, urlBrand]);
 
   useEffect(() => {
     fetchProducts();
@@ -665,5 +680,37 @@ export default function ProductsPage() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+function ProductsLoading() {
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="bg-neutral-50 border-b border-neutral-200">
+        <div className="max-w-[1504px] mx-auto px-6 py-8">
+          <div className="h-8 bg-neutral-200 rounded w-48 animate-pulse mb-4" />
+          <div className="h-6 bg-neutral-200 rounded w-32 animate-pulse" />
+        </div>
+      </div>
+      <div className="max-w-[1504px] mx-auto px-6 py-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div key={i} className="animate-pulse">
+              <div className="bg-neutral-200 rounded-2xl aspect-square mb-4" />
+              <div className="h-4 bg-neutral-200 rounded w-3/4 mb-2" />
+              <div className="h-4 bg-neutral-200 rounded w-1/2" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<ProductsLoading />}>
+      <ProductsContent />
+    </Suspense>
   );
 }

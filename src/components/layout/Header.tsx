@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
 import { useTranslations, useLocale } from "next-intl";
@@ -20,10 +20,21 @@ import {
   Package,
   Grid3X3,
   Phone,
+  Loader2,
 } from "lucide-react";
 import { useCart } from "@/store/cart";
+import { useCurrency } from "@/store/currency";
 import LanguageSelector from "./LanguageSelector";
 import CurrencySelector from "./CurrencySelector";
+
+interface SearchResult {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  images: { url: string }[];
+  brand: { name: string } | null;
+}
 
 // Main navigation menu items
 const mainNavItems = [
@@ -136,16 +147,91 @@ export default function Header() {
   const t = useTranslations("common");
   const locale = useLocale();
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const { items, openCart } = useCart();
+  const { formatPrice } = useCurrency();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
   const categoriesRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Debounced live search
+  const searchProducts = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const res = await fetch(`/api/products?search=${encodeURIComponent(query)}&limit=6`);
+      const data = await res.json();
+      setSearchResults(data.products || []);
+      setShowResults(true);
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchProducts(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchProducts]);
+
+  // Close search results when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Handle search submission
+  const handleSearch = (e: React.FormEvent | React.KeyboardEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/${locale}/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setShowResults(false);
+      setSearchQuery("");
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch(e);
+    }
+    if (e.key === "Escape") {
+      setShowResults(false);
+    }
+  };
+
+  const handleResultClick = (slug: string) => {
+    router.push(`/${locale}/product/${slug}`);
+    setShowResults(false);
+    setSearchQuery("");
+    setSearchOpen(false);
+  };
 
   // Close categories menu when clicking outside
   useEffect(() => {
@@ -207,15 +293,81 @@ export default function Header() {
           </Link>
 
           {/* Search Bar - Desktop */}
-          <div className="hidden lg:flex flex-1 max-w-xl mx-8">
-            <div className="relative w-full">
-              <input
-                type="text"
-                placeholder="Szukaj produktów..."
-                className="w-full px-4 py-2.5 pl-10 bg-neutral-100 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
-            </div>
+          <div ref={searchRef} className="hidden lg:flex flex-1 max-w-xl mx-8 relative">
+            <form onSubmit={handleSearch} className="w-full">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleSearchKeyDown}
+                  onFocus={() => searchQuery.length >= 2 && setShowResults(true)}
+                  placeholder="Szukaj produktów..."
+                  className="w-full px-4 py-2.5 pl-10 pr-20 bg-neutral-100 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                {isSearching ? (
+                  <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 animate-spin" />
+                ) : (
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                )}
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-colors"
+                >
+                  Szukaj
+                </button>
+              </div>
+            </form>
+
+            {/* Search Results Dropdown */}
+            <AnimatePresence>
+              {showResults && searchResults.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-neutral-200 overflow-hidden z-50"
+                >
+                  {searchResults.map((product) => (
+                    <button
+                      key={product.id}
+                      onClick={() => handleResultClick(product.slug)}
+                      className="w-full flex items-center gap-3 p-3 hover:bg-neutral-50 transition-colors text-left"
+                    >
+                      <div className="w-12 h-12 bg-neutral-100 rounded-lg flex-shrink-0 overflow-hidden relative">
+                        {product.images?.[0]?.url ? (
+                          <Image
+                            src={product.images[0].url}
+                            alt={product.name}
+                            fill
+                            className="object-contain p-1"
+                            sizes="48px"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-2xl">🛸</div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-neutral-900 truncate">{product.name}</p>
+                        {product.brand && (
+                          <p className="text-xs text-neutral-500">{product.brand.name}</p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-blue-600">{formatPrice(product.price)}</p>
+                        <p className="text-xs text-neutral-400">+ VAT</p>
+                      </div>
+                    </button>
+                  ))}
+                  <button
+                    onClick={handleSearch}
+                    className="w-full p-3 text-sm text-blue-600 font-medium bg-neutral-50 hover:bg-neutral-100 transition-colors"
+                  >
+                    Zobacz wszystkie wyniki dla &quot;{searchQuery}&quot;
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Right Actions */}
@@ -352,15 +504,26 @@ export default function Header() {
               exit={{ height: 0, opacity: 0 }}
               className="lg:hidden pb-4 overflow-hidden"
             >
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Szukaj produktów..."
-                  autoFocus
-                  className="w-full px-4 py-2.5 pl-10 bg-neutral-100 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
-              </div>
+              <form onSubmit={handleSearch} className="relative flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleSearchKeyDown}
+                    placeholder="Szukaj produktów..."
+                    autoFocus
+                    className="w-full px-4 py-2.5 pl-10 bg-neutral-100 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                </div>
+                <button
+                  type="submit"
+                  className="px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Szukaj
+                </button>
+              </form>
             </motion.div>
           )}
         </AnimatePresence>
