@@ -351,7 +351,7 @@ function CheckoutContent() {
                       name="firstName"
                       value={shippingForm.firstName}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                      className="w-full h-[50px] px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
                     />
                   </div>
                   <div>
@@ -363,7 +363,7 @@ function CheckoutContent() {
                       name="lastName"
                       value={shippingForm.lastName}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                      className="w-full h-[50px] px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
                     />
                   </div>
                   <div>
@@ -375,7 +375,7 @@ function CheckoutContent() {
                       name="email"
                       value={shippingForm.email}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                      className="w-full h-[50px] px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
                     />
                   </div>
                   <div>
@@ -387,7 +387,7 @@ function CheckoutContent() {
                       name="phone"
                       value={shippingForm.phone}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                      className="w-full h-[50px] px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
                     />
                   </div>
                   <div>
@@ -399,7 +399,7 @@ function CheckoutContent() {
                       name="address"
                       value={shippingForm.address}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                      className="w-full h-[50px] px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
                     />
                   </div>
                   <div>
@@ -411,7 +411,7 @@ function CheckoutContent() {
                       name="city"
                       value={shippingForm.city}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                      className="w-full h-[50px] px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
                     />
                   </div>
                   <div>
@@ -423,7 +423,7 @@ function CheckoutContent() {
                       name="postalCode"
                       value={shippingForm.postalCode}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                      className="w-full h-[50px] px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
                     />
                   </div>
                   <div>
@@ -434,7 +434,7 @@ function CheckoutContent() {
                       name="country"
                       value={shippingForm.country}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                      className="w-full h-[50px] px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 cursor-pointer"
                     >
                       <option value="Poland">Polska (PL)</option>
                       <option value="Germany">Niemcy (DE)</option>
