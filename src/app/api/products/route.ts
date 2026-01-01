@@ -12,10 +12,15 @@ export async function GET(request: Request) {
     const sort = searchParams.get("sort") || "newest";
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
+    const featured = searchParams.get("featured");
 
     const where: Record<string, unknown> = {
       isActive: true,
     };
+
+    if (featured === "true") {
+      where.isFeatured = true;
+    }
 
     if (category) {
       where.category = { slug: category };
