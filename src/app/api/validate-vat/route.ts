@@ -108,20 +108,23 @@ export async function POST(request: NextRequest) {
 
     const xmlText = await viesResponse.text();
 
-    // Parse the SOAP response
-    const isValidMatch = xmlText.match(/<valid>(\w+)<\/valid>/);
-    const nameMatch = xmlText.match(/<name>([^<]*)<\/name>/);
-    const addressMatch = xmlText.match(/<address>([^<]*)<\/address>/);
-    const requestDateMatch = xmlText.match(/<requestDate>([^<]*)<\/requestDate>/);
+    // Parse the SOAP response (handle namespaced XML like ns2:valid or just valid)
+    const isValidMatch = xmlText.match(/<(?:\w+:)?valid>(\w+)<\/(?:\w+:)?valid>/);
+    const nameMatch = xmlText.match(/<(?:\w+:)?name>([^<]*)<\/(?:\w+:)?name>/);
+    const addressMatch = xmlText.match(/<(?:\w+:)?address>([^<]*)<\/(?:\w+:)?address>/);
+    const requestDateMatch = xmlText.match(/<(?:\w+:)?requestDate>([^<]*)<\/(?:\w+:)?requestDate>/);
 
     const isValid = isValidMatch ? isValidMatch[1] === "true" : false;
-    const name = nameMatch ? nameMatch[1].trim() : undefined;
-    const address = addressMatch ? addressMatch[1].trim() : undefined;
+    // VIES returns "---" when company data is not available
+    const rawName = nameMatch ? nameMatch[1].trim() : undefined;
+    const rawAddress = addressMatch ? addressMatch[1].trim() : undefined;
+    const name = rawName && rawName !== "---" ? rawName : undefined;
+    const address = rawAddress && rawAddress !== "---" ? rawAddress : undefined;
     const requestDate = requestDateMatch ? requestDateMatch[1] : new Date().toISOString();
 
     // Check for fault/error in response
-    if (xmlText.includes("<faultstring>")) {
-      const faultMatch = xmlText.match(/<faultstring>([^<]*)<\/faultstring>/);
+    if (xmlText.includes("faultstring") || xmlText.includes("Fault")) {
+      const faultMatch = xmlText.match(/<(?:\w+:)?faultstring>([^<]*)<\/(?:\w+:)?faultstring>/);
       const faultMessage = faultMatch ? faultMatch[1] : "VIES service error";
 
       return NextResponse.json({
