@@ -9,31 +9,89 @@ import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Truck, Package
 import { useCart } from "@/store/cart";
 import { useCurrency } from "@/store/currency";
 
-// Shipping options with prices in PLN (brutto)
-const shippingOptions = [
-  {
-    id: "inpost",
-    name: "InPost Paczkomaty",
-    description: "Dostawa do paczkomatu 24-48h",
-    price: 18,
-    icon: Package,
+const localTranslations = {
+  es: {
+    orderSummary: "Resumen del pedido",
+    selectDelivery: "Selecciona envío",
+    freeShippingMessage: "Añade {amount} más para envío gratis",
+    vatIncluded: "IVA 23% (incluido en precio)",
+    grossPrices: "Precios brutos",
+    securePayments: "Pagos seguros",
+    deliveryPartners: "Socios de envío",
+    clearCart: "Vaciar carrito",
+    perUnit: "/ ud.",
+    free: "Gratis",
+    inpostName: "InPost Casilleros",
+    inpostDesc: "Entrega en casillero 24-48h",
+    glsName: "GLS Mensajero",
+    glsDesc: "Entrega por mensajero 24-48h",
+    viewCart: "Ver carrito",
+    emptyMessage: "Comienza a comprar para añadir artículos a tu carrito",
   },
-  {
-    id: "gls",
-    name: "GLS Kurier",
-    description: "Dostawa kurierem 24-48h",
-    price: 24,
-    icon: Truck,
+  en: {
+    orderSummary: "Order Summary",
+    selectDelivery: "Select delivery",
+    freeShippingMessage: "Add {amount} more for free shipping",
+    vatIncluded: "VAT 23% (included in price)",
+    grossPrices: "Gross prices",
+    securePayments: "Secure payments",
+    deliveryPartners: "Delivery partners",
+    clearCart: "Clear cart",
+    perUnit: "/ pc.",
+    free: "Free",
+    inpostName: "InPost Parcel Lockers",
+    inpostDesc: "Delivery to locker 24-48h",
+    glsName: "GLS Courier",
+    glsDesc: "Courier delivery 24-48h",
+    viewCart: "View Cart",
+    emptyMessage: "Start shopping to add items to your cart",
   },
-];
+  pl: {
+    orderSummary: "Podsumowanie zamówienia",
+    selectDelivery: "Wybierz dostawę",
+    freeShippingMessage: "Dodaj jeszcze {amount} do darmowej dostawy!",
+    vatIncluded: "VAT 23% (zawarty w cenie)",
+    grossPrices: "Ceny brutto",
+    securePayments: "Bezpieczne płatności",
+    deliveryPartners: "Partnerzy dostawy",
+    clearCart: "Wyczyść koszyk",
+    perUnit: "/ szt.",
+    free: "Gratis",
+    inpostName: "InPost Paczkomaty",
+    inpostDesc: "Dostawa do paczkomatu 24-48h",
+    glsName: "GLS Kurier",
+    glsDesc: "Dostawa kurierem 24-48h",
+    viewCart: "Zobacz koszyk",
+    emptyMessage: "Zacznij zakupy, aby dodać produkty do koszyka",
+  },
+};
 
 export default function CartPage() {
   const t = useTranslations("cart");
   const tNav = useTranslations("nav");
   const locale = useLocale();
+  const lt = localTranslations[locale as keyof typeof localTranslations] || localTranslations.en;
   const { items, updateQuantity, removeItem, clearCart, getTotalPrice } = useCart();
   const { formatPrice } = useCurrency();
   const [selectedShipping, setSelectedShipping] = useState("inpost");
+
+  // Dynamic shipping options based on locale
+  const shippingOptions = [
+    {
+      id: "inpost",
+      name: lt.inpostName,
+      description: lt.inpostDesc,
+      price: 18,
+      icon: Package,
+    },
+    {
+      id: "gls",
+      name: lt.glsName,
+      description: lt.glsDesc,
+      price: 24,
+      icon: Truck,
+    },
+  ];
 
   const subtotal = getTotalPrice();
   // Free shipping over 5000 PLN
@@ -50,7 +108,7 @@ export default function CartPage() {
             <ShoppingBag className="w-24 h-24 text-neutral-200 mx-auto mb-6" />
             <h1 className="text-2xl font-bold text-neutral-900 mb-4">{t("empty")}</h1>
             <p className="text-neutral-500 mb-8">
-              Start shopping to add items to your cart
+              {lt.emptyMessage}
             </p>
             <Link href="/products">
               <motion.button
@@ -165,7 +223,7 @@ export default function CartPage() {
                         </p>
                         {item.quantity > 1 && (
                           <p className="text-sm text-neutral-400">
-                            {formatPrice(item.price)} / szt.
+                            {formatPrice(item.price)} {lt.perUnit}
                           </p>
                         )}
                       </div>
@@ -181,7 +239,7 @@ export default function CartPage() {
                 onClick={clearCart}
                 className="text-sm text-neutral-500 hover:text-red-500 transition-colors"
               >
-                Clear cart
+                {lt.clearCart}
               </button>
             </div>
           </div>
@@ -189,11 +247,11 @@ export default function CartPage() {
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-neutral-50 rounded-2xl p-6 sticky top-24">
-              <h2 className="text-lg font-semibold mb-6">Podsumowanie zamówienia</h2>
+              <h2 className="text-lg font-semibold mb-6">{lt.orderSummary}</h2>
 
               {/* Shipping Options */}
               <div className="mb-6">
-                <h3 className="text-sm font-medium text-neutral-700 mb-3">Wybierz dostawę</h3>
+                <h3 className="text-sm font-medium text-neutral-700 mb-3">{lt.selectDelivery}</h3>
                 <div className="space-y-2">
                   {shippingOptions.map((option) => {
                     const Icon = option.icon;
@@ -221,7 +279,7 @@ export default function CartPage() {
                         </div>
                         <div className="text-right">
                           {isFree ? (
-                            <span className="text-green-600 font-medium">Gratis</span>
+                            <span className="text-green-600 font-medium">{lt.free}</span>
                           ) : (
                             <span className="font-semibold">{formatPrice(option.price)}</span>
                           )}
@@ -241,21 +299,21 @@ export default function CartPage() {
                   <span className="text-neutral-500">{t("shipping")}</span>
                   <span className="font-medium">
                     {shipping === 0 ? (
-                      <span className="text-green-600">Gratis</span>
+                      <span className="text-green-600">{lt.free}</span>
                     ) : (
                       formatPrice(shipping)
                     )}
                   </span>
                 </div>
                 <div className="flex justify-between text-xs text-neutral-400">
-                  <span>VAT 23% (zawarty w cenie)</span>
-                  <span>Ceny brutto</span>
+                  <span>{lt.vatIncluded}</span>
+                  <span>{lt.grossPrices}</span>
                 </div>
 
                 {subtotal < freeShippingThreshold && (
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-700">
-                      Dodaj jeszcze {formatPrice(freeShippingThreshold - subtotal)} do darmowej dostawy!
+                      {lt.freeShippingMessage.replace("{amount}", formatPrice(freeShippingThreshold - subtotal))}
                     </p>
                   </div>
                 )}
@@ -281,7 +339,7 @@ export default function CartPage() {
 
               {/* Payment Methods */}
               <div className="mt-6 text-center">
-                <p className="text-xs text-neutral-400 mb-3">Bezpieczne płatności</p>
+                <p className="text-xs text-neutral-400 mb-3">{lt.securePayments}</p>
                 <div className="flex items-center justify-center gap-3">
                   <div className="px-3 py-1.5 bg-white border border-neutral-200 rounded text-xs font-medium">
                     VISA
@@ -300,7 +358,7 @@ export default function CartPage() {
 
               {/* Shipping Partners */}
               <div className="mt-4 pt-4 border-t border-neutral-200">
-                <p className="text-xs text-neutral-400 mb-2 text-center">Partnerzy dostawy</p>
+                <p className="text-xs text-neutral-400 mb-2 text-center">{lt.deliveryPartners}</p>
                 <div className="flex items-center justify-center gap-4">
                   <div className="px-3 py-1 bg-yellow-400 rounded text-xs font-bold text-yellow-900">
                     InPost
