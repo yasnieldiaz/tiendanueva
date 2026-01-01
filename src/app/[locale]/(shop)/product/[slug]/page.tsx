@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useLocale } from "next-intl";
+import { useSession } from "next-auth/react";
 import { useCurrency } from "@/store/currency";
 import { useCart } from "@/store/cart";
 import {
@@ -25,6 +26,7 @@ import {
   X,
   Maximize2,
   Loader2,
+  Pencil,
 } from "lucide-react";
 
 interface Product {
@@ -198,6 +200,8 @@ export default function ProductPage() {
   const params = useParams();
   const slug = params.slug as string;
   const locale = useLocale();
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "ADMIN";
 
   const t = useTranslations("product");
   const tProducts = useTranslations("products");
@@ -376,10 +380,21 @@ export default function ProductPage() {
 
           {/* Right: Product Info */}
           <div>
-            {/* Title */}
-            <h1 className="text-2xl lg:text-3xl font-bold text-neutral-900">
-              {product.name}
-            </h1>
+            {/* Title with Admin Edit Button */}
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-2xl lg:text-3xl font-bold text-neutral-900">
+                {product.name}
+              </h1>
+              {isAdmin && (
+                <Link
+                  href={`/${locale}/admin/products/${product.id}/edit`}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shrink-0"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Editar
+                </Link>
+              )}
+            </div>
 
             {/* Description */}
             {product.description && (
@@ -578,8 +593,8 @@ export default function ProductPage() {
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {product.relatedProducts.map((related) => (
-                <Link key={related.id} href={`/${locale}/product/${related.slug}`}>
-                  <div className="bg-white border border-neutral-200 rounded-lg p-4 hover:shadow-lg transition-shadow group">
+                <Link key={related.id} href={`/${locale}/product/${related.slug}`} className="h-full">
+                  <div className="bg-white border border-neutral-200 rounded-lg p-4 hover:shadow-lg transition-shadow group h-full flex flex-col">
                     <div className="aspect-square bg-neutral-50 rounded-lg flex items-center justify-center mb-4 relative overflow-hidden">
                       {related.images && related.images.length > 0 ? (
                         <Image
@@ -593,15 +608,17 @@ export default function ProductPage() {
                         <span className="text-5xl">🛸</span>
                       )}
                     </div>
-                    {related.brand && (
-                      <span className="text-xs text-neutral-400">{related.brand.name}</span>
-                    )}
-                    <h3 className="font-medium text-neutral-900 mt-1 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm">
-                      {related.name}
-                    </h3>
-                    <p className="text-lg font-bold text-blue-600 mt-2">
-                      {formatPrice(related.price)}
-                    </p>
+                    <div className="flex flex-col flex-grow">
+                      <span className="text-xs text-neutral-400 h-4">
+                        {related.brand?.name || ""}
+                      </span>
+                      <h3 className="font-medium text-neutral-900 mt-1 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm min-h-[2.5rem]">
+                        {related.name}
+                      </h3>
+                      <p className="text-lg font-bold text-blue-600 mt-auto pt-2">
+                        {formatPrice(related.price)}
+                      </p>
+                    </div>
                   </div>
                 </Link>
               ))}

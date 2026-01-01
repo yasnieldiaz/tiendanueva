@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 interface Category {
   id: string;
@@ -15,6 +16,12 @@ interface Category {
 interface Brand {
   id: string;
   name: string;
+}
+
+interface ProductImage {
+  id: string;
+  url: string;
+  position: number;
 }
 
 export default function EditProductPage({
@@ -29,13 +36,13 @@ export default function EditProductPage({
   const [fetching, setFetching] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [images, setImages] = useState<string[]>([]);
   const [form, setForm] = useState({
     name: "",
     slug: "",
     description: "",
     price: "",
     stock: "",
-    image: "",
     categoryId: "",
     brandId: "",
     featured: false,
@@ -58,11 +65,14 @@ export default function EditProductPage({
             description: product.description || "",
             price: product.price.toString(),
             stock: product.stock.toString(),
-            image: product.image || "",
             categoryId: product.categoryId || "",
             brandId: product.brandId || "",
-            featured: product.featured,
+            featured: product.isFeatured || false,
           });
+          // Set images from product.images array
+          if (product.images && product.images.length > 0) {
+            setImages(product.images.map((img: ProductImage) => img.url));
+          }
         }
         if (catRes.ok) {
           const data = await catRes.json();
@@ -89,7 +99,10 @@ export default function EditProductPage({
       const res = await fetch(`/api/admin/products/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          images: images, // Array of image URLs
+        }),
       });
 
       if (res.ok) {
@@ -185,14 +198,12 @@ export default function EditProductPage({
 
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Image (Emoji or URL)
+                  Imágenes del producto
                 </label>
-                <input
-                  type="text"
-                  value={form.image}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
-                  className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
-                  placeholder="🛸 or https://..."
+                <ImageUpload
+                  value={images}
+                  onChange={setImages}
+                  maxImages={5}
                 />
               </div>
             </div>

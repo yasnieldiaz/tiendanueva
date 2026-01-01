@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { sendShippingConfirmationEmail } from "@/lib/email";
+import { notifyOrderShipped } from "@/lib/notifications";
 
 export async function POST(
   request: Request,
@@ -16,7 +16,7 @@ export async function POST(
     }
 
     const { id } = await params;
-    const { trackingNumber, carrier, sendEmail } = await request.json();
+    const { trackingNumber, carrier, sendNotification = true } = await request.json();
 
     if (!trackingNumber || !carrier) {
       return NextResponse.json(
@@ -47,23 +47,23 @@ export async function POST(
       include: { items: true },
     });
 
-    // Send shipping confirmation email if requested
-    if (sendEmail && order.shippingAddress) {
+    // Send shipping notification (email + SMS) if requested
+    if (sendNotification && order.shippingAddress) {
       try {
         const shippingAddress = JSON.parse(order.shippingAddress);
-        const customerEmail = shippingAddress.email;
 
-        if (customerEmail) {
-          await sendShippingConfirmationEmail(
-            customerEmail,
-            order.orderNumber,
-            trackingNumber,
-            carrier
-          );
-        }
-      } catch (emailError) {
-        console.error("Error sending shipping email:", emailError);
-        // Don't fail the request if email fails
+        await notifyOrderShipped({
+          orderNumber: order.orderNumber,
+          customerName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+          customerEmail: shippingAddress.email,
+          customerPhone: shippingAddress.phone,
+          total: order.total,
+          trackingNumber,
+          carrier,
+        });
+      } catch (notifyError) {
+        console.error("Error sending shipping notification:", notifyError);
+        // Don't fail the request if notification fails
       }
     }
 

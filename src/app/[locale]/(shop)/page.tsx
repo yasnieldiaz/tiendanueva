@@ -286,9 +286,10 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
+                  className="h-full"
                 >
-                  <Link href={`/${locale}/product/${product.slug}`}>
-                    <div className="group bg-neutral-50 rounded-2xl p-4 hover:bg-neutral-100 transition-colors cursor-pointer">
+                  <Link href={`/${locale}/product/${product.slug}`} className="h-full block">
+                    <div className="group bg-neutral-50 rounded-2xl p-4 hover:bg-neutral-100 transition-colors cursor-pointer h-full flex flex-col">
                       <div className="aspect-square relative mb-4 flex items-center justify-center bg-white rounded-xl overflow-hidden">
                         {product.images && product.images.length > 0 ? (
                           <Image
@@ -322,38 +323,40 @@ export default function HomePage() {
                           </div>
                         )}
                       </div>
-                      <h3 className="font-semibold text-neutral-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm">
-                        {product.name}
-                      </h3>
-                      {product.category && (
-                        <p className="text-xs text-neutral-500 mb-2">{product.category.name}</p>
-                      )}
-                      <div className="flex items-center justify-between">
-                        <span className="text-base font-bold text-neutral-900">
-                          {formatPrice(product.price)}
+                      <div className="flex flex-col flex-grow">
+                        <h3 className="font-semibold text-neutral-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm min-h-[2.5rem]">
+                          {product.name}
+                        </h3>
+                        <span className="text-xs text-neutral-500 h-4">
+                          {product.category?.name || ""}
                         </span>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            if (product.stock > 0) {
-                              addItem({
-                                productId: product.id,
-                                name: product.name,
-                                price: product.price,
-                                quantity: 1,
-                                image: product.images?.[0]?.url,
-                                brand: product.brand?.name,
-                                stock: product.stock,
-                              });
-                            }
-                          }}
-                          disabled={product.stock === 0}
-                          className="px-3 py-1.5 bg-neutral-900 text-white text-xs font-medium rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {product.stock === 0 ? "Sold Out" : tProducts("addToCart")}
-                        </motion.button>
+                        <div className="flex items-center justify-between mt-auto pt-2">
+                          <span className="text-base font-bold text-neutral-900">
+                            {formatPrice(product.price)}
+                          </span>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              if (product.stock > 0) {
+                                addItem({
+                                  productId: product.id,
+                                  name: product.name,
+                                  price: product.price,
+                                  quantity: 1,
+                                  image: product.images?.[0]?.url,
+                                  brand: product.brand?.name,
+                                  stock: product.stock,
+                                });
+                              }
+                            }}
+                            disabled={product.stock === 0}
+                            className="px-3 py-1.5 bg-neutral-900 text-white text-xs font-medium rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {product.stock === 0 ? "Sold Out" : tProducts("addToCart")}
+                          </motion.button>
+                        </div>
                       </div>
                     </div>
                   </Link>

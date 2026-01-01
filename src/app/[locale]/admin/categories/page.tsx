@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Edit2, Trash2, Tags, X, Save } from "lucide-react";
+import { useLocale } from "next-intl";
 
 interface Category {
   id: string;
@@ -18,7 +19,91 @@ interface Brand {
   _count: { products: number };
 }
 
+// Translations for this page
+const translations = {
+  es: {
+    title: "Categorías y Marcas",
+    subtitle: "Organiza tus productos",
+    categories: "Categorías",
+    brands: "Marcas",
+    noCategories: "No hay categorías",
+    noBrands: "No hay marcas",
+    products: "productos",
+    createCategory: "Crear Categoría",
+    editCategory: "Editar Categoría",
+    createBrand: "Crear Marca",
+    editBrand: "Editar Marca",
+    name: "Nombre",
+    slug: "Slug",
+    enterName: "Ingresa el nombre",
+    urlSlug: "url-slug",
+    cancel: "Cancelar",
+    save: "Guardar",
+    deleteCategory: "¿Eliminar Categoría?",
+    deleteBrand: "¿Eliminar Marca?",
+    deleteWarning: "Esta acción no se puede deshacer. Los productos que usan esta",
+    category: "categoría",
+    brand: "marca",
+    willBeUnassigned: "serán desasignados.",
+    delete: "Eliminar",
+  },
+  en: {
+    title: "Categories & Brands",
+    subtitle: "Organize your products",
+    categories: "Categories",
+    brands: "Brands",
+    noCategories: "No categories yet",
+    noBrands: "No brands yet",
+    products: "products",
+    createCategory: "Create Category",
+    editCategory: "Edit Category",
+    createBrand: "Create Brand",
+    editBrand: "Edit Brand",
+    name: "Name",
+    slug: "Slug",
+    enterName: "Enter name",
+    urlSlug: "url-slug",
+    cancel: "Cancel",
+    save: "Save",
+    deleteCategory: "Delete Category?",
+    deleteBrand: "Delete Brand?",
+    deleteWarning: "This action cannot be undone. Products using this",
+    category: "category",
+    brand: "brand",
+    willBeUnassigned: "will be unassigned.",
+    delete: "Delete",
+  },
+  pl: {
+    title: "Kategorie i Marki",
+    subtitle: "Organizuj swoje produkty",
+    categories: "Kategorie",
+    brands: "Marki",
+    noCategories: "Brak kategorii",
+    noBrands: "Brak marek",
+    products: "produktów",
+    createCategory: "Utwórz Kategorię",
+    editCategory: "Edytuj Kategorię",
+    createBrand: "Utwórz Markę",
+    editBrand: "Edytuj Markę",
+    name: "Nazwa",
+    slug: "Slug",
+    enterName: "Wprowadź nazwę",
+    urlSlug: "url-slug",
+    cancel: "Anuluj",
+    save: "Zapisz",
+    deleteCategory: "Usunąć Kategorię?",
+    deleteBrand: "Usunąć Markę?",
+    deleteWarning: "Tej czynności nie można cofnąć. Produkty korzystające z tej",
+    category: "kategorii",
+    brand: "marki",
+    willBeUnassigned: "zostaną odłączone.",
+    delete: "Usuń",
+  },
+};
+
 export default function AdminCategoriesPage() {
+  const locale = useLocale();
+  const t = translations[locale as keyof typeof translations] || translations.es;
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
@@ -151,15 +236,15 @@ export default function AdminCategoriesPage() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-neutral-900">Categories & Brands</h1>
-        <p className="text-neutral-500 mt-1">Manage product organization</p>
+        <h1 className="text-3xl font-bold text-neutral-900">{t.title}</h1>
+        <p className="text-neutral-500 mt-1">{t.subtitle}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Categories */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6 border-b border-neutral-100 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-neutral-900">Categories</h2>
+            <h2 className="text-lg font-bold text-neutral-900">{t.categories}</h2>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -180,7 +265,7 @@ export default function AdminCategoriesPage() {
           {categories.length === 0 ? (
             <div className="p-8 text-center">
               <Tags className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
-              <p className="text-neutral-500">No categories yet</p>
+              <p className="text-neutral-500">{t.noCategories}</p>
             </div>
           ) : (
             <div className="divide-y divide-neutral-100">
@@ -197,7 +282,7 @@ export default function AdminCategoriesPage() {
                       {category.name}
                     </p>
                     <p className="text-sm text-neutral-500">
-                      {category._count.products} products
+                      {category._count.products} {t.products}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -233,7 +318,7 @@ export default function AdminCategoriesPage() {
         {/* Brands */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6 border-b border-neutral-100 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-neutral-900">Brands</h2>
+            <h2 className="text-lg font-bold text-neutral-900">{t.brands}</h2>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -254,7 +339,7 @@ export default function AdminCategoriesPage() {
           {brands.length === 0 ? (
             <div className="p-8 text-center">
               <Tags className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
-              <p className="text-neutral-500">No brands yet</p>
+              <p className="text-neutral-500">{t.noBrands}</p>
             </div>
           ) : (
             <div className="divide-y divide-neutral-100">
@@ -269,7 +354,7 @@ export default function AdminCategoriesPage() {
                   <div>
                     <p className="font-medium text-neutral-900">{brand.name}</p>
                     <p className="text-sm text-neutral-500">
-                      {brand._count.products} products
+                      {brand._count.products} {t.products}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -313,8 +398,13 @@ export default function AdminCategoriesPage() {
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-neutral-900">
-                {editModal.mode === "create" ? "Create" : "Edit"}{" "}
-                {editModal.type === "category" ? "Category" : "Brand"}
+                {editModal.type === "category"
+                  ? editModal.mode === "create"
+                    ? t.createCategory
+                    : t.editCategory
+                  : editModal.mode === "create"
+                  ? t.createBrand
+                  : t.editBrand}
               </h3>
               <button
                 onClick={() => setEditModal(null)}
@@ -327,7 +417,7 @@ export default function AdminCategoriesPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Name
+                  {t.name}
                 </label>
                 <input
                   type="text"
@@ -343,13 +433,13 @@ export default function AdminCategoriesPage() {
                     })
                   }
                   className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
-                  placeholder="Enter name"
+                  placeholder={t.enterName}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Slug
+                  {t.slug}
                 </label>
                 <input
                   type="text"
@@ -358,7 +448,7 @@ export default function AdminCategoriesPage() {
                     setEditModal({ ...editModal, slug: e.target.value })
                   }
                   className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
-                  placeholder="url-slug"
+                  placeholder={t.urlSlug}
                 />
               </div>
             </div>
@@ -368,7 +458,7 @@ export default function AdminCategoriesPage() {
                 onClick={() => setEditModal(null)}
                 className="flex-1 py-3 px-4 bg-neutral-100 text-neutral-700 rounded-xl font-medium hover:bg-neutral-200"
               >
-                Cancel
+                {t.cancel}
               </button>
               <button
                 onClick={handleSave}
@@ -380,7 +470,7 @@ export default function AdminCategoriesPage() {
                 ) : (
                   <>
                     <Save className="w-4 h-4" />
-                    Save
+                    {t.save}
                   </>
                 )}
               </button>
@@ -398,24 +488,25 @@ export default function AdminCategoriesPage() {
             className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4"
           >
             <h3 className="text-lg font-bold text-neutral-900 mb-2">
-              Delete {deleteModal.type === "category" ? "Category" : "Brand"}?
+              {deleteModal.type === "category" ? t.deleteCategory : t.deleteBrand}
             </h3>
             <p className="text-neutral-500 mb-6">
-              This action cannot be undone. Products using this{" "}
-              {deleteModal.type} will be unassigned.
+              {t.deleteWarning}{" "}
+              {deleteModal.type === "category" ? t.category : t.brand}{" "}
+              {t.willBeUnassigned}
             </p>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setDeleteModal(null)}
                 className="flex-1 py-2 px-4 bg-neutral-100 text-neutral-700 rounded-xl font-medium hover:bg-neutral-200"
               >
-                Cancel
+                {t.cancel}
               </button>
               <button
                 onClick={handleDelete}
                 className="flex-1 py-2 px-4 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700"
               >
-                Delete
+                {t.delete}
               </button>
             </div>
           </motion.div>

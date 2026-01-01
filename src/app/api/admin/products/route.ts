@@ -34,6 +34,7 @@ export async function GET(request: Request) {
         include: {
           category: { select: { name: true } },
           brand: { select: { name: true } },
+          images: { orderBy: { position: "asc" } },
         },
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
@@ -79,8 +80,10 @@ export async function POST(request: Request) {
       brandId,
       featured,
       isFeatured,
+      images = [],
     } = body;
 
+    // Create product with images in a transaction
     const product = await prisma.product.create({
       data: {
         name,
@@ -91,6 +94,16 @@ export async function POST(request: Request) {
         categoryId: categoryId || null,
         brandId: brandId || null,
         isFeatured: isFeatured ?? featured ?? false,
+        // Create ProductImage records for each uploaded image
+        images: {
+          create: images.map((url: string, index: number) => ({
+            url,
+            position: index,
+          })),
+        },
+      },
+      include: {
+        images: true,
       },
     });
 

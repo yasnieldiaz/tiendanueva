@@ -400,12 +400,13 @@ export default function ProductsPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
+                    className="h-full"
                   >
-                    <Link href={`/${locale}/product/${product.slug}`}>
+                    <Link href={`/${locale}/product/${product.slug}`} className="h-full block">
                       <div
-                        className={`group ${
+                        className={`group h-full ${
                           viewMode === "grid"
-                            ? "bg-neutral-50 rounded-2xl p-4 hover:bg-neutral-100"
+                            ? "bg-neutral-50 rounded-2xl p-4 hover:bg-neutral-100 flex flex-col"
                             : "flex gap-6 bg-neutral-50 rounded-xl p-4 hover:bg-neutral-100"
                         } transition-colors cursor-pointer`}
                       >
@@ -450,13 +451,11 @@ export default function ProductsPage() {
                         </div>
 
                         {/* Content */}
-                        <div className={viewMode === "list" ? "flex-1" : ""}>
-                          {product.category && (
-                            <span className="text-xs text-neutral-400 font-medium">
-                              {product.category.name}
-                            </span>
-                          )}
-                          <h3 className="font-semibold text-neutral-900 mt-1 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm">
+                        <div className={viewMode === "list" ? "flex-1" : "flex flex-col flex-grow"}>
+                          <span className="text-xs text-neutral-400 font-medium h-4">
+                            {product.category?.name || ""}
+                          </span>
+                          <h3 className="font-semibold text-neutral-900 mt-1 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm min-h-[2.5rem]">
                             {product.name}
                           </h3>
                           {viewMode === "list" && product.description && (
@@ -464,7 +463,7 @@ export default function ProductsPage() {
                               {product.description}
                             </p>
                           )}
-                          <div className="flex items-center justify-between mt-3">
+                          <div className="flex items-center justify-between mt-auto pt-3">
                             <div>
                               <span className="text-base font-bold text-neutral-900">
                                 {formatPrice(product.price)}

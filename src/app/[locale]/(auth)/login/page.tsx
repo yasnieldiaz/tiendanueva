@@ -187,25 +187,115 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Visual */}
-      <div className="hidden lg:flex flex-1 bg-neutral-900 items-center justify-center p-16">
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-50 via-white to-orange-50 items-center justify-center p-16">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
           className="relative"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-orange-400/20 rounded-full blur-3xl" />
           <motion.div
             animate={{ y: [-10, 10, -10] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="relative w-80 h-80 bg-neutral-800 rounded-3xl flex items-center justify-center border border-neutral-700"
+            className="relative w-80 h-80 bg-white rounded-3xl flex items-center justify-center border border-neutral-200 shadow-2xl"
           >
-            <span className="text-[100px]">🛸</span>
+            {/* Animated Drone SVG - Light Style */}
+            <svg width="180" height="180" viewBox="0 0 200 200" className="drop-shadow-2xl">
+              {/* Drone Body - White/Light Gray */}
+              <ellipse cx="100" cy="110" rx="35" ry="15" fill="#E5E7EB" />
+              <ellipse cx="100" cy="105" rx="30" ry="12" fill="#F3F4F6" />
+              <rect x="85" y="95" width="30" height="20" rx="5" fill="#FFFFFF" stroke="#D1D5DB" strokeWidth="1" />
+
+              {/* Camera - Blue accent */}
+              <circle cx="100" cy="120" r="8" fill="#1E40AF" />
+              <circle cx="100" cy="120" r="5" fill="#3B82F6" />
+              <circle cx="98" cy="118" r="2" fill="#BFDBFE" />
+
+              {/* Arms - Light gray */}
+              <line x1="70" y1="100" x2="30" y2="70" stroke="#D1D5DB" strokeWidth="6" strokeLinecap="round" />
+              <line x1="130" y1="100" x2="170" y2="70" stroke="#D1D5DB" strokeWidth="6" strokeLinecap="round" />
+              <line x1="70" y1="110" x2="30" y2="140" stroke="#D1D5DB" strokeWidth="6" strokeLinecap="round" />
+              <line x1="130" y1="110" x2="170" y2="140" stroke="#D1D5DB" strokeWidth="6" strokeLinecap="round" />
+
+              {/* Orange accent stripes on arms */}
+              <line x1="55" y1="90" x2="45" y2="80" stroke="#F97316" strokeWidth="3" strokeLinecap="round" />
+              <line x1="145" y1="90" x2="155" y2="80" stroke="#F97316" strokeWidth="3" strokeLinecap="round" />
+              <line x1="55" y1="120" x2="45" y2="130" stroke="#F97316" strokeWidth="3" strokeLinecap="round" />
+              <line x1="145" y1="120" x2="155" y2="130" stroke="#F97316" strokeWidth="3" strokeLinecap="round" />
+
+              {/* Motors - White with dark ring */}
+              <circle cx="30" cy="70" r="10" fill="#FFFFFF" stroke="#9CA3AF" strokeWidth="2" />
+              <circle cx="170" cy="70" r="10" fill="#FFFFFF" stroke="#9CA3AF" strokeWidth="2" />
+              <circle cx="30" cy="140" r="10" fill="#FFFFFF" stroke="#9CA3AF" strokeWidth="2" />
+              <circle cx="170" cy="140" r="10" fill="#FFFFFF" stroke="#9CA3AF" strokeWidth="2" />
+
+              {/* Motor centers */}
+              <circle cx="30" cy="70" r="4" fill="#6B7280" />
+              <circle cx="170" cy="70" r="4" fill="#6B7280" />
+              <circle cx="30" cy="140" r="4" fill="#6B7280" />
+              <circle cx="170" cy="140" r="4" fill="#6B7280" />
+
+              {/* Propellers with animation - Transparent/light */}
+              <motion.ellipse
+                cx="30" cy="70" rx="22" ry="5"
+                fill="rgba(59, 130, 246, 0.5)"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 0.1, repeat: Infinity, ease: "linear" }}
+                style={{ transformOrigin: "30px 70px" }}
+              />
+              <motion.ellipse
+                cx="170" cy="70" rx="22" ry="5"
+                fill="rgba(59, 130, 246, 0.5)"
+                animate={{ rotate: -360 }}
+                transition={{ duration: 0.1, repeat: Infinity, ease: "linear" }}
+                style={{ transformOrigin: "170px 70px" }}
+              />
+              <motion.ellipse
+                cx="30" cy="140" rx="22" ry="5"
+                fill="rgba(249, 115, 22, 0.5)"
+                animate={{ rotate: -360 }}
+                transition={{ duration: 0.1, repeat: Infinity, ease: "linear" }}
+                style={{ transformOrigin: "30px 140px" }}
+              />
+              <motion.ellipse
+                cx="170" cy="140" rx="22" ry="5"
+                fill="rgba(249, 115, 22, 0.5)"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 0.1, repeat: Infinity, ease: "linear" }}
+                style={{ transformOrigin: "170px 140px" }}
+              />
+
+              {/* LED Lights - Brighter */}
+              <motion.circle
+                cx="85" cy="100"
+                r="4"
+                fill="#22C55E"
+                animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              />
+              <motion.circle
+                cx="115" cy="100"
+                r="4"
+                fill="#EF4444"
+                animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
+                transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}
+              />
+
+              {/* Shadow under drone */}
+              <ellipse cx="100" cy="165" rx="50" ry="10" fill="#000" opacity="0.1" />
+              <defs>
+                <radialGradient id="glowGradient">
+                  <stop offset="0%" stopColor="#3B82F6" />
+                  <stop offset="100%" stopColor="transparent" />
+                </radialGradient>
+              </defs>
+            </svg>
           </motion.div>
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-8 border border-dashed border-neutral-700 rounded-full"
+            className="absolute -inset-8 border border-dashed border-blue-300/50 rounded-full"
           />
         </motion.div>
       </div>

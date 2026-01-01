@@ -2,8 +2,9 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
 import {
@@ -11,12 +12,49 @@ import {
   Package,
   ShoppingCart,
   Tags,
+  Users,
+  Settings,
   LogOut,
   Menu,
   X,
   ChevronRight,
+  Home,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
+
+// Translations object for admin navigation
+const translations = {
+  es: {
+    dashboard: "Dashboard",
+    products: "Productos",
+    orders: "Pedidos",
+    customers: "Clientes",
+    categories: "Categorías",
+    settings: "Configuración",
+    logout: "Cerrar sesión",
+    goToStore: "Ir a la tienda",
+  },
+  en: {
+    dashboard: "Dashboard",
+    products: "Products",
+    orders: "Orders",
+    customers: "Customers",
+    categories: "Categories",
+    settings: "Settings",
+    logout: "Logout",
+    goToStore: "Go to Store",
+  },
+  pl: {
+    dashboard: "Dashboard",
+    products: "Produkty",
+    orders: "Zamówienia",
+    customers: "Klienci",
+    categories: "Kategorie",
+    settings: "Ustawienia",
+    logout: "Wyloguj się",
+    goToStore: "Idź do sklepu",
+  },
+};
 
 export default function AdminLayout({
   children,
@@ -29,12 +67,16 @@ export default function AdminLayout({
   const locale = useLocale();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const navItems = [
-    { href: `/${locale}/admin`, icon: LayoutDashboard, label: "Dashboard" },
-    { href: `/${locale}/admin/products`, icon: Package, label: "Products" },
-    { href: `/${locale}/admin/orders`, icon: ShoppingCart, label: "Orders" },
-    { href: `/${locale}/admin/categories`, icon: Tags, label: "Categories" },
-  ];
+  const t = translations[locale as keyof typeof translations] || translations.es;
+
+  const navItems = useMemo(() => [
+    { href: `/${locale}/admin`, icon: LayoutDashboard, label: t.dashboard },
+    { href: `/${locale}/admin/products`, icon: Package, label: t.products },
+    { href: `/${locale}/admin/orders`, icon: ShoppingCart, label: t.orders },
+    { href: `/${locale}/admin/customers`, icon: Users, label: t.customers },
+    { href: `/${locale}/admin/categories`, icon: Tags, label: t.categories },
+    { href: `/${locale}/admin/settings`, icon: Settings, label: t.settings },
+  ], [locale, t]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -86,11 +128,17 @@ export default function AdminLayout({
       >
         <div className="p-6">
           <Link href={`/${locale}/admin`} className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-              <span className="text-neutral-900 font-bold">DP</span>
+            <div className="relative w-10 h-10 bg-white rounded-xl overflow-hidden">
+              <Image
+                src="https://drone-partss.com/wp-content/uploads/2024/11/LogoDrone.png"
+                alt="Drone-Partss Logo"
+                fill
+                className="object-contain p-1"
+                sizes="40px"
+              />
             </div>
             <div>
-              <p className="font-semibold">DroneParts</p>
+              <p className="font-semibold">Drone-Partss</p>
               <p className="text-xs text-neutral-400">Admin Panel</p>
             </div>
           </Link>
@@ -118,6 +166,17 @@ export default function AdminLayout({
           })}
         </nav>
 
+        {/* Go to Store Button */}
+        <div className="px-4 mt-6">
+          <Link
+            href={`/${locale}`}
+            className="flex items-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+          >
+            <Home className="w-5 h-5" />
+            <span className="font-medium">{t.goToStore}</span>
+          </Link>
+        </div>
+
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-neutral-800">
           <div className="flex items-center gap-3 px-4 py-3 mb-2">
             <div className="w-8 h-8 bg-neutral-700 rounded-full flex items-center justify-center">
@@ -135,7 +194,7 @@ export default function AdminLayout({
             className="flex items-center gap-3 w-full px-4 py-3 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors"
           >
             <LogOut className="w-5 h-5" />
-            <span className="font-medium">Logout</span>
+            <span className="font-medium">{t.logout}</span>
           </button>
         </div>
       </aside>

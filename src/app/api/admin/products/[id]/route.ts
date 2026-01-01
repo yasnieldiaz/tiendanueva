@@ -24,6 +24,7 @@ export async function GET(
       include: {
         category: true,
         brand: true,
+        images: { orderBy: { position: "asc" } },
       },
     });
 
@@ -70,20 +71,39 @@ export async function PUT(
       brandId,
       featured,
       isFeatured,
+      images = [],
     } = body;
 
-    const product = await prisma.product.update({
-      where: { id },
-      data: {
-        name,
-        slug,
-        description,
-        price: parseFloat(price),
-        stock: parseInt(stock),
-        categoryId: categoryId || null,
-        brandId: brandId || null,
-        isFeatured: isFeatured ?? featured ?? false,
-      },
+    // Update product and images in a transaction
+    const product = await prisma.$transaction(async (tx) => {
+      // Delete existing images
+      await tx.productImage.deleteMany({
+        where: { productId: id },
+      });
+
+      // Update product and create new images
+      return tx.product.update({
+        where: { id },
+        data: {
+          name,
+          slug,
+          description,
+          price: parseFloat(price),
+          stock: parseInt(stock),
+          categoryId: categoryId || null,
+          brandId: brandId || null,
+          isFeatured: isFeatured ?? featured ?? false,
+          images: {
+            create: images.map((url: string, index: number) => ({
+              url,
+              position: index,
+            })),
+          },
+        },
+        include: {
+          images: { orderBy: { position: "asc" } },
+        },
+      });
     });
 
     return NextResponse.json(product);

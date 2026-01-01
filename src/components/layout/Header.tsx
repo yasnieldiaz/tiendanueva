@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
@@ -18,10 +19,21 @@ import {
   Settings,
   Package,
   Grid3X3,
+  Phone,
 } from "lucide-react";
 import { useCart } from "@/store/cart";
 import LanguageSelector from "./LanguageSelector";
 import CurrencySelector from "./CurrencySelector";
+
+// Main navigation menu items
+const mainNavItems = [
+  { name: "Home", href: "", isHome: true },
+  { name: "Serwis", href: "/service" },
+  { name: "Kontakt", href: "/contact" },
+  { name: "Dostawa I Zwrot", href: "/legal/shipping" },
+  { name: "Regulamin", href: "/legal/terms" },
+  { name: "Prywatność", href: "/legal/privacy" },
+];
 
 // Menu categories structure based on drone-partss.com
 const menuCategories = [
@@ -147,6 +159,14 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Check if current path matches nav item
+  const isNavActive = (href: string, isHome?: boolean) => {
+    if (isHome) {
+      return pathname === `/${locale}` || pathname === `/${locale}/`;
+    }
+    return pathname.startsWith(`/${locale}${href}`);
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-white shadow-sm">
       {/* Top Bar */}
@@ -155,28 +175,35 @@ export default function Header() {
           <div className="flex items-center gap-4">
             <span>Bezpłatna dostawa od 5000 zł</span>
             <span className="hidden sm:inline">|</span>
-            <span className="hidden sm:inline">Gwarancja 2 lata</span>
+            <span className="hidden sm:inline">Ekonomiczne wysyłki do Europy</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href={`/${locale}/contact`} className="hover:text-neutral-300">
-              Kontakt
-            </Link>
-            <Link href={`/${locale}/service`} className="hover:text-neutral-300">
-              Serwis
-            </Link>
+            <a href="tel:+48784608733" className="flex items-center gap-1 hover:text-neutral-300">
+              <Phone className="w-3 h-3" />
+              +48 784-608-733
+            </a>
           </div>
         </div>
       </div>
 
       {/* Main Header */}
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href={`/${locale}`} className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold">DP</span>
+          <Link href={`/${locale}`} className="flex items-center gap-3">
+            <div className="relative w-12 h-12">
+              <Image
+                src="https://drone-partss.com/wp-content/uploads/2024/11/LogoDrone.png"
+                alt="Drone-Partss Logo"
+                fill
+                className="object-contain"
+                sizes="48px"
+              />
             </div>
-            <span className="font-bold text-xl hidden sm:block">DroneParts</span>
+            <div className="hidden sm:block">
+              <span className="font-bold text-lg text-neutral-900">Drone-Partss</span>
+              <p className="text-xs text-neutral-500">Oficjalny dystrybutor XAG</p>
+            </div>
           </Link>
 
           {/* Search Bar - Desktop */}
@@ -339,10 +366,10 @@ export default function Header() {
         </AnimatePresence>
       </div>
 
-      {/* Categories Navigation */}
-      <div className="hidden lg:block border-t border-neutral-200 bg-neutral-50">
+      {/* Main Navigation Menu - Pill Style with Categories */}
+      <div className="hidden lg:block border-t border-neutral-200 bg-slate-100" ref={categoriesRef}>
         <div className="container mx-auto px-4">
-          <div className="flex items-center gap-6 h-12" ref={categoriesRef}>
+          <div className="flex items-center gap-6 py-3">
             {/* All Categories Dropdown */}
             <div className="relative">
               <button
@@ -406,43 +433,23 @@ export default function Header() {
               </AnimatePresence>
             </div>
 
-            {/* Quick Links */}
-            <Link
-              href={`/${locale}`}
-              className="text-sm text-neutral-600 hover:text-blue-600 font-medium"
-            >
-              Strona główna
-            </Link>
-            <Link
-              href={`/${locale}/products?category=xag`}
-              className="text-sm text-neutral-600 hover:text-blue-600 font-medium"
-            >
-              XAG Drony Rolnicze
-            </Link>
-            <Link
-              href={`/${locale}/products?category=dji-mavic-4`}
-              className="text-sm text-neutral-600 hover:text-blue-600 font-medium"
-            >
-              DJI Mavic 4
-            </Link>
-            <Link
-              href={`/${locale}/products?category=dji-mini-5-pro`}
-              className="text-sm text-neutral-600 hover:text-blue-600 font-medium"
-            >
-              DJI Mini 5 Pro
-            </Link>
-            <Link
-              href={`/${locale}/products?category=autel-max-4t`}
-              className="text-sm text-neutral-600 hover:text-blue-600 font-medium"
-            >
-              Autel Max 4T
-            </Link>
-            <Link
-              href={`/${locale}/products`}
-              className="text-sm text-red-600 hover:text-red-700 font-medium"
-            >
-              Promocje
-            </Link>
+            {/* Main Nav Items - Pill Style */}
+            {mainNavItems.map((item) => {
+              const isActive = isNavActive(item.href, item.isHome);
+              return (
+                <Link
+                  key={item.name}
+                  href={item.isHome ? `/${locale}` : `/${locale}${item.href}`}
+                  className={`px-5 py-2 text-sm font-medium rounded-full transition-all ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700"
+                      : "text-neutral-700 hover:bg-neutral-200"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -457,13 +464,24 @@ export default function Header() {
             className="lg:hidden border-t border-neutral-200 overflow-hidden bg-white"
           >
             <nav className="py-4 px-4 space-y-1 max-h-[70vh] overflow-y-auto">
-              <Link
-                href={`/${locale}`}
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 text-neutral-900 font-medium hover:bg-neutral-50 rounded-lg"
-              >
-                Strona główna
-              </Link>
+              {/* Main Navigation */}
+              {mainNavItems.map((item) => {
+                const isActive = isNavActive(item.href, item.isHome);
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.isHome ? `/${locale}` : `/${locale}${item.href}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`block px-4 py-3 rounded-lg font-medium ${
+                      isActive
+                        ? "bg-blue-100 text-blue-700"
+                        : "text-neutral-700 hover:bg-neutral-50"
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                );
+              })}
 
               <div className="border-t border-neutral-100 my-2"></div>
               <p className="px-4 py-2 text-xs font-semibold text-neutral-400 uppercase">Kategorie</p>
@@ -493,23 +511,6 @@ export default function Header() {
                   )}
                 </div>
               ))}
-
-              <div className="border-t border-neutral-100 my-2"></div>
-
-              <Link
-                href={`/${locale}/contact`}
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-2.5 text-neutral-700 hover:bg-neutral-50 rounded-lg"
-              >
-                Kontakt
-              </Link>
-              <Link
-                href={`/${locale}/service`}
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-2.5 text-neutral-700 hover:bg-neutral-50 rounded-lg"
-              >
-                Serwis
-              </Link>
 
               {!session && (
                 <>

@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { notifyNewOrder } from "@/lib/notifications";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder", {
   apiVersion: "2025-12-15.clover",
@@ -104,6 +105,20 @@ export async function POST(request: Request) {
         orderId: order.id,
       },
     });
+
+    // Send new order notification (email + SMS)
+    try {
+      await notifyNewOrder({
+        orderNumber,
+        customerName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+        customerEmail: shippingAddress.email,
+        customerPhone: shippingAddress.phone,
+        total,
+      });
+    } catch (notifyError) {
+      console.error("Error sending order notification:", notifyError);
+      // Don't fail the request if notification fails
+    }
 
     return NextResponse.json({
       sessionId: stripeSession.id,

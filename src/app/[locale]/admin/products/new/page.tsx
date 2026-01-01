@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 interface Category {
   id: string;
@@ -23,13 +24,13 @@ export default function NewProductPage() {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [images, setImages] = useState<string[]>([]);
   const [form, setForm] = useState({
     name: "",
     slug: "",
     description: "",
     price: "",
     stock: "",
-    image: "",
     categoryId: "",
     brandId: "",
     featured: false,
@@ -68,7 +69,10 @@ export default function NewProductPage() {
       const res = await fetch("/api/admin/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          images: images, // Array of image URLs
+        }),
       });
 
       if (res.ok) {
@@ -159,14 +163,12 @@ export default function NewProductPage() {
 
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Image (Emoji or URL)
+                  Imágenes del producto
                 </label>
-                <input
-                  type="text"
-                  value={form.image}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
-                  className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
-                  placeholder="🛸 or https://..."
+                <ImageUpload
+                  value={images}
+                  onChange={setImages}
+                  maxImages={5}
                 />
               </div>
             </div>
