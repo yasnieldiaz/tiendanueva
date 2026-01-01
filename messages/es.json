@@ -156,8 +156,11 @@
     "back": "Volver",
     "next": "Siguiente",
     "previous": "Anterior",
-    "search": "Buscar",
+    "search": "Buscar...",
     "noResults": "Sin resultados",
-    "viewAll": "Ver todos"
+    "viewAll": "Ver todos",
+    "home": "Inicio",
+    "products": "Productos",
+    "login": "Iniciar sesión"
   }
 }

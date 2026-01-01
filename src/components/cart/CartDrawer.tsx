@@ -1,13 +1,14 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { X, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "@/store/cart";
 
 export default function CartDrawer() {
   const t = useTranslations("cart");
+  const locale = useLocale();
   const { items, isOpen, closeCart, updateQuantity, removeItem, getTotalPrice } = useCart();
 
   const subtotal = getTotalPrice();
@@ -134,7 +135,7 @@ export default function CartDrawer() {
 
                 {/* Actions */}
                 <div className="space-y-3">
-                  <Link href="/checkout" onClick={closeCart}>
+                  <Link href={`/${locale}/checkout`} onClick={closeCart}>
                     <motion.button
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
@@ -143,7 +144,7 @@ export default function CartDrawer() {
                       {t("checkout")}
                     </motion.button>
                   </Link>
-                  <Link href="/cart" onClick={closeCart}>
+                  <Link href={`/${locale}/cart`} onClick={closeCart}>
                     <button className="w-full py-3 text-neutral-700 font-medium hover:text-neutral-900 transition-colors">
                       View Cart
                     </button>

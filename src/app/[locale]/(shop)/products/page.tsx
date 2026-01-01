@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Search,
   SlidersHorizontal,
@@ -15,6 +16,8 @@ import {
   ArrowLeft,
   Loader2,
 } from "lucide-react";
+import { useCurrency } from "@/store/currency";
+import { useCart } from "@/store/cart";
 
 interface Product {
   id: string;
@@ -54,6 +57,9 @@ const sortOptions = [
 export default function ProductsPage() {
   const t = useTranslations("products");
   const tNav = useTranslations("nav");
+  const locale = useLocale();
+  const { formatPrice } = useCurrency();
+  const { addItem } = useCart();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -395,11 +401,11 @@ export default function ProductsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
                   >
-                    <Link href={`/product/${product.slug}`}>
+                    <Link href={`/${locale}/product/${product.slug}`}>
                       <div
                         className={`group ${
                           viewMode === "grid"
-                            ? "bg-neutral-50 rounded-2xl p-5 hover:bg-neutral-100"
+                            ? "bg-neutral-50 rounded-2xl p-4 hover:bg-neutral-100"
                             : "flex gap-6 bg-neutral-50 rounded-xl p-4 hover:bg-neutral-100"
                         } transition-colors cursor-pointer`}
                       >
@@ -409,14 +415,24 @@ export default function ProductsPage() {
                             viewMode === "grid"
                               ? "aspect-square mb-4"
                               : "w-32 h-32 flex-shrink-0"
-                          } bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-xl flex items-center justify-center relative overflow-hidden`}
+                          } bg-white rounded-xl flex items-center justify-center relative overflow-hidden`}
                         >
-                          <motion.span
-                            className="text-5xl"
-                            whileHover={{ scale: 1.1 }}
-                          >
-                            🛸
-                          </motion.span>
+                          {product.images && product.images.length > 0 ? (
+                            <Image
+                              src={product.images[0].url}
+                              alt={product.images[0].alt || product.name}
+                              fill
+                              className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                              sizes="(max-width: 768px) 50vw, 33vw"
+                            />
+                          ) : (
+                            <motion.span
+                              className="text-5xl"
+                              whileHover={{ scale: 1.1 }}
+                            >
+                              🛸
+                            </motion.span>
+                          )}
                           {product.stock === 0 && (
                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                               <span className="text-white text-sm font-medium">
@@ -440,7 +456,7 @@ export default function ProductsPage() {
                               {product.category.name}
                             </span>
                           )}
-                          <h3 className="font-semibold text-neutral-900 mt-1 group-hover:text-blue-600 transition-colors line-clamp-2">
+                          <h3 className="font-semibold text-neutral-900 mt-1 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm">
                             {product.name}
                           </h3>
                           {viewMode === "list" && product.description && (
@@ -450,22 +466,33 @@ export default function ProductsPage() {
                           )}
                           <div className="flex items-center justify-between mt-3">
                             <div>
-                              <span className="text-lg font-bold text-neutral-900">
-                                €{product.price.toFixed(2)}
+                              <span className="text-base font-bold text-neutral-900">
+                                {formatPrice(product.price)}
                               </span>
                               {product.comparePrice && (
                                 <span className="ml-2 text-sm text-neutral-400 line-through">
-                                  €{product.comparePrice.toFixed(2)}
+                                  {formatPrice(product.comparePrice)}
                                 </span>
                               )}
                             </div>
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              className="p-2.5 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 transition-colors"
+                              className="p-2 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-50"
+                              disabled={product.stock === 0}
                               onClick={(e) => {
                                 e.preventDefault();
-                                // Add to cart logic
+                                if (product.stock > 0) {
+                                  addItem({
+                                    productId: product.id,
+                                    name: product.name,
+                                    price: product.price,
+                                    quantity: 1,
+                                    image: product.images?.[0]?.url,
+                                    brand: product.brand?.name,
+                                    stock: product.stock,
+                                  });
+                                }
                               }}
                             >
                               <ShoppingCart className="w-4 h-4" />
