@@ -1,86 +1,144 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations, useLocale } from "next-intl";
-import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { useLocale } from "next-intl";
+import { Mail, Phone, MapPin, Facebook, Instagram, Youtube, Shield, Truck, RotateCcw } from "lucide-react";
 
 export default function Footer() {
-  const t = useTranslations("footer");
   const locale = useLocale();
 
-  const productLinks = [
-    { href: `/${locale}/products?category=drones`, label: "Drones" },
-    { href: `/${locale}/products?category=batteries`, label: "Batteries" },
-    { href: `/${locale}/products?category=propellers`, label: "Propellers" },
-    { href: `/${locale}/products?category=cameras`, label: "Cameras" },
-    { href: `/${locale}/products?category=accessories`, label: "Accessories" },
+  const categoryLinks = [
+    { href: `/${locale}/products?category=xag`, label: "XAG Drony Rolnicze" },
+    { href: `/${locale}/products?category=dji-mavic-4`, label: "DJI Mavic 4" },
+    { href: `/${locale}/products?category=dji-mini-5-pro`, label: "DJI Mini 5 Pro" },
+    { href: `/${locale}/products?category=dji-mavic-3-enterprise`, label: "DJI Enterprise" },
+    { href: `/${locale}/products?category=autel-max-4t`, label: "Autel Max 4T" },
+    { href: `/${locale}/products?category=akcesoria`, label: "Akcesoria" },
   ];
 
   const supportLinks = [
-    { href: `/${locale}/shipping`, label: t("shipping") },
-    { href: `/${locale}/returns`, label: t("returns") },
-    { href: `/${locale}/contact`, label: t("contact") },
+    { href: `/${locale}/legal/shipping`, label: "Dostawa i zwrot" },
+    { href: `/${locale}/service`, label: "Serwis" },
+    { href: `/${locale}/contact`, label: "Kontakt" },
+    { href: `/${locale}/faq`, label: "FAQ" },
   ];
 
-  const companyLinks = [
-    { href: `/${locale}/about`, label: t("aboutUs") },
-    { href: `/${locale}/privacy`, label: t("privacy") },
-    { href: `/${locale}/terms`, label: t("terms") },
+  const legalLinks = [
+    { href: `/${locale}/legal/terms`, label: "Regulamin" },
+    { href: `/${locale}/legal/privacy`, label: "Polityka prywatności" },
+    { href: `/${locale}/legal/cookies`, label: "Polityka cookies" },
+    { href: `/${locale}/legal/returns`, label: "Zwroty i reklamacje" },
   ];
 
   return (
     <footer className="bg-neutral-900 text-white">
+      {/* Trust Badges */}
+      <div className="border-b border-neutral-800">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-neutral-800 rounded-xl">
+                <Truck className="w-6 h-6 text-green-400" />
+              </div>
+              <div>
+                <p className="font-semibold">Bezpłatna dostawa</p>
+                <p className="text-sm text-neutral-400">Przy zamówieniach od 500 zł</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-neutral-800 rounded-xl">
+                <Shield className="w-6 h-6 text-blue-400" />
+              </div>
+              <div>
+                <p className="font-semibold">Gwarancja 2 lata</p>
+                <p className="text-sm text-neutral-400">Na wszystkie produkty</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-neutral-800 rounded-xl">
+                <RotateCcw className="w-6 h-6 text-orange-400" />
+              </div>
+              <div>
+                <p className="font-semibold">14 dni na zwrot</p>
+                <p className="text-sm text-neutral-400">Zgodnie z prawem UE</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Footer */}
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand */}
-          <div>
+          <div className="lg:col-span-2">
             <Link href={`/${locale}`} className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
                 <span className="text-neutral-900 font-bold text-lg">DP</span>
               </div>
               <span className="font-bold text-xl">DroneParts</span>
             </Link>
-            <p className="text-neutral-400 mb-6 leading-relaxed">
-              {t("description")}
+            <p className="text-neutral-400 mb-6 leading-relaxed max-w-md">
+              Twój zaufany dostawca profesjonalnych dronów i akcesoriów.
+              Oferujemy najwyższej jakości produkty DJI, XAG i Autel z pełną gwarancją i wsparciem technicznym.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 mb-6">
               <a
-                href="#"
-                className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors"
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors"
               >
                 <Facebook className="w-5 h-5" />
               </a>
               <a
-                href="#"
-                className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors"
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-pink-600 transition-colors"
               >
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href="#"
-                className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors"
+                href="https://youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors"
               >
                 <Youtube className="w-5 h-5" />
               </a>
             </div>
+
+            {/* Contact Info */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <MapPin className="w-4 h-4 text-neutral-500" />
+                <span className="text-neutral-400 text-sm">ul. Przykładowa 123, 00-001 Warszawa</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Phone className="w-4 h-4 text-neutral-500" />
+                <a href="tel:+48123456789" className="text-neutral-400 text-sm hover:text-white">
+                  +48 123 456 789
+                </a>
+              </div>
+              <div className="flex items-center gap-3">
+                <Mail className="w-4 h-4 text-neutral-500" />
+                <a href="mailto:info@drone-partss.com" className="text-neutral-400 text-sm hover:text-white">
+                  info@drone-partss.com
+                </a>
+              </div>
+            </div>
           </div>
 
-          {/* Products */}
+          {/* Categories */}
           <div>
-            <h3 className="font-semibold text-lg mb-6">{t("products")}</h3>
-            <ul className="space-y-3">
-              {productLinks.map((link) => (
+            <h3 className="font-semibold text-lg mb-4">Kategorie</h3>
+            <ul className="space-y-2">
+              {categoryLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-neutral-400 hover:text-white transition-colors"
+                    className="text-neutral-400 hover:text-white transition-colors text-sm"
                   >
                     {link.label}
                   </Link>
@@ -91,13 +149,13 @@ export default function Footer() {
 
           {/* Support */}
           <div>
-            <h3 className="font-semibold text-lg mb-6">{t("support")}</h3>
-            <ul className="space-y-3">
+            <h3 className="font-semibold text-lg mb-4">Obsługa klienta</h3>
+            <ul className="space-y-2">
               {supportLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-neutral-400 hover:text-white transition-colors"
+                    className="text-neutral-400 hover:text-white transition-colors text-sm"
                   >
                     {link.label}
                   </Link>
@@ -106,51 +164,64 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Legal */}
           <div>
-            <h3 className="font-semibold text-lg mb-6">{t("contact")}</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-neutral-400 mt-0.5 flex-shrink-0" />
-                <span className="text-neutral-400">
-                  ul. Przykładowa 123<br />
-                  00-001 Warszawa, Poland
-                </span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-neutral-400 flex-shrink-0" />
-                <a
-                  href="tel:+48123456789"
-                  className="text-neutral-400 hover:text-white transition-colors"
-                >
-                  +48 123 456 789
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-neutral-400 flex-shrink-0" />
-                <a
-                  href="mailto:info@drone-partss.com"
-                  className="text-neutral-400 hover:text-white transition-colors"
-                >
-                  info@drone-partss.com
-                </a>
-              </li>
+            <h3 className="font-semibold text-lg mb-4">Informacje prawne</h3>
+            <ul className="space-y-2">
+              {legalLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-neutral-400 hover:text-white transition-colors text-sm"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
       </div>
 
-      {/* Bottom Bar */}
+      {/* EU Compliance */}
       <div className="border-t border-neutral-800">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-neutral-400 text-sm">
-              © {new Date().getFullYear()} DroneParts. {t("rights")}
+            <div className="flex items-center gap-4 text-sm text-neutral-400">
+              <span>Platforma ODR:</span>
+              <a
+                href="https://ec.europa.eu/consumers/odr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-300 underline"
+              >
+                ec.europa.eu/consumers/odr
+              </a>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-neutral-400 text-sm">Zgodność z:</span>
+              <span className="px-2 py-1 bg-blue-900/50 text-blue-300 text-xs rounded">RODO/GDPR</span>
+              <span className="px-2 py-1 bg-green-900/50 text-green-300 text-xs rounded">PSD2</span>
+              <span className="px-2 py-1 bg-orange-900/50 text-orange-300 text-xs rounded">Dyrektywa 2011/83/UE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Payment Methods & Copyright */}
+      <div className="border-t border-neutral-800">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-neutral-500 text-sm">
+              © {new Date().getFullYear()} DroneParts. Wszelkie prawa zastrzeżone.
             </p>
-            <div className="flex items-center gap-6">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-6 opacity-50" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6 opacity-50" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-6 opacity-50" />
+            <div className="flex items-center gap-3">
+              <span className="text-neutral-500 text-sm mr-2">Płatności:</span>
+              <div className="px-3 py-1.5 bg-neutral-800 rounded text-xs font-bold">PayPal</div>
+              <div className="px-3 py-1.5 bg-[#1A1F71] rounded text-xs font-bold">VISA</div>
+              <div className="px-3 py-1.5 bg-neutral-700 rounded text-xs font-bold">Mastercard</div>
+              <div className="px-3 py-1.5 bg-[#635BFF] rounded text-xs font-bold">stripe</div>
+              <div className="px-3 py-1.5 bg-black border border-neutral-700 rounded text-xs font-bold">Apple Pay</div>
             </div>
           </div>
         </div>
