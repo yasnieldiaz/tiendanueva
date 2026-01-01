@@ -16,12 +16,11 @@ import {
   AlertCircle,
   Package,
   ShoppingBag,
+  Banknote,
+  Building2,
 } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { useCurrency } from "@/store/currency";
-import { loadStripe } from "@stripe/stripe-js";
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_placeholder");
 
 // Shipping options with prices in PLN (brutto)
 const shippingOptions = [
@@ -78,7 +77,7 @@ function CheckoutContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
   const [step, setStep] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "cod">("stripe");
+  const [paymentMethod, setPaymentMethod] = useState<"przelewy24" | "cod">("przelewy24");
   const [selectedShipping, setSelectedShipping] = useState("inpost");
   const [isBusinessPurchase, setIsBusinessPurchase] = useState(false);
   const [vatValidation, setVatValidation] = useState<VatValidation>({
@@ -104,7 +103,9 @@ function CheckoutContent() {
   const subtotal = getTotalPrice();
   const freeShippingThreshold = 5000;
   const selectedShippingOption = shippingOptions.find(s => s.id === selectedShipping);
-  const shipping = subtotal >= freeShippingThreshold ? 0 : (selectedShippingOption?.price || 18);
+  const baseShipping = subtotal >= freeShippingThreshold ? 0 : (selectedShippingOption?.price || 18);
+  const codFee = paymentMethod === "cod" ? 10 : 0; // COD fee
+  const shipping = baseShipping + codFee;
   // VAT is 0% for valid intra-community purchases, otherwise included in price (23%)
   const vatRate = vatValidation.vatExempt ? 0 : 0.23;
   const vatAmount = vatValidation.vatExempt ? 0 : (subtotal / 1.23) * 0.23; // Extract VAT from brutto price
@@ -198,7 +199,8 @@ function CheckoutContent() {
     setError("");
 
     try {
-      if (paymentMethod === "stripe") {
+      if (paymentMethod === "przelewy24") {
+        // Przelewy24 through Stripe
         const response = await fetch("/api/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -211,6 +213,8 @@ function CheckoutContent() {
               variant: item.variant,
             })),
             shippingAddress: shippingForm,
+            paymentMethod: "przelewy24",
+            shippingCost: shipping,
           }),
         });
 
@@ -223,7 +227,7 @@ function CheckoutContent() {
           throw new Error(data.error || "Failed to create checkout session");
         }
       } else {
-        // Cash on delivery
+        // Cash on delivery (COD)
         const response = await fetch("/api/orders", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -236,6 +240,8 @@ function CheckoutContent() {
               variant: item.variant,
             })),
             shippingAddress: shippingForm,
+            paymentMethod: "cod",
+            shippingCost: shipping,
           }),
         });
 
@@ -601,56 +607,70 @@ function CheckoutContent() {
                 </h2>
 
                 <div className="space-y-4">
+                  {/* Przelewy24 Option */}
                   <button
-                    onClick={() => setPaymentMethod("stripe")}
+                    onClick={() => setPaymentMethod("przelewy24")}
                     className={`w-full p-4 border-2 rounded-xl text-left transition-colors ${
-                      paymentMethod === "stripe"
-                        ? "border-neutral-900 bg-neutral-50"
+                      paymentMethod === "przelewy24"
+                        ? "border-blue-600 bg-blue-50"
                         : "border-neutral-200 hover:border-neutral-300"
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <CreditCard className="w-6 h-6" />
+                        <div className="w-12 h-8 bg-white rounded border border-neutral-200 flex items-center justify-center overflow-hidden">
+                          <Building2 className="w-5 h-5 text-red-600" />
+                        </div>
                         <div>
-                          <p className="font-medium">Credit / Debit Card</p>
-                          <p className="text-sm text-neutral-500">Secure payment via Stripe</p>
+                          <p className="font-medium">Przelewy24</p>
+                          <p className="text-sm text-neutral-500">Szybki przelew, BLIK, karta płatnicza</p>
                         </div>
                       </div>
                       <div className={`w-5 h-5 rounded-full border-2 ${
-                        paymentMethod === "stripe" ? "border-neutral-900 bg-neutral-900" : "border-neutral-300"
+                        paymentMethod === "przelewy24" ? "border-blue-600 bg-blue-600" : "border-neutral-300"
                       }`}>
-                        {paymentMethod === "stripe" && (
+                        {paymentMethod === "przelewy24" && (
                           <Check className="w-full h-full text-white p-0.5" />
                         )}
                       </div>
                     </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="px-2 py-1 bg-white border border-neutral-200 rounded text-xs font-medium text-neutral-600">BLIK</span>
+                      <span className="px-2 py-1 bg-white border border-neutral-200 rounded text-xs font-medium text-neutral-600">Przelew bankowy</span>
+                      <span className="px-2 py-1 bg-white border border-neutral-200 rounded text-xs font-medium text-neutral-600">Visa / Mastercard</span>
+                    </div>
                   </button>
 
+                  {/* Cash on Delivery Option */}
                   <button
                     onClick={() => setPaymentMethod("cod")}
                     className={`w-full p-4 border-2 rounded-xl text-left transition-colors ${
                       paymentMethod === "cod"
-                        ? "border-neutral-900 bg-neutral-50"
+                        ? "border-green-600 bg-green-50"
                         : "border-neutral-200 hover:border-neutral-300"
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <Truck className="w-6 h-6" />
+                        <div className="w-12 h-8 bg-green-100 rounded border border-green-200 flex items-center justify-center">
+                          <Banknote className="w-5 h-5 text-green-600" />
+                        </div>
                         <div>
-                          <p className="font-medium">Cash on Delivery</p>
-                          <p className="text-sm text-neutral-500">Pay when you receive the order</p>
+                          <p className="font-medium">Płatność przy odbiorze</p>
+                          <p className="text-sm text-neutral-500">Zapłać gotówką kurierowi</p>
                         </div>
                       </div>
                       <div className={`w-5 h-5 rounded-full border-2 ${
-                        paymentMethod === "cod" ? "border-neutral-900 bg-neutral-900" : "border-neutral-300"
+                        paymentMethod === "cod" ? "border-green-600 bg-green-600" : "border-neutral-300"
                       }`}>
                         {paymentMethod === "cod" && (
                           <Check className="w-full h-full text-white p-0.5" />
                         )}
                       </div>
                     </div>
+                    <p className="mt-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
+                      Dodatkowa opłata +10 zł za pobranie
+                    </p>
                   </button>
                 </div>
 
@@ -759,8 +779,14 @@ function CheckoutContent() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-neutral-500">{tCart("shipping")}</span>
-                  <span>{shipping === 0 ? <span className="text-green-600">Gratis</span> : formatPrice(shipping)}</span>
+                  <span>{baseShipping === 0 ? <span className="text-green-600">Gratis</span> : formatPrice(baseShipping)}</span>
                 </div>
+                {codFee > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-neutral-500">Pobranie (COD)</span>
+                    <span>{formatPrice(codFee)}</span>
+                  </div>
+                )}
                 {vatValidation.vatExempt ? (
                   <div className="flex justify-between text-sm">
                     <span className="text-green-600 font-medium">VAT (0% - WDT)</span>
@@ -787,7 +813,7 @@ function CheckoutContent() {
 
               <div className="mt-6 flex items-center gap-2 text-sm text-neutral-500">
                 <Shield className="w-4 h-4" />
-                <span>Bezpieczne płatności przez Stripe</span>
+                <span>Bezpieczne płatności przez Przelewy24</span>
               </div>
             </div>
           </div>

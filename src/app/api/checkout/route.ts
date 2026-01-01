@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     const body = await request.json();
-    const { items, shippingAddress } = body;
+    const { items, shippingAddress, paymentMethod, shippingCost } = body;
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -37,20 +37,20 @@ export async function POST(request: Request) {
 
       lineItems.push({
         price_data: {
-          currency: "eur",
+          currency: "pln", // PLN for Przelewy24
           product_data: {
             name: product.name,
             description: product.description || undefined,
           },
-          unit_amount: Math.round(product.price * 100),
+          unit_amount: Math.round(product.price * 100), // Convert to grosze
         },
         quantity: item.quantity,
       });
     }
 
-    const shipping = subtotal >= 100 ? 0 : 9.99;
-    const tax = subtotal * 0.23;
-    const total = subtotal + shipping + tax;
+    // Use shipping cost from frontend or calculate default
+    const shipping = shippingCost !== undefined ? shippingCost : (subtotal >= 5000 ? 0 : 18);
+    const total = subtotal + shipping;
 
     // Create order in database
     const lastOrder = await prisma.order.findFirst({
@@ -64,10 +64,11 @@ export async function POST(request: Request) {
         userId: session?.user?.id || "guest",
         subtotal,
         shippingCost: shipping,
-        tax,
+        tax: 0, // VAT included in prices
         total,
         shippingAddress: JSON.stringify(shippingAddress),
         status: "PENDING",
+        paymentMethod: paymentMethod || "przelewy24",
         items: {
           create: items.map((item: { productId: string; name: string; price: number; quantity: number; variant?: string }) => ({
             productId: item.productId,
@@ -84,9 +85,9 @@ export async function POST(request: Request) {
     if (shipping > 0) {
       lineItems.push({
         price_data: {
-          currency: "eur",
+          currency: "pln",
           product_data: {
-            name: "Shipping",
+            name: "Dostawa / Shipping",
           },
           unit_amount: Math.round(shipping * 100),
         },
@@ -94,15 +95,22 @@ export async function POST(request: Request) {
       });
     }
 
-    // Create Stripe checkout session
+    // Create Stripe checkout session with Przelewy24
     const stripeSession = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      payment_method_types: ["p24", "card", "blik"], // Przelewy24, Card, and BLIK
       line_items: lineItems,
       mode: "payment",
       success_url: `${process.env.NEXTAUTH_URL || "http://localhost:3001"}/checkout/success?orderId=${order.id}`,
       cancel_url: `${process.env.NEXTAUTH_URL || "http://localhost:3001"}/checkout?canceled=true`,
+      customer_email: shippingAddress.email, // Required for P24
       metadata: {
         orderId: order.id,
+      },
+      payment_intent_data: {
+        metadata: {
+          orderId: order.id,
+          orderNumber: orderNumber.toString(),
+        },
       },
     });
 
