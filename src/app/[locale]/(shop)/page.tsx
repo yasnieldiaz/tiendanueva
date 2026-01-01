@@ -331,9 +331,17 @@ export default function HomePage() {
                           {product.category?.name || ""}
                         </span>
                         <div className="flex items-center justify-between mt-auto pt-2">
-                          <span className="text-base font-bold text-neutral-900">
-                            {formatPrice(product.price)}
-                          </span>
+                          <div>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-base font-bold text-neutral-900">
+                                {formatPrice(product.price)}
+                              </span>
+                              <span className="text-xs text-neutral-500">+ VAT</span>
+                            </div>
+                            <span className="text-xs text-neutral-400">
+                              {formatPrice(product.price * 1.23)} brutto
+                            </span>
+                          </div>
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}

@@ -93,12 +93,18 @@ export default function CartPage() {
     },
   ];
 
-  const subtotal = getTotalPrice();
-  // Free shipping over 5000 PLN
+  const subtotalNet = getTotalPrice(); // Prices are now net (without VAT)
+  const vatRate = 0.23;
+  const vatAmount = subtotalNet * vatRate;
+  const subtotalGross = subtotalNet + vatAmount;
+  // Free shipping over 5000 PLN (gross)
   const freeShippingThreshold = 5000;
   const selectedShippingOption = shippingOptions.find(s => s.id === selectedShipping);
-  const shipping = subtotal >= freeShippingThreshold ? 0 : (selectedShippingOption?.price || 18);
-  const total = subtotal + shipping;
+  const shippingNet = subtotalGross >= freeShippingThreshold ? 0 : (selectedShippingOption?.price || 18);
+  const shippingVat = shippingNet * vatRate;
+  const totalNet = subtotalNet + shippingNet;
+  const totalVat = vatAmount + shippingVat;
+  const totalGross = totalNet + totalVat;
 
   if (items.length === 0) {
     return (
@@ -219,10 +225,13 @@ export default function CartPage() {
                       {/* Price */}
                       <div className="text-right">
                         <p className="text-xl font-bold text-neutral-900">
-                          {formatPrice(item.price * item.quantity)}
+                          {formatPrice(item.price * item.quantity)} <span className="text-xs font-normal text-neutral-500">+ VAT</span>
+                        </p>
+                        <p className="text-sm text-neutral-400">
+                          {formatPrice(item.price * item.quantity * 1.23)} brutto
                         </p>
                         {item.quantity > 1 && (
-                          <p className="text-sm text-neutral-400">
+                          <p className="text-xs text-neutral-400">
                             {formatPrice(item.price)} {lt.perUnit}
                           </p>
                         )}
@@ -255,7 +264,7 @@ export default function CartPage() {
                 <div className="space-y-2">
                   {shippingOptions.map((option) => {
                     const Icon = option.icon;
-                    const isFree = subtotal >= freeShippingThreshold;
+                    const isFree = subtotalGross >= freeShippingThreshold;
                     return (
                       <button
                         key={option.id}
@@ -290,38 +299,42 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-neutral-500">{t("subtotal")}</span>
-                  <span className="font-medium">{formatPrice(subtotal)}</span>
+                  <span className="text-neutral-500">{t("subtotal")} (netto)</span>
+                  <span className="font-medium">{formatPrice(subtotalNet)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-neutral-500">{t("shipping")}</span>
+                  <span className="text-neutral-500">{t("shipping")} (netto)</span>
                   <span className="font-medium">
-                    {shipping === 0 ? (
+                    {shippingNet === 0 ? (
                       <span className="text-green-600">{lt.free}</span>
                     ) : (
-                      formatPrice(shipping)
+                      formatPrice(shippingNet)
                     )}
                   </span>
                 </div>
-                <div className="flex justify-between text-xs text-neutral-400">
-                  <span>{lt.vatIncluded}</span>
-                  <span>{lt.grossPrices}</span>
+                <div className="flex justify-between text-neutral-500">
+                  <span>VAT 23%</span>
+                  <span className="font-medium">{formatPrice(totalVat)}</span>
                 </div>
 
-                {subtotal < freeShippingThreshold && (
+                {subtotalGross < freeShippingThreshold && (
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-700">
-                      {lt.freeShippingMessage.replace("{amount}", formatPrice(freeShippingThreshold - subtotal))}
+                      {lt.freeShippingMessage.replace("{amount}", formatPrice(freeShippingThreshold - subtotalGross))}
                     </p>
                   </div>
                 )}
 
-                <div className="border-t border-neutral-200 pt-4">
+                <div className="border-t border-neutral-200 pt-4 space-y-2">
+                  <div className="flex justify-between text-sm text-neutral-500">
+                    <span>{t("total")} netto</span>
+                    <span>{formatPrice(totalNet)}</span>
+                  </div>
                   <div className="flex justify-between text-lg font-bold">
-                    <span>{t("total")}</span>
-                    <span>{formatPrice(total)}</span>
+                    <span>{t("total")} brutto</span>
+                    <span>{formatPrice(totalGross)}</span>
                   </div>
                 </div>
               </div>

@@ -14,11 +14,16 @@ export default function CartDrawer() {
   const { items, isOpen, closeCart, updateQuantity, removeItem, getTotalPrice } = useCart();
   const { formatPrice } = useCurrency();
 
-  const subtotal = getTotalPrice();
-  // Free shipping over 5000 PLN
+  const subtotalNet = getTotalPrice(); // Prices are now net (without VAT)
+  const vatRate = 0.23;
+  const vatAmount = subtotalNet * vatRate;
+  const subtotalGross = subtotalNet + vatAmount;
+  // Free shipping over 5000 PLN (gross)
   const freeShippingThreshold = 5000;
-  const shipping = subtotal >= freeShippingThreshold ? 0 : 18; // InPost price as default
-  const total = subtotal + shipping;
+  const shippingNet = subtotalGross >= freeShippingThreshold ? 0 : 18; // InPost price as default
+  const shippingVat = shippingNet * vatRate;
+  const totalVat = vatAmount + shippingVat;
+  const totalGross = subtotalNet + shippingNet + totalVat;
 
   return (
     <AnimatePresence>
@@ -136,16 +141,20 @@ export default function CartDrawer() {
                 {/* Totals */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-neutral-500">{t("subtotal")}</span>
-                    <span>{formatPrice(subtotal)}</span>
+                    <span className="text-neutral-500">{t("subtotal")} (netto)</span>
+                    <span>{formatPrice(subtotalNet)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-neutral-500">{t("shipping")}</span>
-                    <span>{shipping === 0 ? t("free") : formatPrice(shipping)}</span>
+                    <span className="text-neutral-500">{t("shipping")} (netto)</span>
+                    <span>{shippingNet === 0 ? t("free") : formatPrice(shippingNet)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-neutral-500">VAT 23%</span>
+                    <span>{formatPrice(totalVat)}</span>
                   </div>
                   <div className="flex justify-between font-semibold text-lg pt-2 border-t border-neutral-200">
-                    <span>{t("total")}</span>
-                    <span>{formatPrice(total)}</span>
+                    <span>{t("total")} brutto</span>
+                    <span>{formatPrice(totalGross)}</span>
                   </div>
                 </div>
 
@@ -162,7 +171,7 @@ export default function CartDrawer() {
                   </Link>
                   <Link href={`/${locale}/cart`} onClick={closeCart}>
                     <button className="w-full py-3 text-neutral-700 font-medium hover:text-neutral-900 transition-colors">
-                      View Cart
+                      {t("viewCart")}
                     </button>
                   </Link>
                 </div>

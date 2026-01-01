@@ -100,16 +100,20 @@ function CheckoutContent() {
     vatNumber: "",
   });
 
-  const subtotal = getTotalPrice();
+  const subtotalNet = getTotalPrice(); // Prices are now net (without VAT)
+  const vatRate = 0.23;
+  const subtotalVat = vatValidation.vatExempt ? 0 : subtotalNet * vatRate;
+  const subtotalGross = subtotalNet + subtotalVat;
+  // Free shipping over 5000 PLN (gross)
   const freeShippingThreshold = 5000;
   const selectedShippingOption = shippingOptions.find(s => s.id === selectedShipping);
-  const baseShipping = subtotal >= freeShippingThreshold ? 0 : (selectedShippingOption?.price || 18);
-  const codFee = paymentMethod === "cod" ? 10 : 0; // COD fee
-  const shipping = baseShipping + codFee;
-  // VAT is 0% for valid intra-community purchases, otherwise included in price (23%)
-  const vatRate = vatValidation.vatExempt ? 0 : 0.23;
-  const vatAmount = vatValidation.vatExempt ? 0 : (subtotal / 1.23) * 0.23; // Extract VAT from brutto price
-  const total = subtotal + shipping;
+  const baseShippingNet = subtotalGross >= freeShippingThreshold ? 0 : (selectedShippingOption?.price || 18);
+  const codFeeNet = paymentMethod === "cod" ? 10 : 0; // COD fee (net)
+  const shippingNet = baseShippingNet + codFeeNet;
+  const shippingVat = vatValidation.vatExempt ? 0 : shippingNet * vatRate;
+  const totalNet = subtotalNet + shippingNet;
+  const totalVat = subtotalVat + shippingVat;
+  const totalGross = totalNet + totalVat;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -214,7 +218,7 @@ function CheckoutContent() {
             })),
             shippingAddress: shippingForm,
             paymentMethod: "przelewy24",
-            shippingCost: shipping,
+            shippingCost: shippingNet + shippingVat,
           }),
         });
 
@@ -241,7 +245,7 @@ function CheckoutContent() {
             })),
             shippingAddress: shippingForm,
             paymentMethod: "cod",
-            shippingCost: shipping,
+            shippingCost: shippingNet + shippingVat,
           }),
         });
 
@@ -696,7 +700,7 @@ function CheckoutContent() {
                     ) : (
                       <>
                         <Shield className="w-5 h-5" />
-                        {t("placeOrder")} - {formatPrice(total)}
+                        {t("placeOrder")} - {formatPrice(totalGross)}
                       </>
                     )}
                   </motion.button>
@@ -730,7 +734,7 @@ function CheckoutContent() {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.name}</p>
                       <p className="text-sm text-neutral-500">Ilość: {item.quantity}</p>
-                      <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
+                      <p className="font-medium">{formatPrice(item.price * item.quantity)} <span className="text-xs text-neutral-500">+ VAT</span></p>
                     </div>
                   </div>
                 ))}
@@ -742,7 +746,7 @@ function CheckoutContent() {
                 <div className="space-y-2">
                   {shippingOptions.map((option) => {
                     const Icon = option.icon;
-                    const isFree = subtotal >= freeShippingThreshold;
+                    const isFree = subtotalGross >= freeShippingThreshold;
                     return (
                       <button
                         key={option.id}
@@ -774,17 +778,17 @@ function CheckoutContent() {
 
               <div className="border-t border-neutral-200 mt-4 pt-4 space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-neutral-500">{tCart("subtotal")}</span>
-                  <span>{formatPrice(subtotal)}</span>
+                  <span className="text-neutral-500">{tCart("subtotal")} (netto)</span>
+                  <span>{formatPrice(subtotalNet)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-neutral-500">{tCart("shipping")}</span>
-                  <span>{baseShipping === 0 ? <span className="text-green-600">Gratis</span> : formatPrice(baseShipping)}</span>
+                  <span className="text-neutral-500">{tCart("shipping")} (netto)</span>
+                  <span>{baseShippingNet === 0 ? <span className="text-green-600">Gratis</span> : formatPrice(baseShippingNet)}</span>
                 </div>
-                {codFee > 0 && (
+                {codFeeNet > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-neutral-500">Pobranie (COD)</span>
-                    <span>{formatPrice(codFee)}</span>
+                    <span>{formatPrice(codFeeNet)}</span>
                   </div>
                 )}
                 {vatValidation.vatExempt ? (
@@ -793,9 +797,9 @@ function CheckoutContent() {
                     <span className="text-green-600 font-medium">0,00 zł</span>
                   </div>
                 ) : (
-                  <div className="flex justify-between text-xs text-neutral-400">
-                    <span>VAT 23% (zawarty w cenie)</span>
-                    <span>≈ {formatPrice(vatAmount)}</span>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-neutral-500">VAT 23%</span>
+                    <span>{formatPrice(totalVat)}</span>
                   </div>
                 )}
                 {vatValidation.vatExempt && (
@@ -805,9 +809,15 @@ function CheckoutContent() {
                     </p>
                   </div>
                 )}
-                <div className="flex justify-between text-lg font-bold pt-3 border-t border-neutral-200">
-                  <span>{tCart("total")}</span>
-                  <span>{formatPrice(total)}</span>
+                <div className="border-t border-neutral-200 pt-3 space-y-2">
+                  <div className="flex justify-between text-sm text-neutral-500">
+                    <span>{tCart("total")} netto</span>
+                    <span>{formatPrice(totalNet)}</span>
+                  </div>
+                  <div className="flex justify-between text-lg font-bold">
+                    <span>{tCart("total")} brutto</span>
+                    <span>{formatPrice(totalGross)}</span>
+                  </div>
                 </div>
               </div>
 

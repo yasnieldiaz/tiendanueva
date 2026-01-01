@@ -465,11 +465,17 @@ export default function ProductsPage() {
                           )}
                           <div className="flex items-center justify-between mt-auto pt-3">
                             <div>
-                              <span className="text-base font-bold text-neutral-900">
-                                {formatPrice(product.price)}
-                              </span>
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-base font-bold text-neutral-900">
+                                  {formatPrice(product.price)}
+                                </span>
+                                <span className="text-xs text-neutral-500">+ VAT</span>
+                              </div>
+                              <div className="text-xs text-neutral-400">
+                                {formatPrice(product.price * 1.23)} brutto
+                              </div>
                               {product.comparePrice && (
-                                <span className="ml-2 text-sm text-neutral-400 line-through">
+                                <span className="text-sm text-neutral-400 line-through">
                                   {formatPrice(product.comparePrice)}
                                 </span>
                               )}
