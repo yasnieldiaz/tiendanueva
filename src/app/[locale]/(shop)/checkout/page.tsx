@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
@@ -13,11 +14,32 @@ import {
   Loader2,
   Check,
   AlertCircle,
+  Package,
+  ShoppingBag,
 } from "lucide-react";
 import { useCart } from "@/store/cart";
+import { useCurrency } from "@/store/currency";
 import { loadStripe } from "@stripe/stripe-js";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_placeholder");
+
+// Shipping options with prices in PLN (brutto)
+const shippingOptions = [
+  {
+    id: "inpost",
+    name: "InPost Paczkomaty",
+    description: "Dostawa do paczkomatu 24-48h",
+    price: 18,
+    icon: Package,
+  },
+  {
+    id: "gls",
+    name: "GLS Kurier",
+    description: "Dostawa kurierem 24-48h",
+    price: 24,
+    icon: Truck,
+  },
+];
 
 interface ShippingForm {
   firstName: string;
@@ -39,11 +61,13 @@ function CheckoutContent() {
   const canceled = searchParams.get("canceled");
 
   const { items, getTotalPrice, clearCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "cod">("stripe");
+  const [selectedShipping, setSelectedShipping] = useState("inpost");
 
   const [shippingForm, setShippingForm] = useState<ShippingForm>({
     firstName: "",
@@ -57,9 +81,10 @@ function CheckoutContent() {
   });
 
   const subtotal = getTotalPrice();
-  const shipping = subtotal >= 100 ? 0 : 9.99;
-  const tax = subtotal * 0.23;
-  const total = subtotal + shipping + tax;
+  const freeShippingThreshold = 500;
+  const selectedShippingOption = shippingOptions.find(s => s.id === selectedShipping);
+  const shipping = subtotal >= freeShippingThreshold ? 0 : (selectedShippingOption?.price || 18);
+  const total = subtotal + shipping;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setShippingForm({ ...shippingForm, [e.target.name]: e.target.value });
@@ -437,7 +462,7 @@ function CheckoutContent() {
                     ) : (
                       <>
                         <Shield className="w-5 h-5" />
-                        {t("placeOrder")} - €{total.toFixed(2)}
+                        {t("placeOrder")} - {formatPrice(total)}
                       </>
                     )}
                   </motion.button>
@@ -451,43 +476,90 @@ function CheckoutContent() {
             <div className="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
               <h2 className="text-lg font-semibold mb-6">{t("orderSummary")}</h2>
 
-              <div className="space-y-4 max-h-64 overflow-y-auto">
+              <div className="space-y-4 max-h-48 overflow-y-auto">
                 {items.map((item) => (
                   <div key={item.id} className="flex gap-3">
-                    <div className="w-16 h-16 bg-neutral-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-2xl">🛸</span>
+                    <div className="w-16 h-16 bg-neutral-100 rounded-lg overflow-hidden flex-shrink-0 relative">
+                      {item.image ? (
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <ShoppingBag className="w-6 h-6 text-neutral-300" />
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.name}</p>
-                      <p className="text-sm text-neutral-500">Qty: {item.quantity}</p>
-                      <p className="font-medium">€{(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-sm text-neutral-500">Ilość: {item.quantity}</p>
+                      <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="border-t border-neutral-200 mt-6 pt-6 space-y-3">
+              {/* Shipping Selection */}
+              <div className="border-t border-neutral-200 mt-4 pt-4">
+                <h3 className="text-sm font-medium text-neutral-700 mb-3">Dostawa</h3>
+                <div className="space-y-2">
+                  {shippingOptions.map((option) => {
+                    const Icon = option.icon;
+                    const isFree = subtotal >= freeShippingThreshold;
+                    return (
+                      <button
+                        key={option.id}
+                        onClick={() => setSelectedShipping(option.id)}
+                        className={`w-full p-2.5 rounded-lg border transition-all text-left flex items-center gap-2 ${
+                          selectedShipping === option.id
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-neutral-200 bg-neutral-50 hover:border-neutral-300"
+                        }`}
+                      >
+                        <Icon className={`w-4 h-4 ${
+                          selectedShipping === option.id ? "text-blue-600" : "text-neutral-500"
+                        }`} />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{option.name}</p>
+                        </div>
+                        <span className="text-sm font-medium">
+                          {isFree ? (
+                            <span className="text-green-600">Gratis</span>
+                          ) : (
+                            formatPrice(option.price)
+                          )}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="border-t border-neutral-200 mt-4 pt-4 space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-neutral-500">{tCart("subtotal")}</span>
-                  <span>€{subtotal.toFixed(2)}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-neutral-500">{tCart("shipping")}</span>
-                  <span>{shipping === 0 ? "Free" : `€${shipping.toFixed(2)}`}</span>
+                  <span>{shipping === 0 ? <span className="text-green-600">Gratis</span> : formatPrice(shipping)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-neutral-500">{tCart("tax")} (23% VAT)</span>
-                  <span>€{tax.toFixed(2)}</span>
+                <div className="flex justify-between text-xs text-neutral-400">
+                  <span>VAT 23% (zawarty w cenie)</span>
+                  <span>Ceny brutto</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold pt-3 border-t border-neutral-200">
                   <span>{tCart("total")}</span>
-                  <span>€{total.toFixed(2)}</span>
+                  <span>{formatPrice(total)}</span>
                 </div>
               </div>
 
               <div className="mt-6 flex items-center gap-2 text-sm text-neutral-500">
                 <Shield className="w-4 h-4" />
-                <span>Secure checkout powered by Stripe</span>
+                <span>Bezpieczne płatności przez Stripe</span>
               </div>
             </div>
           </div>

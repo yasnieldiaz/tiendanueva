@@ -1,21 +1,46 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
+import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Truck, Package } from "lucide-react";
 import { useCart } from "@/store/cart";
+import { useCurrency } from "@/store/currency";
+
+// Shipping options with prices in PLN (brutto)
+const shippingOptions = [
+  {
+    id: "inpost",
+    name: "InPost Paczkomaty",
+    description: "Dostawa do paczkomatu 24-48h",
+    price: 18,
+    icon: Package,
+  },
+  {
+    id: "gls",
+    name: "GLS Kurier",
+    description: "Dostawa kurierem 24-48h",
+    price: 24,
+    icon: Truck,
+  },
+];
 
 export default function CartPage() {
   const t = useTranslations("cart");
   const tNav = useTranslations("nav");
+  const locale = useLocale();
   const { items, updateQuantity, removeItem, clearCart, getTotalPrice } = useCart();
+  const { formatPrice } = useCurrency();
+  const [selectedShipping, setSelectedShipping] = useState("inpost");
 
   const subtotal = getTotalPrice();
-  const shipping = subtotal >= 100 ? 0 : 9.99;
-  const tax = subtotal * 0.23; // 23% VAT for Poland
-  const total = subtotal + shipping + tax;
+  // Free shipping over 500 PLN
+  const freeShippingThreshold = 500;
+  const selectedShippingOption = shippingOptions.find(s => s.id === selectedShipping);
+  const shipping = subtotal >= freeShippingThreshold ? 0 : (selectedShippingOption?.price || 18);
+  const total = subtotal + shipping;
 
   if (items.length === 0) {
     return (
@@ -136,11 +161,11 @@ export default function CartPage() {
                       {/* Price */}
                       <div className="text-right">
                         <p className="text-xl font-bold text-neutral-900">
-                          €{(item.price * item.quantity).toFixed(2)}
+                          {formatPrice(item.price * item.quantity)}
                         </p>
                         {item.quantity > 1 && (
                           <p className="text-sm text-neutral-400">
-                            €{item.price.toFixed(2)} each
+                            {formatPrice(item.price)} / szt.
                           </p>
                         )}
                       </div>
@@ -164,32 +189,73 @@ export default function CartPage() {
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-neutral-50 rounded-2xl p-6 sticky top-24">
-              <h2 className="text-lg font-semibold mb-6">Order Summary</h2>
+              <h2 className="text-lg font-semibold mb-6">Podsumowanie zamówienia</h2>
+
+              {/* Shipping Options */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-neutral-700 mb-3">Wybierz dostawę</h3>
+                <div className="space-y-2">
+                  {shippingOptions.map((option) => {
+                    const Icon = option.icon;
+                    const isFree = subtotal >= freeShippingThreshold;
+                    return (
+                      <button
+                        key={option.id}
+                        onClick={() => setSelectedShipping(option.id)}
+                        className={`w-full p-3 rounded-xl border-2 transition-all text-left flex items-center gap-3 ${
+                          selectedShipping === option.id
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-neutral-200 bg-white hover:border-neutral-300"
+                        }`}
+                      >
+                        <div className={`p-2 rounded-lg ${
+                          selectedShipping === option.id ? "bg-blue-100" : "bg-neutral-100"
+                        }`}>
+                          <Icon className={`w-5 h-5 ${
+                            selectedShipping === option.id ? "text-blue-600" : "text-neutral-500"
+                          }`} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-neutral-900">{option.name}</p>
+                          <p className="text-xs text-neutral-500">{option.description}</p>
+                        </div>
+                        <div className="text-right">
+                          {isFree ? (
+                            <span className="text-green-600 font-medium">Gratis</span>
+                          ) : (
+                            <span className="font-semibold">{formatPrice(option.price)}</span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-neutral-500">{t("subtotal")}</span>
-                  <span className="font-medium">€{subtotal.toFixed(2)}</span>
+                  <span className="font-medium">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-neutral-500">{t("shipping")}</span>
                   <span className="font-medium">
                     {shipping === 0 ? (
-                      <span className="text-green-600">Free</span>
+                      <span className="text-green-600">Gratis</span>
                     ) : (
-                      `€${shipping.toFixed(2)}`
+                      formatPrice(shipping)
                     )}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-500">{t("tax")} (23% VAT)</span>
-                  <span className="font-medium">€{tax.toFixed(2)}</span>
+                <div className="flex justify-between text-xs text-neutral-400">
+                  <span>VAT 23% (zawarty w cenie)</span>
+                  <span>Ceny brutto</span>
                 </div>
 
-                {subtotal < 100 && (
+                {subtotal < freeShippingThreshold && (
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-700">
-                      Add €{(100 - subtotal).toFixed(2)} more for free shipping!
+                      Dodaj jeszcze {formatPrice(freeShippingThreshold - subtotal)} do darmowej dostawy!
                     </p>
                   </div>
                 )}
@@ -197,12 +263,12 @@ export default function CartPage() {
                 <div className="border-t border-neutral-200 pt-4">
                   <div className="flex justify-between text-lg font-bold">
                     <span>{t("total")}</span>
-                    <span>€{total.toFixed(2)}</span>
+                    <span>{formatPrice(total)}</span>
                   </div>
                 </div>
               </div>
 
-              <Link href="/checkout" className="block mt-6">
+              <Link href={`/${locale}/checkout`} className="block mt-6">
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
@@ -215,16 +281,32 @@ export default function CartPage() {
 
               {/* Payment Methods */}
               <div className="mt-6 text-center">
-                <p className="text-xs text-neutral-400 mb-3">Secure payment with</p>
-                <div className="flex items-center justify-center gap-4">
-                  <div className="px-3 py-1 bg-white border border-neutral-200 rounded text-xs font-medium">
+                <p className="text-xs text-neutral-400 mb-3">Bezpieczne płatności</p>
+                <div className="flex items-center justify-center gap-3">
+                  <div className="px-3 py-1.5 bg-white border border-neutral-200 rounded text-xs font-medium">
                     VISA
                   </div>
-                  <div className="px-3 py-1 bg-white border border-neutral-200 rounded text-xs font-medium">
+                  <div className="px-3 py-1.5 bg-white border border-neutral-200 rounded text-xs font-medium">
                     Mastercard
                   </div>
-                  <div className="px-3 py-1 bg-white border border-neutral-200 rounded text-xs font-medium">
+                  <div className="px-3 py-1.5 bg-white border border-neutral-200 rounded text-xs font-medium">
                     PayPal
+                  </div>
+                  <div className="px-3 py-1.5 bg-white border border-neutral-200 rounded text-xs font-medium">
+                    BLIK
+                  </div>
+                </div>
+              </div>
+
+              {/* Shipping Partners */}
+              <div className="mt-4 pt-4 border-t border-neutral-200">
+                <p className="text-xs text-neutral-400 mb-2 text-center">Partnerzy dostawy</p>
+                <div className="flex items-center justify-center gap-4">
+                  <div className="px-3 py-1 bg-yellow-400 rounded text-xs font-bold text-yellow-900">
+                    InPost
+                  </div>
+                  <div className="px-3 py-1 bg-blue-600 rounded text-xs font-bold text-white">
+                    GLS
                   </div>
                 </div>
               </div>

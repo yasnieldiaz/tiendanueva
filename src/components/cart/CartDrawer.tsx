@@ -6,14 +6,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { X, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "@/store/cart";
+import { useCurrency } from "@/store/currency";
 
 export default function CartDrawer() {
   const t = useTranslations("cart");
   const locale = useLocale();
   const { items, isOpen, closeCart, updateQuantity, removeItem, getTotalPrice } = useCart();
+  const { formatPrice } = useCurrency();
 
   const subtotal = getTotalPrice();
-  const shipping = subtotal >= 100 ? 0 : 9.99;
+  // Free shipping over 500 PLN
+  const freeShippingThreshold = 500;
+  const shipping = subtotal >= freeShippingThreshold ? 0 : 18; // InPost price as default
   const total = subtotal + shipping;
 
   return (
@@ -92,7 +96,7 @@ export default function CartDrawer() {
                         {item.variant && (
                           <p className="text-sm text-neutral-400">{item.variant}</p>
                         )}
-                        <p className="font-semibold mt-1">€{item.price.toFixed(2)}</p>
+                        <p className="font-semibold mt-1">{formatPrice(item.price)}</p>
 
                         {/* Quantity */}
                         <div className="flex items-center gap-3 mt-2">
@@ -133,15 +137,15 @@ export default function CartDrawer() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-neutral-500">{t("subtotal")}</span>
-                    <span>€{subtotal.toFixed(2)}</span>
+                    <span>{formatPrice(subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-neutral-500">{t("shipping")}</span>
-                    <span>{shipping === 0 ? "Free" : `€${shipping.toFixed(2)}`}</span>
+                    <span>{shipping === 0 ? t("free") : formatPrice(shipping)}</span>
                   </div>
                   <div className="flex justify-between font-semibold text-lg pt-2 border-t border-neutral-200">
                     <span>{t("total")}</span>
-                    <span>€{total.toFixed(2)}</span>
+                    <span>{formatPrice(total)}</span>
                   </div>
                 </div>
 
