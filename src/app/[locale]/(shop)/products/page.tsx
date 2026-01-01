@@ -440,14 +440,29 @@ function ProductsContent() {
                               fill
                               className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                               sizes="(max-width: 768px) 50vw, 33vw"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  const placeholder = document.createElement('div');
+                                  placeholder.className = 'absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-neutral-100';
+                                  placeholder.innerHTML = '<span class="text-5xl mb-2">🛸</span><span class="text-xs text-neutral-400 font-medium">' + (product.brand?.name || 'Dron') + '</span>';
+                                  parent.appendChild(placeholder);
+                                }
+                              }}
                             />
                           ) : (
-                            <motion.span
-                              className="text-5xl"
-                              whileHover={{ scale: 1.1 }}
-                            >
-                              🛸
-                            </motion.span>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-neutral-100">
+                              <motion.span
+                                className="text-5xl mb-2"
+                                whileHover={{ scale: 1.1, rotate: 5 }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                              >
+                                🛸
+                              </motion.span>
+                              <span className="text-xs text-neutral-400 font-medium">{product.brand?.name || "Dron"}</span>
+                            </div>
                           )}
                           {product.stock === 0 && (
                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
