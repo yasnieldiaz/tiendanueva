@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import { useCart } from "@/store/cart";
 
@@ -76,8 +77,19 @@ export default function CartPage() {
                   className="flex gap-6 p-6 bg-neutral-50 rounded-2xl"
                 >
                   {/* Image */}
-                  <div className="w-32 h-32 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <span className="text-5xl">🛸</span>
+                  <div className="w-32 h-32 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-xl overflow-hidden flex-shrink-0 relative">
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ShoppingBag className="w-12 h-12 text-neutral-300" />
+                      </div>
+                    )}
                   </div>
 
                   {/* Details */}
