@@ -344,7 +344,7 @@ function CheckoutContent() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      First Name *
+                      Imię / First Name *
                     </label>
                     <input
                       type="text"
@@ -356,7 +356,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Last Name *
+                      Nazwisko / Last Name *
                     </label>
                     <input
                       type="text"
@@ -368,7 +368,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Email *
+                      E-mail *
                     </label>
                     <input
                       type="email"
@@ -380,7 +380,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Phone *
+                      Telefon / Phone *
                     </label>
                     <input
                       type="tel"
@@ -390,9 +390,9 @@ function CheckoutContent() {
                       className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
                     />
                   </div>
-                  <div className="md:col-span-2">
+                  <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Address *
+                      Adres / Address *
                     </label>
                     <input
                       type="text"
@@ -404,7 +404,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      City *
+                      Miasto / City *
                     </label>
                     <input
                       type="text"
@@ -416,7 +416,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Postal Code *
+                      Kod pocztowy *
                     </label>
                     <input
                       type="text"
@@ -426,7 +426,7 @@ function CheckoutContent() {
                       className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
                     />
                   </div>
-                  <div className="md:col-span-2">
+                  <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
                       Kraj / Country
                     </label>
