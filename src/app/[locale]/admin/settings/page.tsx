@@ -15,15 +15,26 @@ import {
   Eye,
   EyeOff,
   Info,
+  CreditCard,
+  Building2,
+  Banknote,
+  ExternalLink,
 } from "lucide-react";
 
-type TabType = "shipping" | "email" | "sms" | "templates";
+type TabType = "shipping" | "payments" | "email" | "sms" | "templates";
 
 interface Settings {
   // Shipping
   inpost_price: string;
   gls_price: string;
   free_shipping_threshold: string;
+
+  // Payments
+  stripe_publishable_key: string;
+  stripe_secret_key: string;
+  cod_enabled: string;
+  cod_fee: string;
+  przelewy24_enabled: string;
 
   // Email
   smtp_host: string;
@@ -61,6 +72,13 @@ const defaultSettings: Settings = {
   inpost_price: "18",
   gls_price: "24",
   free_shipping_threshold: "5000",
+  // Payments
+  stripe_publishable_key: "",
+  stripe_secret_key: "",
+  cod_enabled: "true",
+  cod_fee: "10",
+  przelewy24_enabled: "true",
+  // Email
   smtp_host: "",
   smtp_port: "587",
   smtp_user: "",
@@ -172,6 +190,7 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: "shipping" as TabType, label: t("settingsPage.shipping"), icon: Truck },
+    { id: "payments" as TabType, label: "Płatności", icon: CreditCard },
     { id: "email" as TabType, label: t("settingsPage.email"), icon: Mail },
     { id: "sms" as TabType, label: t("settingsPage.sms"), icon: MessageSquare },
     { id: "templates" as TabType, label: t("settingsPage.templates"), icon: FileText },
@@ -298,6 +317,199 @@ export default function SettingsPage() {
                       zł
                     </span>
                   </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Payment Settings */}
+          {activeTab === "payments" && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              {/* Przelewy24 Section */}
+              <div className="border border-neutral-200 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                      <Building2 className="w-6 h-6 text-red-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-neutral-900">Przelewy24</h3>
+                      <p className="text-sm text-neutral-500">Szybkie przelewy, BLIK, karty płatnicze</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.przelewy24_enabled === "true"}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          przelewy24_enabled: e.target.checked ? "true" : "false",
+                        })
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl mb-4">
+                  <div className="flex items-start gap-2">
+                    <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-blue-800">
+                      <p className="font-medium mb-1">Przelewy24 przez Stripe</p>
+                      <p>Przelewy24 jest obsługiwane przez Stripe. Aby aktywować, włącz metodę płatności P24 w panelu Stripe.</p>
+                      <a
+                        href="https://dashboard.stripe.com/settings/payment_methods"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 mt-2 text-blue-600 hover:underline font-medium"
+                      >
+                        Otwórz ustawienia Stripe
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Stripe Publishable Key
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.stripe_publishable_key}
+                      onChange={(e) =>
+                        setSettings({ ...settings, stripe_publishable_key: e.target.value })
+                      }
+                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 font-mono text-sm"
+                      placeholder="pk_live_..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Stripe Secret Key
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPasswords.stripe ? "text" : "password"}
+                        value={settings.stripe_secret_key}
+                        onChange={(e) =>
+                          setSettings({ ...settings, stripe_secret_key: e.target.value })
+                        }
+                        className="w-full px-4 py-3 pr-12 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 font-mono text-sm"
+                        placeholder="sk_live_..."
+                      />
+                      <button
+                        type="button"
+                        onClick={() => togglePassword("stripe")}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                      >
+                        {showPasswords.stripe ? (
+                          <EyeOff className="w-5 h-5" />
+                        ) : (
+                          <Eye className="w-5 h-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-xs text-amber-800">
+                    <strong>Ważne:</strong> Po wprowadzeniu kluczy, dodaj je również do pliku <code className="bg-amber-100 px-1 rounded">.env</code>:
+                    <br />
+                    <code className="text-xs">NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...</code>
+                    <br />
+                    <code className="text-xs">STRIPE_SECRET_KEY=sk_live_...</code>
+                  </p>
+                </div>
+              </div>
+
+              {/* Cash on Delivery Section */}
+              <div className="border border-neutral-200 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                      <Banknote className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-neutral-900">Płatność przy odbiorze (COD)</h3>
+                      <p className="text-sm text-neutral-500">Klient płaci gotówką kurierowi</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.cod_enabled === "true"}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          cod_enabled: e.target.checked ? "true" : "false",
+                        })
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Opłata za pobranie
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={settings.cod_fee}
+                        onChange={(e) =>
+                          setSettings({ ...settings, cod_fee: e.target.value })
+                        }
+                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400">
+                        zł
+                      </span>
+                    </div>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      Dodatkowa opłata doliczana do zamówienia przy płatności przy odbiorze
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Methods Summary */}
+              <div className="bg-neutral-50 rounded-xl p-4">
+                <h4 className="font-medium text-neutral-900 mb-3">Aktywne metody płatności:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {settings.przelewy24_enabled === "true" && (
+                    <>
+                      <span className="px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700">
+                        Przelewy24
+                      </span>
+                      <span className="px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700">
+                        BLIK
+                      </span>
+                      <span className="px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700">
+                        Visa / Mastercard
+                      </span>
+                    </>
+                  )}
+                  {settings.cod_enabled === "true" && (
+                    <span className="px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700">
+                      Przy odbiorze (+{settings.cod_fee} zł)
+                    </span>
+                  )}
+                  {settings.przelewy24_enabled !== "true" && settings.cod_enabled !== "true" && (
+                    <span className="text-sm text-red-600">Brak aktywnych metod płatności!</span>
+                  )}
                 </div>
               </div>
             </motion.div>
