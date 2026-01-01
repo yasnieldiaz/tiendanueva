@@ -1,0 +1,140 @@
+{
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "categories": "Categories",
+    "brands": "Brands",
+    "cart": "Cart",
+    "account": "My Account",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "admin": "Admin Panel",
+    "search": "Search products..."
+  },
+  "hero": {
+    "title": "Drone Parts",
+    "titleHighlight": "Premium",
+    "subtitle": "Official distributor of DJI, Autel, XAG and FIMI spare parts. Shipping across Europe.",
+    "cta": "View Products",
+    "ctaSecondary": "Our Brands",
+    "stats": {
+      "products": "Products",
+      "brands": "Brands",
+      "shipping": "EU Shipping",
+      "warranty": "Warranty"
+    }
+  },
+  "products": {
+    "title": "Our Products",
+    "featured": "Featured",
+    "new": "New Arrivals",
+    "sale": "On Sale",
+    "all": "All Products",
+    "filter": "Filter",
+    "sort": "Sort",
+    "sortOptions": {
+      "newest": "Newest",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "nameAsc": "Name: A-Z",
+      "nameDesc": "Name: Z-A"
+    },
+    "addToCart": "Add to Cart",
+    "addedToCart": "Added to cart!",
+    "outOfStock": "Out of Stock",
+    "inStock": "In Stock",
+    "stock": "pcs.",
+    "viewDetails": "View Details",
+    "noProducts": "No products found"
+  },
+  "product": {
+    "description": "Description",
+    "specifications": "Specifications",
+    "reviews": "Reviews",
+    "relatedProducts": "Related Products",
+    "quantity": "Quantity",
+    "sku": "SKU",
+    "category": "Category",
+    "brand": "Brand",
+    "share": "Share",
+    "addToWishlist": "Add to Wishlist",
+    "removeFromWishlist": "Remove from Wishlist"
+  },
+  "cart": {
+    "title": "Your Cart",
+    "empty": "Your cart is empty",
+    "continueShopping": "Continue Shopping",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "tax": "Tax",
+    "total": "Total",
+    "checkout": "Checkout",
+    "remove": "Remove",
+    "update": "Update",
+    "items": "items"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "shippingInfo": "Shipping Information",
+    "paymentInfo": "Payment",
+    "orderSummary": "Order Summary",
+    "placeOrder": "Place Order",
+    "processing": "Processing...",
+    "success": "Order Placed!",
+    "successMessage": "Thank you for your purchase. You will receive a confirmation email."
+  },
+  "account": {
+    "title": "My Account",
+    "orders": "My Orders",
+    "addresses": "Addresses",
+    "wishlist": "Wishlist",
+    "settings": "Settings",
+    "noOrders": "You don't have any orders yet"
+  },
+  "auth": {
+    "loginTitle": "Login",
+    "registerTitle": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Full Name",
+    "phone": "Phone",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "loginButton": "Login",
+    "registerButton": "Register",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "orContinueWith": "or continue with"
+  },
+  "footer": {
+    "description": "Official drone parts distributor. DJI, Autel, XAG, FIMI and more. Shipping across Europe.",
+    "products": "Products",
+    "support": "Support",
+    "company": "Company",
+    "contact": "Contact",
+    "aboutUs": "About Us",
+    "shipping": "Shipping",
+    "returns": "Returns",
+    "privacy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "rights": "All rights reserved."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "noResults": "No results",
+    "viewAll": "View All"
+  }
+}

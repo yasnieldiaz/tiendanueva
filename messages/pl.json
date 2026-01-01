@@ -1,0 +1,140 @@
+{
+  "nav": {
+    "home": "Strona główna",
+    "products": "Produkty",
+    "categories": "Kategorie",
+    "brands": "Marki",
+    "cart": "Koszyk",
+    "account": "Moje konto",
+    "login": "Zaloguj się",
+    "register": "Zarejestruj się",
+    "logout": "Wyloguj się",
+    "admin": "Panel Admin",
+    "search": "Szukaj produktów..."
+  },
+  "hero": {
+    "title": "Części do Dronów",
+    "titleHighlight": "Premium",
+    "subtitle": "Oficjalny dystrybutor części zamiennych DJI, Autel, XAG i FIMI. Wysyłka w całej Europie.",
+    "cta": "Zobacz produkty",
+    "ctaSecondary": "Nasze marki",
+    "stats": {
+      "products": "Produktów",
+      "brands": "Marek",
+      "shipping": "Wysyłka UE",
+      "warranty": "Gwarancja"
+    }
+  },
+  "products": {
+    "title": "Nasze Produkty",
+    "featured": "Polecane",
+    "new": "Nowości",
+    "sale": "Promocje",
+    "all": "Wszystkie produkty",
+    "filter": "Filtruj",
+    "sort": "Sortuj",
+    "sortOptions": {
+      "newest": "Najnowsze",
+      "priceAsc": "Cena: rosnąco",
+      "priceDesc": "Cena: malejąco",
+      "nameAsc": "Nazwa: A-Z",
+      "nameDesc": "Nazwa: Z-A"
+    },
+    "addToCart": "Dodaj do koszyka",
+    "addedToCart": "Dodano do koszyka!",
+    "outOfStock": "Brak w magazynie",
+    "inStock": "Dostępny",
+    "stock": "szt.",
+    "viewDetails": "Zobacz szczegóły",
+    "noProducts": "Nie znaleziono produktów"
+  },
+  "product": {
+    "description": "Opis",
+    "specifications": "Specyfikacja",
+    "reviews": "Opinie",
+    "relatedProducts": "Podobne produkty",
+    "quantity": "Ilość",
+    "sku": "SKU",
+    "category": "Kategoria",
+    "brand": "Marka",
+    "share": "Udostępnij",
+    "addToWishlist": "Dodaj do ulubionych",
+    "removeFromWishlist": "Usuń z ulubionych"
+  },
+  "cart": {
+    "title": "Twój Koszyk",
+    "empty": "Twój koszyk jest pusty",
+    "continueShopping": "Kontynuuj zakupy",
+    "subtotal": "Suma częściowa",
+    "shipping": "Wysyłka",
+    "tax": "Podatek",
+    "total": "Razem",
+    "checkout": "Przejdź do kasy",
+    "remove": "Usuń",
+    "update": "Aktualizuj",
+    "items": "produktów"
+  },
+  "checkout": {
+    "title": "Kasa",
+    "shippingInfo": "Dane wysyłki",
+    "paymentInfo": "Płatność",
+    "orderSummary": "Podsumowanie zamówienia",
+    "placeOrder": "Złóż zamówienie",
+    "processing": "Przetwarzanie...",
+    "success": "Zamówienie złożone!",
+    "successMessage": "Dziękujemy za zakupy. Otrzymasz email z potwierdzeniem."
+  },
+  "account": {
+    "title": "Moje Konto",
+    "orders": "Moje zamówienia",
+    "addresses": "Adresy",
+    "wishlist": "Lista życzeń",
+    "settings": "Ustawienia",
+    "noOrders": "Nie masz jeszcze żadnych zamówień"
+  },
+  "auth": {
+    "loginTitle": "Zaloguj się",
+    "registerTitle": "Utwórz konto",
+    "email": "Email",
+    "password": "Hasło",
+    "confirmPassword": "Potwierdź hasło",
+    "name": "Imię i nazwisko",
+    "phone": "Telefon",
+    "rememberMe": "Zapamiętaj mnie",
+    "forgotPassword": "Zapomniałeś hasła?",
+    "loginButton": "Zaloguj się",
+    "registerButton": "Zarejestruj się",
+    "noAccount": "Nie masz konta?",
+    "hasAccount": "Masz już konto?",
+    "orContinueWith": "lub kontynuuj z"
+  },
+  "footer": {
+    "description": "Oficjalny dystrybutor części do dronów. DJI, Autel, XAG, FIMI i więcej. Wysyłka w całej Europie.",
+    "products": "Produkty",
+    "support": "Wsparcie",
+    "company": "Firma",
+    "contact": "Kontakt",
+    "aboutUs": "O nas",
+    "shipping": "Wysyłka",
+    "returns": "Zwroty",
+    "privacy": "Polityka prywatności",
+    "terms": "Regulamin",
+    "rights": "Wszelkie prawa zastrzeżone."
+  },
+  "common": {
+    "loading": "Ładowanie...",
+    "error": "Błąd",
+    "success": "Sukces",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "close": "Zamknij",
+    "back": "Wróć",
+    "next": "Dalej",
+    "previous": "Wstecz",
+    "search": "Szukaj",
+    "noResults": "Brak wyników",
+    "viewAll": "Zobacz wszystkie"
+  }
+}

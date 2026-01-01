@@ -1,0 +1,140 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "products": "Productos",
+    "categories": "Categorías",
+    "brands": "Marcas",
+    "cart": "Carrito",
+    "account": "Mi cuenta",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "admin": "Panel Admin",
+    "search": "Buscar productos..."
+  },
+  "hero": {
+    "title": "Piezas para Drones",
+    "titleHighlight": "Premium",
+    "subtitle": "Distribuidor oficial de repuestos DJI, Autel, XAG y FIMI. Envíos a toda Europa.",
+    "cta": "Ver productos",
+    "ctaSecondary": "Nuestras marcas",
+    "stats": {
+      "products": "Productos",
+      "brands": "Marcas",
+      "shipping": "Envío UE",
+      "warranty": "Garantía"
+    }
+  },
+  "products": {
+    "title": "Nuestros Productos",
+    "featured": "Destacados",
+    "new": "Novedades",
+    "sale": "Ofertas",
+    "all": "Todos los productos",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "sortOptions": {
+      "newest": "Más recientes",
+      "priceAsc": "Precio: menor a mayor",
+      "priceDesc": "Precio: mayor a menor",
+      "nameAsc": "Nombre: A-Z",
+      "nameDesc": "Nombre: Z-A"
+    },
+    "addToCart": "Añadir al carrito",
+    "addedToCart": "¡Añadido al carrito!",
+    "outOfStock": "Agotado",
+    "inStock": "Disponible",
+    "stock": "uds.",
+    "viewDetails": "Ver detalles",
+    "noProducts": "No se encontraron productos"
+  },
+  "product": {
+    "description": "Descripción",
+    "specifications": "Especificaciones",
+    "reviews": "Opiniones",
+    "relatedProducts": "Productos relacionados",
+    "quantity": "Cantidad",
+    "sku": "SKU",
+    "category": "Categoría",
+    "brand": "Marca",
+    "share": "Compartir",
+    "addToWishlist": "Añadir a favoritos",
+    "removeFromWishlist": "Quitar de favoritos"
+  },
+  "cart": {
+    "title": "Tu Carrito",
+    "empty": "Tu carrito está vacío",
+    "continueShopping": "Continuar comprando",
+    "subtotal": "Subtotal",
+    "shipping": "Envío",
+    "tax": "Impuestos",
+    "total": "Total",
+    "checkout": "Finalizar compra",
+    "remove": "Eliminar",
+    "update": "Actualizar",
+    "items": "productos"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "shippingInfo": "Datos de envío",
+    "paymentInfo": "Pago",
+    "orderSummary": "Resumen del pedido",
+    "placeOrder": "Realizar pedido",
+    "processing": "Procesando...",
+    "success": "¡Pedido realizado!",
+    "successMessage": "Gracias por tu compra. Recibirás un email de confirmación."
+  },
+  "account": {
+    "title": "Mi Cuenta",
+    "orders": "Mis pedidos",
+    "addresses": "Direcciones",
+    "wishlist": "Lista de deseos",
+    "settings": "Configuración",
+    "noOrders": "Aún no tienes pedidos"
+  },
+  "auth": {
+    "loginTitle": "Iniciar sesión",
+    "registerTitle": "Crear cuenta",
+    "email": "Email",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "name": "Nombre completo",
+    "phone": "Teléfono",
+    "rememberMe": "Recordarme",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loginButton": "Iniciar sesión",
+    "registerButton": "Registrarse",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "orContinueWith": "o continúa con"
+  },
+  "footer": {
+    "description": "Distribuidor oficial de piezas para drones. DJI, Autel, XAG, FIMI y más. Envíos a toda Europa.",
+    "products": "Productos",
+    "support": "Soporte",
+    "company": "Empresa",
+    "contact": "Contacto",
+    "aboutUs": "Sobre nosotros",
+    "shipping": "Envíos",
+    "returns": "Devoluciones",
+    "privacy": "Política de privacidad",
+    "terms": "Términos y condiciones",
+    "rights": "Todos los derechos reservados."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "search": "Buscar",
+    "noResults": "Sin resultados",
+    "viewAll": "Ver todos"
+  }
+}
