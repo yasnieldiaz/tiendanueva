@@ -50,6 +50,18 @@ interface ShippingForm {
   city: string;
   postalCode: string;
   country: string;
+  companyName: string;
+  vatNumber: string;
+}
+
+interface VatValidation {
+  isValid: boolean;
+  isIntraCommunity: boolean;
+  vatExempt: boolean;
+  companyName?: string;
+  companyAddress?: string;
+  message?: string;
+  isValidating: boolean;
 }
 
 function CheckoutContent() {
@@ -68,6 +80,13 @@ function CheckoutContent() {
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "cod">("stripe");
   const [selectedShipping, setSelectedShipping] = useState("inpost");
+  const [isBusinessPurchase, setIsBusinessPurchase] = useState(false);
+  const [vatValidation, setVatValidation] = useState<VatValidation>({
+    isValid: false,
+    isIntraCommunity: false,
+    vatExempt: false,
+    isValidating: false,
+  });
 
   const [shippingForm, setShippingForm] = useState<ShippingForm>({
     firstName: "",
@@ -78,16 +97,80 @@ function CheckoutContent() {
     city: "",
     postalCode: "",
     country: "Poland",
+    companyName: "",
+    vatNumber: "",
   });
 
   const subtotal = getTotalPrice();
   const freeShippingThreshold = 5000;
   const selectedShippingOption = shippingOptions.find(s => s.id === selectedShipping);
   const shipping = subtotal >= freeShippingThreshold ? 0 : (selectedShippingOption?.price || 18);
+  // VAT is 0% for valid intra-community purchases, otherwise included in price (23%)
+  const vatRate = vatValidation.vatExempt ? 0 : 0.23;
+  const vatAmount = vatValidation.vatExempt ? 0 : (subtotal / 1.23) * 0.23; // Extract VAT from brutto price
   const total = subtotal + shipping;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setShippingForm({ ...shippingForm, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setShippingForm({ ...shippingForm, [name]: value });
+
+    // Reset VAT validation when VAT number changes
+    if (name === "vatNumber") {
+      setVatValidation({
+        isValid: false,
+        isIntraCommunity: false,
+        vatExempt: false,
+        isValidating: false,
+      });
+    }
+  };
+
+  const validateVatNumber = async () => {
+    if (!shippingForm.vatNumber.trim()) {
+      setVatValidation({
+        isValid: false,
+        isIntraCommunity: false,
+        vatExempt: false,
+        isValidating: false,
+        message: "Wprowadź numer VAT",
+      });
+      return;
+    }
+
+    setVatValidation(prev => ({ ...prev, isValidating: true }));
+
+    try {
+      const response = await fetch("/api/validate-vat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vatNumber: shippingForm.vatNumber }),
+      });
+
+      const data = await response.json();
+
+      setVatValidation({
+        isValid: data.isValid,
+        isIntraCommunity: data.isIntraCommunity || false,
+        vatExempt: data.vatExempt || false,
+        companyName: data.name,
+        companyAddress: data.address,
+        message: data.message || data.error,
+        isValidating: false,
+      });
+
+      // Auto-fill company name if returned from VIES
+      if (data.name && !shippingForm.companyName) {
+        setShippingForm(prev => ({ ...prev, companyName: data.name }));
+      }
+    } catch (err) {
+      setVatValidation({
+        isValid: false,
+        isIntraCommunity: false,
+        vatExempt: false,
+        isValidating: false,
+        message: "Błąd walidacji. Spróbuj ponownie.",
+      });
+    }
   };
 
   const validateShipping = () => {
@@ -345,7 +428,7 @@ function CheckoutContent() {
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Country
+                      Kraj / Country
                     </label>
                     <select
                       name="country"
@@ -353,15 +436,146 @@ function CheckoutContent() {
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
                     >
-                      <option value="Poland">Poland</option>
-                      <option value="Germany">Germany</option>
-                      <option value="Spain">Spain</option>
-                      <option value="France">France</option>
-                      <option value="Italy">Italy</option>
-                      <option value="Netherlands">Netherlands</option>
-                      <option value="Czech Republic">Czech Republic</option>
+                      <option value="Poland">Polska (PL)</option>
+                      <option value="Germany">Niemcy (DE)</option>
+                      <option value="Spain">Hiszpania (ES)</option>
+                      <option value="France">Francja (FR)</option>
+                      <option value="Italy">Włochy (IT)</option>
+                      <option value="Netherlands">Holandia (NL)</option>
+                      <option value="Czech Republic">Czechy (CZ)</option>
+                      <option value="Austria">Austria (AT)</option>
+                      <option value="Belgium">Belgia (BE)</option>
+                      <option value="Slovakia">Słowacja (SK)</option>
+                      <option value="Lithuania">Litwa (LT)</option>
+                      <option value="Latvia">Łotwa (LV)</option>
+                      <option value="Estonia">Estonia (EE)</option>
+                      <option value="Sweden">Szwecja (SE)</option>
+                      <option value="Denmark">Dania (DK)</option>
+                      <option value="Finland">Finlandia (FI)</option>
+                      <option value="Ireland">Irlandia (IE)</option>
+                      <option value="Portugal">Portugalia (PT)</option>
+                      <option value="Greece">Grecja (EL)</option>
+                      <option value="Hungary">Węgry (HU)</option>
+                      <option value="Romania">Rumunia (RO)</option>
+                      <option value="Bulgaria">Bułgaria (BG)</option>
+                      <option value="Croatia">Chorwacja (HR)</option>
+                      <option value="Slovenia">Słowenia (SI)</option>
+                      <option value="Luxembourg">Luksemburg (LU)</option>
+                      <option value="Malta">Malta (MT)</option>
+                      <option value="Cyprus">Cypr (CY)</option>
                     </select>
                   </div>
+                </div>
+
+                {/* Business Purchase / Company Details */}
+                <div className="mt-6 pt-6 border-t border-neutral-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <input
+                      type="checkbox"
+                      id="businessPurchase"
+                      checked={isBusinessPurchase}
+                      onChange={(e) => setIsBusinessPurchase(e.target.checked)}
+                      className="w-5 h-5 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900"
+                    />
+                    <label htmlFor="businessPurchase" className="text-sm font-medium text-neutral-700">
+                      Zakup na firmę / Faktura VAT
+                    </label>
+                  </div>
+
+                  {isBusinessPurchase && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="space-y-4"
+                    >
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Nazwa firmy / Company Name
+                        </label>
+                        <input
+                          type="text"
+                          name="companyName"
+                          value={shippingForm.companyName}
+                          onChange={handleInputChange}
+                          placeholder="np. Firma Sp. z o.o."
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          NIP / VAT Number (EU)
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            name="vatNumber"
+                            value={shippingForm.vatNumber}
+                            onChange={handleInputChange}
+                            placeholder="np. PL1234567890 lub ES12345678A"
+                            className="flex-1 px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                          />
+                          <button
+                            type="button"
+                            onClick={validateVatNumber}
+                            disabled={vatValidation.isValidating || !shippingForm.vatNumber}
+                            className="px-4 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                          >
+                            {vatValidation.isValidating ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Check className="w-4 h-4" />
+                            )}
+                            Sprawdź VIES
+                          </button>
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          Wprowadź numer VAT z prefiksem kraju (np. ES, DE, FR)
+                        </p>
+                      </div>
+
+                      {/* VAT Validation Result */}
+                      {vatValidation.message && (
+                        <div className={`p-4 rounded-xl flex items-start gap-3 ${
+                          vatValidation.vatExempt
+                            ? "bg-green-50 border border-green-200"
+                            : vatValidation.isValid
+                              ? "bg-blue-50 border border-blue-200"
+                              : "bg-red-50 border border-red-200"
+                        }`}>
+                          {vatValidation.vatExempt ? (
+                            <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          ) : vatValidation.isValid ? (
+                            <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                          ) : (
+                            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                          )}
+                          <div>
+                            <p className={`font-medium ${
+                              vatValidation.vatExempt
+                                ? "text-green-700"
+                                : vatValidation.isValid
+                                  ? "text-blue-700"
+                                  : "text-red-700"
+                            }`}>
+                              {vatValidation.message}
+                            </p>
+                            {vatValidation.companyName && (
+                              <p className="text-sm text-neutral-600 mt-1">
+                                Firma: {vatValidation.companyName}
+                              </p>
+                            )}
+                            {vatValidation.vatExempt && (
+                              <p className="text-sm text-green-600 mt-1 font-medium">
+                                Transakcja wewnątrzwspólnotowa - VAT 0%
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
                 </div>
 
                 <motion.button
@@ -547,10 +761,24 @@ function CheckoutContent() {
                   <span className="text-neutral-500">{tCart("shipping")}</span>
                   <span>{shipping === 0 ? <span className="text-green-600">Gratis</span> : formatPrice(shipping)}</span>
                 </div>
-                <div className="flex justify-between text-xs text-neutral-400">
-                  <span>VAT 23% (zawarty w cenie)</span>
-                  <span>Ceny brutto</span>
-                </div>
+                {vatValidation.vatExempt ? (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-green-600 font-medium">VAT (0% - WDT)</span>
+                    <span className="text-green-600 font-medium">0,00 zł</span>
+                  </div>
+                ) : (
+                  <div className="flex justify-between text-xs text-neutral-400">
+                    <span>VAT 23% (zawarty w cenie)</span>
+                    <span>≈ {formatPrice(vatAmount)}</span>
+                  </div>
+                )}
+                {vatValidation.vatExempt && (
+                  <div className="p-2 bg-green-50 rounded-lg">
+                    <p className="text-xs text-green-700 font-medium">
+                      Transakcja wewnątrzwspólnotowa - zwolnienie z VAT
+                    </p>
+                  </div>
+                )}
                 <div className="flex justify-between text-lg font-bold pt-3 border-t border-neutral-200">
                   <span>{tCart("total")}</span>
                   <span>{formatPrice(total)}</span>
