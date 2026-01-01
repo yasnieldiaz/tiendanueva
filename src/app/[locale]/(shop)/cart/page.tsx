@@ -36,8 +36,8 @@ export default function CartPage() {
   const [selectedShipping, setSelectedShipping] = useState("inpost");
 
   const subtotal = getTotalPrice();
-  // Free shipping over 500 PLN
-  const freeShippingThreshold = 500;
+  // Free shipping over 5000 PLN
+  const freeShippingThreshold = 5000;
   const selectedShippingOption = shippingOptions.find(s => s.id === selectedShipping);
   const shipping = subtotal >= freeShippingThreshold ? 0 : (selectedShippingOption?.price || 18);
   const total = subtotal + shipping;

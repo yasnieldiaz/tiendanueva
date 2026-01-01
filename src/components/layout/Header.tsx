@@ -153,7 +153,7 @@ export default function Header() {
       <div className="bg-neutral-900 text-white text-xs py-2">
         <div className="container mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <span>Bezpłatna dostawa od 500 zł</span>
+            <span>Bezpłatna dostawa od 5000 zł</span>
             <span className="hidden sm:inline">|</span>
             <span className="hidden sm:inline">Gwarancja 2 lata</span>
           </div>

@@ -42,7 +42,7 @@ export default function Footer() {
               </div>
               <div>
                 <p className="font-semibold">Bezpłatna dostawa</p>
-                <p className="text-sm text-neutral-400">Przy zamówieniach od 500 zł</p>
+                <p className="text-sm text-neutral-400">Przy zamówieniach od 5000 zł</p>
               </div>
             </div>
             <div className="flex items-center gap-4">

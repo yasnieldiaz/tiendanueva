@@ -81,7 +81,7 @@ function CheckoutContent() {
   });
 
   const subtotal = getTotalPrice();
-  const freeShippingThreshold = 500;
+  const freeShippingThreshold = 5000;
   const selectedShippingOption = shippingOptions.find(s => s.id === selectedShipping);
   const shipping = subtotal >= freeShippingThreshold ? 0 : (selectedShippingOption?.price || 18);
   const total = subtotal + shipping;

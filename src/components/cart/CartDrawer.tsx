@@ -15,8 +15,8 @@ export default function CartDrawer() {
   const { formatPrice } = useCurrency();
 
   const subtotal = getTotalPrice();
-  // Free shipping over 500 PLN
-  const freeShippingThreshold = 500;
+  // Free shipping over 5000 PLN
+  const freeShippingThreshold = 5000;
   const shipping = subtotal >= freeShippingThreshold ? 0 : 18; // InPost price as default
   const total = subtotal + shipping;
 

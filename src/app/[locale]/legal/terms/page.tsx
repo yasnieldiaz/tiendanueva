@@ -83,12 +83,11 @@ export default function TermsPage() {
               <li>Dostawa realizowana jest na terenie Unii Europejskiej.</li>
               <li>Dostępne metody dostawy:
                 <ul className="list-disc pl-6 mt-2 space-y-1">
-                  <li>Odbiór osobisty - bezpłatnie</li>
-                  <li>Kurier - 17,80 zł (24 godziny)</li>
-                  <li>DHL - 17,80 zł (24-48 godzin)</li>
+                  <li>InPost Paczkomaty - 18 zł brutto (24-48 godzin)</li>
+                  <li>GLS Kurier - 24 zł brutto (24-48 godzin)</li>
                 </ul>
               </li>
-              <li>Bezpłatna dostawa przy zamówieniach powyżej 500 zł.</li>
+              <li>Bezpłatna dostawa przy zamówieniach powyżej 5000 zł.</li>
               <li>Czas realizacji zamówienia: 1-3 dni robocze.</li>
               <li>W przypadku braku towaru Klient zostanie poinformowany o przewidywanym terminie realizacji.</li>
             </ol>
