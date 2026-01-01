@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
   Package,
   ShoppingCart,
@@ -10,6 +12,7 @@ import {
   TrendingUp,
   ArrowUpRight,
   ArrowDownRight,
+  ChevronRight,
 } from "lucide-react";
 
 interface Stats {
@@ -29,6 +32,7 @@ interface Stats {
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const locale = useLocale();
 
   useEffect(() => {
     async function fetchStats() {
@@ -55,6 +59,7 @@ export default function AdminDashboard() {
       color: "bg-blue-500",
       change: "+12%",
       up: true,
+      href: `/${locale}/admin/products`,
     },
     {
       title: "Total Orders",
@@ -63,14 +68,16 @@ export default function AdminDashboard() {
       color: "bg-green-500",
       change: "+8%",
       up: true,
+      href: `/${locale}/admin/orders`,
     },
     {
       title: "Total Revenue",
-      value: `€${(stats?.totalRevenue || 0).toFixed(2)}`,
+      value: `${(stats?.totalRevenue || 0).toFixed(2)} zł`,
       icon: DollarSign,
       color: "bg-purple-500",
       change: "+23%",
       up: true,
+      href: `/${locale}/admin/orders`,
     },
     {
       title: "Total Users",
@@ -79,6 +86,7 @@ export default function AdminDashboard() {
       color: "bg-orange-500",
       change: "+5%",
       up: true,
+      href: `/${locale}/admin/customers`,
     },
   ];
 
@@ -107,33 +115,32 @@ export default function AdminDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {statCards.map((stat, index) => (
-          <motion.div
-            key={stat.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-2xl p-6 shadow-sm"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className={`${stat.color} p-3 rounded-xl`}>
-                <stat.icon className="w-6 h-6 text-white" />
+          <Link key={stat.title} href={stat.href}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className={`${stat.color} p-3 rounded-xl`}>
+                  <stat.icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex items-center gap-1">
+                  <span
+                    className={`text-sm ${
+                      stat.up ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {stat.change}
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 transition-colors" />
+                </div>
               </div>
-              <div
-                className={`flex items-center gap-1 text-sm ${
-                  stat.up ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {stat.change}
-                {stat.up ? (
-                  <ArrowUpRight className="w-4 h-4" />
-                ) : (
-                  <ArrowDownRight className="w-4 h-4" />
-                )}
-              </div>
-            </div>
-            <p className="text-2xl font-bold text-neutral-900">{stat.value}</p>
-            <p className="text-sm text-neutral-500 mt-1">{stat.title}</p>
-          </motion.div>
+              <p className="text-2xl font-bold text-neutral-900">{stat.value}</p>
+              <p className="text-sm text-neutral-500 mt-1">{stat.title}</p>
+            </motion.div>
+          </Link>
         ))}
       </div>
 

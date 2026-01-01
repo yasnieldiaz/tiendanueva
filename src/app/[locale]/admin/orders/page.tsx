@@ -11,6 +11,7 @@ import {
   X,
   Truck,
   Send,
+  Trash2,
 } from "lucide-react";
 
 interface OrderItem {
@@ -48,6 +49,8 @@ export default function AdminOrdersPage() {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [carrier, setCarrier] = useState("");
   const [sendingShipping, setSendingShipping] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -141,6 +144,30 @@ export default function AdminOrdersPage() {
     setSelectedOrder(order);
     setTrackingNumber(order.trackingNumber || "");
     setCarrier(order.carrier || "");
+  }
+
+  async function deleteOrder(orderId: string) {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setOrders(orders.filter((o) => o.id !== orderId));
+        setDeleteConfirm(null);
+        if (selectedOrder?.id === orderId) {
+          setSelectedOrder(null);
+        }
+      } else {
+        const data = await res.json();
+        alert(data.error || "Error deleting order");
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      alert("Error deleting order");
+    } finally {
+      setDeleting(false);
+    }
   }
 
   const statusColors: Record<string, string> = {
@@ -267,12 +294,20 @@ export default function AdminOrdersPage() {
                       €{order.total.toFixed(2)}
                     </td>
                     <td className="py-4 px-6">
-                      <div className="flex items-center justify-end">
+                      <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => handleSelectOrder(order)}
                           className="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg"
+                          title="View details"
                         >
                           <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirm(order.id)}
+                          className="p-2 text-neutral-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                          title="Delete order"
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -504,6 +539,45 @@ export default function AdminOrdersPage() {
                     </p>
                   </div>
                 )}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl max-w-md w-full p-6"
+          >
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-8 h-8 text-red-600" />
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 mb-2">
+                Delete Order?
+              </h3>
+              <p className="text-neutral-500 mb-6">
+                Are you sure you want to delete this order? This action cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-3 bg-neutral-100 text-neutral-700 font-medium rounded-xl hover:bg-neutral-200 transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => deleteOrder(deleteConfirm)}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-3 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {deleting ? "Deleting..." : "Delete"}
+                </button>
               </div>
             </div>
           </motion.div>
