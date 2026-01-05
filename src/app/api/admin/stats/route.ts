@@ -34,7 +34,7 @@ export async function GET() {
       }),
     ]);
 
-    const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+    const totalRevenue = orders.reduce((sum: number, order: { total: number }) => sum + order.total, 0);
 
     return NextResponse.json({
       totalProducts,

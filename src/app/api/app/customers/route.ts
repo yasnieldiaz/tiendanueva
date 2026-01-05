@@ -78,13 +78,13 @@ export async function GET(request: Request) {
       prisma.user.count({ where }),
     ]);
 
-    const formattedCustomers = customers.map((customer) => ({
+    const formattedCustomers = customers.map((customer: typeof customers[number]) => ({
       id: customer.id,
       name: customer.name || "Sin nombre",
       email: customer.email,
       phone: customer.phone || "-",
       ordersCount: customer.orders.length,
-      totalSpent: customer.orders.reduce((sum, order) => sum + order.total, 0),
+      totalSpent: customer.orders.reduce((sum: number, order: { total: number }) => sum + order.total, 0),
       createdAt: customer.createdAt,
     }));
 
