@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLocale } from "next-intl";
-import { Mail, Phone, MapPin, Facebook, Instagram, Youtube, Shield, Truck, RotateCcw } from "lucide-react";
+import { Mail, Phone, MapPin, Facebook, Shield, Truck, RotateCcw } from "lucide-react";
 
 export default function Footer() {
   const locale = useLocale();
@@ -73,10 +73,11 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href={`/${locale}`} className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
-                <span className="text-neutral-900 font-bold text-lg">DP</span>
-              </div>
-              <span className="font-bold text-xl">DroneParts</span>
+              <img
+                src="https://drone-partss.com/wp-content/uploads/2024/11/LogoDrone.png"
+                alt="Drone-Partss"
+                className="h-12 w-auto"
+              />
             </Link>
             <p className="text-neutral-400 mb-6 leading-relaxed max-w-md">
               Twój zaufany dostawca profesjonalnych dronów i akcesoriów.
@@ -84,28 +85,12 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-4 mb-6">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/profile.php?id=100063593409895"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors"
               >
                 <Facebook className="w-5 h-5" />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-pink-600 transition-colors"
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a
-                href="https://youtube.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors"
-              >
-                <Youtube className="w-5 h-5" />
               </a>
             </div>
 
@@ -113,18 +98,18 @@ export default function Footer() {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <MapPin className="w-4 h-4 text-neutral-500" />
-                <span className="text-neutral-400 text-sm">ul. Przykładowa 123, 00-001 Warszawa</span>
+                <span className="text-neutral-400 text-sm">ul. Smolna 14, 44-200 Rybnik, Polska</span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-neutral-500" />
-                <a href="tel:+48123456789" className="text-neutral-400 text-sm hover:text-white">
-                  +48 123 456 789
+                <a href="tel:+48784608733" className="text-neutral-400 text-sm hover:text-white">
+                  +48 784-608-733
                 </a>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-neutral-500" />
-                <a href="mailto:info@drone-partss.com" className="text-neutral-400 text-sm hover:text-white">
-                  info@drone-partss.com
+                <a href="mailto:admin@drone-partss.com" className="text-neutral-400 text-sm hover:text-white">
+                  admin@drone-partss.com
                 </a>
               </div>
             </div>
@@ -225,7 +210,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-neutral-500 text-sm text-center">
-              © {new Date().getFullYear()} DroneParts. Wszelkie prawa zastrzeżone.
+              © {new Date().getFullYear()} Drone-Partss. Wszelkie prawa zastrzeżone.
             </p>
           </div>
         </div>
