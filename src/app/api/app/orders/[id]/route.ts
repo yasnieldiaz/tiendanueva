@@ -105,7 +105,7 @@ export async function GET(
         : null),
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-      items: order.items.map((item) => ({
+      items: order.items.map((item: typeof order.items[number]) => ({
         id: item.id,
         name: item.name,
         price: item.price,

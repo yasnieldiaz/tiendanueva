@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Upsert each setting
-    const operations = Object.entries(body).map(([key, value]) =>
+    const operations = Object.entries(body).map(([key, value]: [string, unknown]) =>
       prisma.setting.upsert({
         where: { key },
         update: { value: String(value) },

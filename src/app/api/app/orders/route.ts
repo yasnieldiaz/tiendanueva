@@ -93,7 +93,7 @@ export async function GET(request: Request) {
       prisma.order.count({ where }),
     ]);
 
-    const formattedOrders = orders.map((order) => ({
+    const formattedOrders = orders.map((order: typeof orders[number]) => ({
       id: order.id,
       orderNumber: order.orderNumber,
       customerName: order.user?.name || "Cliente",
@@ -110,7 +110,7 @@ export async function GET(request: Request) {
       notes: order.notes,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-      items: order.items.map((item) => ({
+      items: order.items.map((item: typeof order.items[number]) => ({
         id: item.id,
         name: item.name,
         price: item.price,

@@ -85,7 +85,7 @@ export async function POST(request: Request) {
         // Prepare order data for emails
         const orderEmailData = {
           orderNumber: order.orderNumber,
-          items: order.items.map((item) => ({
+          items: order.items.map((item: { name: string; price: number; quantity: number; variant: string | null }) => ({
             name: item.name,
             price: item.price,
             quantity: item.quantity,
