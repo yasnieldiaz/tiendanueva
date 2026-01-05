@@ -75,7 +75,8 @@ export async function PUT(
     } = body;
 
     // Update product and images in a transaction
-    const product = await prisma.$transaction(async (tx: typeof prisma) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const product = await prisma.$transaction(async (tx: any) => {
       // Delete existing images
       await tx.productImage.deleteMany({
         where: { productId: id },
