@@ -180,6 +180,7 @@
   "products": {
     "title": "Nuestros Productos",
     "featured": "Destacados",
+    "featuredSubtitle": "Nuestros productos más populares",
     "new": "Novedades",
     "sale": "Ofertas",
     "all": "Todos los productos",

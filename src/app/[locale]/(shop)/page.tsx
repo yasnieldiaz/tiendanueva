@@ -253,18 +253,9 @@ export default function HomePage() {
       {/* Featured Products */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-neutral-900">{tProducts("featured")}</h2>
-              <p className="text-neutral-500 mt-1">Our most popular products</p>
-            </div>
-            <Link
-              href={`/${locale}/products`}
-              className="flex items-center gap-1 text-neutral-700 hover:text-neutral-900 font-medium transition-colors"
-            >
-              {tProducts("all")}
-              <ChevronRight className="w-4 h-4" />
-            </Link>
+          <div className="mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-neutral-900">{tProducts("featured")}</h2>
+            <p className="text-neutral-500 mt-1">{tProducts("featuredSubtitle")}</p>
           </div>
 
           {loading ? (
