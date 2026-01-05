@@ -16,7 +16,7 @@ export async function GET() {
 
     // Convert array to object
     const settingsObject: Record<string, string> = {};
-    settings.forEach((s) => {
+    settings.forEach((s: { key: string; value: string }) => {
       settingsObject[s.key] = s.value;
     });
 
