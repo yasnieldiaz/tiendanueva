@@ -1,13 +1,10 @@
 "use client";
 
-import { BuilderComponent as BuilderIO, useIsPreviewing } from "@builder.io/react";
-import { builder } from "@/lib/builder";
+import { BuilderComponent as BuilderIO, builder } from "@builder.io/react";
 
-// Register custom components that can be used in Builder
-// builder.registerComponent(YourComponent, {
-//   name: "YourComponent",
-//   inputs: [{ name: "title", type: "string" }],
-// });
+// Initialize Builder
+const BUILDER_API_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY || "";
+builder.init(BUILDER_API_KEY);
 
 interface BuilderPageProps {
   content: any;
@@ -15,9 +12,7 @@ interface BuilderPageProps {
 }
 
 export default function BuilderContent({ content, model = "page" }: BuilderPageProps) {
-  const isPreviewing = useIsPreviewing();
-
-  if (!content && !isPreviewing) {
+  if (!content) {
     return null;
   }
 
@@ -25,7 +20,6 @@ export default function BuilderContent({ content, model = "page" }: BuilderPageP
     <BuilderIO
       model={model}
       content={content}
-      apiKey={process.env.NEXT_PUBLIC_BUILDER_API_KEY}
     />
   );
 }

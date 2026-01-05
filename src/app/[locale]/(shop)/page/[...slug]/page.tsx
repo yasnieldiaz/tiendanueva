@@ -1,9 +1,12 @@
-import { builder } from "@builder.io/sdk";
+import { builder } from "@builder.io/react";
 import BuilderContent from "@/components/BuilderComponent";
 import { notFound } from "next/navigation";
 
 // Initialize Builder
-builder.init(process.env.NEXT_PUBLIC_BUILDER_API_KEY || "");
+const BUILDER_API_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY || "";
+if (BUILDER_API_KEY) {
+  builder.init(BUILDER_API_KEY);
+}
 
 interface PageProps {
   params: Promise<{
@@ -21,9 +24,6 @@ export default async function BuilderPage({ params }: PageProps) {
     .get("page", {
       userAttributes: {
         urlPath,
-        locale,
-      },
-      options: {
         locale,
       },
     })

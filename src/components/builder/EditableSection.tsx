@@ -1,7 +1,10 @@
 "use client";
 
-import { BuilderComponent, useIsPreviewing } from "@builder.io/react";
-import { builder } from "@/lib/builder";
+import { BuilderComponent, builder } from "@builder.io/react";
+
+// Initialize Builder
+const BUILDER_API_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY || "";
+builder.init(BUILDER_API_KEY);
 
 interface EditableSectionProps {
   model: string; // e.g., "hero-section", "banner", "announcement"
@@ -10,10 +13,8 @@ interface EditableSectionProps {
 }
 
 export default function EditableSection({ model, content, fallback }: EditableSectionProps) {
-  const isPreviewing = useIsPreviewing();
-
-  // Show fallback if no Builder content and not previewing
-  if (!content && !isPreviewing) {
+  // Show fallback if no Builder content
+  if (!content) {
     return fallback || null;
   }
 
@@ -21,7 +22,6 @@ export default function EditableSection({ model, content, fallback }: EditableSe
     <BuilderComponent
       model={model}
       content={content}
-      apiKey={process.env.NEXT_PUBLIC_BUILDER_API_KEY}
     />
   );
 }
