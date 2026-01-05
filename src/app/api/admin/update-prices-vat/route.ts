@@ -72,7 +72,7 @@ export async function GET() {
     });
 
     const VAT_RATE = 1.23;
-    const preview = products.map(product => ({
+    const preview = products.map((product: { id: string; name: string; price: number }) => ({
       id: product.id,
       name: product.name,
       currentPrice: product.price,
