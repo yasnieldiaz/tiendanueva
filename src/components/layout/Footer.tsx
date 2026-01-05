@@ -186,23 +186,25 @@ export default function Footer() {
       {/* EU Compliance */}
       <div className="border-t border-neutral-800">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4 text-sm text-neutral-400">
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm text-neutral-400">
               <span>Platforma ODR:</span>
               <a
                 href="https://ec.europa.eu/consumers/odr"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 underline"
+                className="text-blue-400 hover:text-blue-300 underline text-xs sm:text-sm break-all sm:break-normal"
               >
                 ec.europa.eu/consumers/odr
               </a>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-center gap-2">
               <span className="text-neutral-400 text-sm">Zgodność z:</span>
-              <span className="px-2 py-1 bg-blue-900/50 text-blue-300 text-xs rounded">RODO/GDPR</span>
-              <span className="px-2 py-1 bg-green-900/50 text-green-300 text-xs rounded">PSD2</span>
-              <span className="px-2 py-1 bg-orange-900/50 text-orange-300 text-xs rounded">Dyrektywa 2011/83/UE</span>
+              <div className="flex items-center gap-2 flex-wrap justify-center">
+                <span className="px-2 py-1 bg-blue-900/50 text-blue-300 text-[10px] sm:text-xs rounded">RODO/GDPR</span>
+                <span className="px-2 py-1 bg-green-900/50 text-green-300 text-[10px] sm:text-xs rounded">PSD2</span>
+                <span className="px-2 py-1 bg-orange-900/50 text-orange-300 text-[10px] sm:text-xs rounded whitespace-nowrap">Dyrektywa 2011/83/UE</span>
+              </div>
             </div>
           </div>
         </div>
@@ -211,18 +213,20 @@ export default function Footer() {
       {/* Payment Methods & Copyright */}
       <div className="border-t border-neutral-800">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-neutral-500 text-sm">
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <span className="text-neutral-500 text-sm">Płatności:</span>
+              <div className="flex items-center gap-2 flex-wrap justify-center">
+                <div className="px-2 sm:px-3 py-1.5 bg-neutral-800 rounded text-[10px] sm:text-xs font-bold">PayPal</div>
+                <div className="px-2 sm:px-3 py-1.5 bg-[#1A1F71] rounded text-[10px] sm:text-xs font-bold">VISA</div>
+                <div className="px-2 sm:px-3 py-1.5 bg-neutral-700 rounded text-[10px] sm:text-xs font-bold">Mastercard</div>
+                <div className="px-2 sm:px-3 py-1.5 bg-[#635BFF] rounded text-[10px] sm:text-xs font-bold">stripe</div>
+                <div className="px-2 sm:px-3 py-1.5 bg-black border border-neutral-700 rounded text-[10px] sm:text-xs font-bold">Apple Pay</div>
+              </div>
+            </div>
+            <p className="text-neutral-500 text-sm text-center">
               © {new Date().getFullYear()} DroneParts. Wszelkie prawa zastrzeżone.
             </p>
-            <div className="flex items-center gap-3">
-              <span className="text-neutral-500 text-sm mr-2">Płatności:</span>
-              <div className="px-3 py-1.5 bg-neutral-800 rounded text-xs font-bold">PayPal</div>
-              <div className="px-3 py-1.5 bg-[#1A1F71] rounded text-xs font-bold">VISA</div>
-              <div className="px-3 py-1.5 bg-neutral-700 rounded text-xs font-bold">Mastercard</div>
-              <div className="px-3 py-1.5 bg-[#635BFF] rounded text-xs font-bold">stripe</div>
-              <div className="px-3 py-1.5 bg-black border border-neutral-700 rounded text-xs font-bold">Apple Pay</div>
-            </div>
           </div>
         </div>
       </div>

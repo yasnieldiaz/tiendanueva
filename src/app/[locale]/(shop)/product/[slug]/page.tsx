@@ -442,50 +442,55 @@ export default function ProductPage() {
             </div>
 
             {/* Quantity & Add to Cart */}
-            <div className="mt-6 flex items-center gap-3">
-              {/* Quantity */}
-              <div className="flex items-center border border-neutral-300 rounded-lg">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-2 text-neutral-600 hover:text-neutral-900 disabled:opacity-50"
-                  disabled={quantity <= 1}
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="w-12 text-center font-medium">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                  className="px-3 py-2 text-neutral-600 hover:text-neutral-900 disabled:opacity-50"
-                  disabled={quantity >= product.stock}
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
+            <div className="mt-6 space-y-3">
+              {/* Quantity Row */}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center border border-neutral-300 rounded-lg">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="px-3 py-2 text-neutral-600 hover:text-neutral-900 disabled:opacity-50"
+                    disabled={quantity <= 1}
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="w-12 text-center font-medium">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                    className="px-3 py-2 text-neutral-600 hover:text-neutral-900 disabled:opacity-50"
+                    disabled={quantity >= product.stock}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
-              {/* Add to Cart */}
-              <button
-                onClick={handleAddToCart}
-                disabled={product.stock === 0 || isAddingToCart}
-                className="flex-1 flex items-center justify-center gap-2 py-3 px-6 bg-neutral-900 text-white font-semibold rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isAddingToCart ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <>
-                    <ShoppingCart className="w-5 h-5" />
-                    Dodaj Do Koszyka
-                  </>
-                )}
-              </button>
+              {/* Buttons Row - Stack on mobile */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                {/* Add to Cart */}
+                <button
+                  onClick={handleAddToCart}
+                  disabled={product.stock === 0 || isAddingToCart}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-neutral-900 text-white font-semibold rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                >
+                  {isAddingToCart ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-5 h-5" />
+                      <span>Dodaj Do Koszyka</span>
+                    </>
+                  )}
+                </button>
 
-              {/* Buy Now */}
-              <button
-                onClick={handleBuyNow}
-                disabled={product.stock === 0}
-                className="py-3 px-6 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Buy Now
-              </button>
+                {/* Buy Now */}
+                <button
+                  onClick={handleBuyNow}
+                  disabled={product.stock === 0}
+                  className="flex-1 sm:flex-none py-3 px-6 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                >
+                  Buy Now
+                </button>
+              </div>
             </div>
 
             {/* Wishlist & Compare */}
@@ -510,42 +515,42 @@ export default function ProductPage() {
 
             {/* Delivery Options */}
             <div className="mt-6 border border-neutral-200 rounded-lg divide-y divide-neutral-200">
-              <div className="p-4 flex items-start justify-between">
+              <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                 <div className="flex items-start gap-3">
-                  <Store className="w-5 h-5 text-neutral-500 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-neutral-900">Odbiór ze sklepu Drone-Partss</p>
-                    <p className="text-sm text-neutral-500">Do odebrania dzisiaj</p>
+                  <Store className="w-5 h-5 text-neutral-500 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-medium text-neutral-900 text-sm sm:text-base">Odbiór ze sklepu Drone-Partss</p>
+                    <p className="text-xs sm:text-sm text-neutral-500">Do odebrania dzisiaj</p>
                   </div>
                 </div>
-                <span className="text-green-600 font-medium">Bezpłatnie</span>
+                <span className="text-green-600 font-medium text-sm sm:text-base ml-8 sm:ml-0 flex-shrink-0">Bezpłatnie</span>
               </div>
-              <div className="p-4 flex items-start justify-between">
+              <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                 <div className="flex items-start gap-3">
-                  <Truck className="w-5 h-5 text-neutral-500 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-neutral-900">Courier delivery</p>
-                    <p className="text-sm text-neutral-500">Nasz kurier dostarczy pod wskazany adres</p>
+                  <Truck className="w-5 h-5 text-neutral-500 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-medium text-neutral-900 text-sm sm:text-base">Courier delivery</p>
+                    <p className="text-xs sm:text-sm text-neutral-500">Nasz kurier dostarczy pod wskazany adres</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-neutral-500 text-sm">24 Godziny</span>
-                  <p className="font-medium">17,80</p>
+                <div className="text-left sm:text-right ml-8 sm:ml-0 flex-shrink-0">
+                  <span className="text-neutral-500 text-xs sm:text-sm">24 Godziny</span>
+                  <p className="font-medium text-sm sm:text-base">17,80 zł</p>
                 </div>
               </div>
-              <div className="p-4 flex items-start justify-between">
+              <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                 <div className="flex items-start gap-3">
-                  <div className="w-5 h-5 flex items-center justify-center">
+                  <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                     <span className="text-yellow-500 text-xs font-bold">DHL</span>
                   </div>
-                  <div>
-                    <p className="font-medium text-neutral-900">DHL Courier delivery</p>
-                    <p className="text-sm text-neutral-500">Kurier DHL dostarczy pod wskazany adres</p>
+                  <div className="min-w-0">
+                    <p className="font-medium text-neutral-900 text-sm sm:text-base">DHL Courier delivery</p>
+                    <p className="text-xs sm:text-sm text-neutral-500">Kurier DHL dostarczy pod wskazany adres</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-neutral-500 text-sm">24-48 Godziny</span>
-                  <p className="font-medium">17,80</p>
+                <div className="text-left sm:text-right ml-8 sm:ml-0 flex-shrink-0">
+                  <span className="text-neutral-500 text-xs sm:text-sm">24-48 Godziny</span>
+                  <p className="font-medium text-sm sm:text-base">17,80 zł</p>
                 </div>
               </div>
             </div>
@@ -573,21 +578,15 @@ export default function ProductPage() {
             </div>
 
             {/* Payment Methods */}
-            <div className="mt-6 flex items-center gap-3 flex-wrap">
-              <span className="text-sm text-neutral-600">Payment Methods:</span>
-              <div className="flex items-center gap-2">
-                <div className="px-3 py-1.5 bg-[#003087] rounded text-white text-xs font-bold">PayPal</div>
-                <div className="px-2 py-1.5 bg-gradient-to-r from-red-500 to-yellow-500 rounded">
-                  <div className="w-8 h-4 flex items-center justify-center">
-                    <div className="w-3 h-3 bg-red-500 rounded-full -mr-1"></div>
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                  </div>
-                </div>
-                <div className="px-3 py-1.5 bg-[#1A1F71] rounded text-white text-xs font-bold">VISA</div>
-                <div className="px-3 py-1.5 bg-neutral-800 rounded text-white text-xs font-bold">Maestro</div>
-                <div className="px-3 py-1.5 bg-[#635BFF] rounded text-white text-xs font-bold">stripe</div>
-                <div className="px-3 py-1.5 bg-black rounded text-white text-xs font-bold">Pay</div>
-                <div className="px-3 py-1.5 bg-white border border-neutral-300 rounded text-neutral-800 text-xs font-bold">G Pay</div>
+            <div className="mt-6">
+              <span className="text-sm text-neutral-600 block mb-2">Payment Methods:</span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="px-2 sm:px-3 py-1.5 bg-[#003087] rounded text-white text-[10px] sm:text-xs font-bold">PayPal</div>
+                <div className="px-2 sm:px-3 py-1.5 bg-[#1A1F71] rounded text-white text-[10px] sm:text-xs font-bold">VISA</div>
+                <div className="px-2 sm:px-3 py-1.5 bg-neutral-800 rounded text-white text-[10px] sm:text-xs font-bold">Mastercard</div>
+                <div className="px-2 sm:px-3 py-1.5 bg-[#635BFF] rounded text-white text-[10px] sm:text-xs font-bold">stripe</div>
+                <div className="px-2 sm:px-3 py-1.5 bg-black rounded text-white text-[10px] sm:text-xs font-bold">Apple Pay</div>
+                <div className="px-2 sm:px-3 py-1.5 bg-white border border-neutral-300 rounded text-neutral-800 text-[10px] sm:text-xs font-bold">G Pay</div>
               </div>
             </div>
           </div>
