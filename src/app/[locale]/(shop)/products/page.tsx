@@ -263,78 +263,8 @@ function ProductsContent() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="flex gap-8">
-          {/* Sidebar Filters - Desktop */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <div className="sticky top-24">
-              {/* All Categories Header */}
-              <div className="bg-blue-600 text-white px-4 py-3 rounded-t-xl flex items-center gap-2">
-                <Menu className="w-5 h-5" />
-                <span className="font-semibold">All Categories</span>
-              </div>
-
-              {/* Categories List */}
-              <div className="bg-white border border-neutral-200 border-t-0 rounded-b-xl divide-y divide-neutral-100">
-                {categoryStructure.map((category) => (
-                  <div key={category.slug}>
-                    <div className="flex items-center">
-                      <button
-                        onClick={() => setSelectedCategory(category.slug)}
-                        className={`flex-1 text-left px-4 py-3 text-sm transition-colors ${
-                          selectedCategory === category.slug
-                            ? "text-blue-600 font-medium"
-                            : "text-neutral-700 hover:text-blue-600"
-                        }`}
-                      >
-                        {category.name}
-                      </button>
-                      {category.subcategories.length > 0 && (
-                        <button
-                          onClick={() => toggleCategory(category.slug)}
-                          className="px-3 py-3 text-neutral-400 hover:text-neutral-600"
-                        >
-                          <ChevronRight
-                            className={`w-4 h-4 transition-transform ${
-                              expandedCategories.includes(category.slug) ? "rotate-90" : ""
-                            }`}
-                          />
-                        </button>
-                      )}
-                    </div>
-                    {/* Subcategories */}
-                    <AnimatePresence>
-                      {category.subcategories.length > 0 && expandedCategories.includes(category.slug) && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden bg-neutral-50"
-                        >
-                          {category.subcategories.map((sub) => (
-                            <button
-                              key={sub.slug}
-                              onClick={() => setSelectedCategory(sub.slug)}
-                              className={`w-full text-left pl-8 pr-4 py-2 text-sm transition-colors ${
-                                selectedCategory === sub.slug
-                                  ? "text-blue-600 font-medium bg-blue-50"
-                                  : "text-neutral-600 hover:text-blue-600 hover:bg-neutral-100"
-                              }`}
-                            >
-                              {sub.name}
-                            </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ))}
-              </div>
-
-            </div>
-          </aside>
-
-          {/* Main Content */}
-          <div className="flex-1">
+          {/* Main Content - Full Width */}
+          <div>
             {/* Toolbar */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
@@ -440,7 +370,7 @@ function ProductsContent() {
               <div
                 className={
                   viewMode === "grid"
-                    ? "grid grid-cols-2 lg:grid-cols-4 gap-4"
+                    ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"
                     : "space-y-4"
                 }
               >
@@ -456,16 +386,16 @@ function ProductsContent() {
                       <div
                         className={`group h-full ${
                           viewMode === "grid"
-                            ? "bg-white border border-neutral-200 rounded-xl p-3 hover:shadow-md flex flex-col"
-                            : "flex gap-4 bg-white border border-neutral-200 rounded-xl p-3 hover:shadow-md"
+                            ? "bg-white border border-neutral-200 rounded-xl p-4 hover:shadow-lg flex flex-col"
+                            : "flex gap-4 bg-white border border-neutral-200 rounded-xl p-4 hover:shadow-lg"
                         } transition-all cursor-pointer`}
                       >
                         {/* Image */}
                         <div
                           className={`${
                             viewMode === "grid"
-                              ? "aspect-[4/3] mb-3"
-                              : "w-28 h-28 flex-shrink-0"
+                              ? "aspect-square mb-4"
+                              : "w-32 h-32 flex-shrink-0"
                           } bg-neutral-50 rounded-lg flex items-center justify-center relative overflow-hidden`}
                         >
                           {product.images && product.images.length > 0 ? (
@@ -609,7 +539,6 @@ function ProductsContent() {
               </div>
             )}
           </div>
-        </div>
       </div>
 
       {/* Mobile Filters Drawer */}
@@ -743,25 +672,14 @@ function ProductsLoading() {
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="flex gap-8">
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <div className="space-y-4">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-8 bg-neutral-200 rounded animate-pulse" />
-              ))}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div key={i} className="animate-pulse">
+              <div className="bg-neutral-200 rounded-xl aspect-square mb-3" />
+              <div className="h-4 bg-neutral-200 rounded w-3/4 mb-2" />
+              <div className="h-4 bg-neutral-200 rounded w-1/2" />
             </div>
-          </aside>
-          <div className="flex-1">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="bg-neutral-200 rounded-xl aspect-[4/3] mb-3" />
-                  <div className="h-4 bg-neutral-200 rounded w-3/4 mb-2" />
-                  <div className="h-4 bg-neutral-200 rounded w-1/2" />
-                </div>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
