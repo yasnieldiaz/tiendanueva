@@ -15,7 +15,7 @@ interface OrderInfo {
 async function getSettings(): Promise<Record<string, string>> {
   const settings = await prisma.setting.findMany();
   const settingsObj: Record<string, string> = {};
-  settings.forEach((s) => {
+  settings.forEach((s: { key: string; value: string }) => {
     settingsObj[s.key] = s.value;
   });
   return settingsObj;
