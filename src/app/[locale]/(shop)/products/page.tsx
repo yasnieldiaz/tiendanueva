@@ -11,11 +11,13 @@ import {
   SlidersHorizontal,
   X,
   ChevronDown,
+  ChevronRight,
   Grid3X3,
   List,
   ShoppingCart,
   ArrowLeft,
   Loader2,
+  Menu,
 } from "lucide-react";
 import { useCurrency } from "@/store/currency";
 import { useCart } from "@/store/cart";
@@ -55,6 +57,80 @@ const sortOptions = [
   { value: "nameDesc", label: "sortOptions.nameDesc" },
 ];
 
+// Hierarchical category structure like drone-partss.com
+const categoryStructure = [
+  { name: "XAG", slug: "xag", subcategories: [] },
+  { name: "DJI Neo", slug: "dji-neo", subcategories: [] },
+  { name: "DJI Flip", slug: "dji-flip", subcategories: [] },
+  { name: "FIMI Drone Series", slug: "fimi", subcategories: [] },
+  {
+    name: "Autel Robotics",
+    slug: "autel-robotics",
+    subcategories: [
+      { name: "Autel Max 4T", slug: "autel-max-4t" },
+      { name: "Autel Evo II V3", slug: "autel-evo-ii-v3" },
+      { name: "Autel Evo 2 V2", slug: "autel-evo-2-v2" },
+      { name: "Autel Lite", slug: "autel-lite" },
+    ]
+  },
+  {
+    name: "DJI Mavic Pro",
+    slug: "dji-mavic",
+    subcategories: [
+      { name: "DJI Mavic 4 Pro", slug: "dji-mavic-4-pro" },
+      { name: "DJI Mavic 3 Pro", slug: "dji-mavic-3-pro" },
+      { name: "DJI Mavic 3 Classic", slug: "dji-mavic-3-classic" },
+    ]
+  },
+  { name: "DJI FPV", slug: "dji-fpv", subcategories: [] },
+  {
+    name: "DJI Avata Series",
+    slug: "dji-avata",
+    subcategories: [
+      { name: "DJI Avata 2", slug: "dji-avata-2" },
+      { name: "DJI Avata", slug: "dji-avata-1" },
+    ]
+  },
+  {
+    name: "DJI Enterprises",
+    slug: "dji-enterprise",
+    subcategories: [
+      { name: "DJI Matrice 4 Series", slug: "dji-matrice-4" },
+      { name: "DJI Matrice 350 RTK", slug: "dji-matrice-350-rtk" },
+      { name: "DJI M30T", slug: "dji-m30t" },
+      { name: "DJI Inspire 2", slug: "dji-inspire-2" },
+    ]
+  },
+  {
+    name: "DJI Mavic 2 Series",
+    slug: "dji-mavic-2",
+    subcategories: [
+      { name: "DJI Mavic 2 Pro", slug: "dji-mavic-2-pro" },
+      { name: "DJI Mavic 2 Zoom", slug: "dji-mavic-2-zoom" },
+    ]
+  },
+  {
+    name: "DJI Mavic Air Series",
+    slug: "dji-mavic-air",
+    subcategories: [
+      { name: "DJI Air 3", slug: "dji-air-3" },
+      { name: "DJI Air 2S", slug: "dji-air-2s" },
+      { name: "DJI Mavic Air 2", slug: "dji-mavic-air-2" },
+    ]
+  },
+  {
+    name: "DJI Mavic Mini Series",
+    slug: "dji-mini",
+    subcategories: [
+      { name: "DJI Mini 4 Pro", slug: "dji-mini-4-pro" },
+      { name: "DJI Mini 3 Pro", slug: "dji-mini-3-pro" },
+      { name: "DJI Mini 3", slug: "dji-mini-3" },
+      { name: "DJI Mini 2", slug: "dji-mini-2" },
+    ]
+  },
+  { name: "Akcesoria", slug: "akcesoria", subcategories: [] },
+];
+
 function ProductsContent() {
   const t = useTranslations("products");
   const tNav = useTranslations("nav");
@@ -74,6 +150,13 @@ function ProductsContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+
+  const toggleCategory = (slug: string) => {
+    setExpandedCategories(prev =>
+      prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]
+    );
+  };
 
   // Filters - initialize from URL params
   const [search, setSearch] = useState(urlSearch);
@@ -183,118 +266,70 @@ function ProductsContent() {
         <div className="flex gap-8">
           {/* Sidebar Filters - Desktop */}
           <aside className="hidden lg:block w-64 flex-shrink-0">
-            <div className="sticky top-24 space-y-6">
-              {/* Search */}
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  {t("filter")}
-                </label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder={tNav("search")}
-                    className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-                  />
-                </div>
+            <div className="sticky top-24">
+              {/* All Categories Header */}
+              <div className="bg-blue-600 text-white px-4 py-3 rounded-t-xl flex items-center gap-2">
+                <Menu className="w-5 h-5" />
+                <span className="font-semibold">All Categories</span>
               </div>
 
-              {/* Categories */}
-              <div>
-                <h3 className="text-sm font-medium text-neutral-900 mb-3">
-                  {tNav("categories")}
-                </h3>
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() =>
-                        setSelectedCategory(
-                          selectedCategory === category.slug ? "" : category.slug
-                        )
-                      }
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-                        selectedCategory === category.slug
-                          ? "bg-neutral-900 text-white"
-                          : "text-neutral-600 hover:bg-neutral-100"
-                      }`}
-                    >
-                      <span>{category.name}</span>
-                      <span className="text-xs opacity-60">
-                        ({category._count.products})
-                      </span>
-                    </button>
-                  ))}
-                </div>
+              {/* Categories List */}
+              <div className="bg-white border border-neutral-200 border-t-0 rounded-b-xl divide-y divide-neutral-100">
+                {categoryStructure.map((category) => (
+                  <div key={category.slug}>
+                    <div className="flex items-center">
+                      <button
+                        onClick={() => setSelectedCategory(category.slug)}
+                        className={`flex-1 text-left px-4 py-3 text-sm transition-colors ${
+                          selectedCategory === category.slug
+                            ? "text-blue-600 font-medium"
+                            : "text-neutral-700 hover:text-blue-600"
+                        }`}
+                      >
+                        {category.name}
+                      </button>
+                      {category.subcategories.length > 0 && (
+                        <button
+                          onClick={() => toggleCategory(category.slug)}
+                          className="px-3 py-3 text-neutral-400 hover:text-neutral-600"
+                        >
+                          <ChevronRight
+                            className={`w-4 h-4 transition-transform ${
+                              expandedCategories.includes(category.slug) ? "rotate-90" : ""
+                            }`}
+                          />
+                        </button>
+                      )}
+                    </div>
+                    {/* Subcategories */}
+                    <AnimatePresence>
+                      {category.subcategories.length > 0 && expandedCategories.includes(category.slug) && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden bg-neutral-50"
+                        >
+                          {category.subcategories.map((sub) => (
+                            <button
+                              key={sub.slug}
+                              onClick={() => setSelectedCategory(sub.slug)}
+                              className={`w-full text-left pl-8 pr-4 py-2 text-sm transition-colors ${
+                                selectedCategory === sub.slug
+                                  ? "text-blue-600 font-medium bg-blue-50"
+                                  : "text-neutral-600 hover:text-blue-600 hover:bg-neutral-100"
+                              }`}
+                            >
+                              {sub.name}
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
               </div>
 
-              {/* Brands */}
-              <div>
-                <h3 className="text-sm font-medium text-neutral-900 mb-3">
-                  {tNav("brands")}
-                </h3>
-                <div className="space-y-2">
-                  {brands.map((brand) => (
-                    <button
-                      key={brand.id}
-                      onClick={() =>
-                        setSelectedBrand(
-                          selectedBrand === brand.slug ? "" : brand.slug
-                        )
-                      }
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-                        selectedBrand === brand.slug
-                          ? "bg-neutral-900 text-white"
-                          : "text-neutral-600 hover:bg-neutral-100"
-                      }`}
-                    >
-                      <span>{brand.name}</span>
-                      <span className="text-xs opacity-60">
-                        ({brand._count.products})
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Price Range */}
-              <div>
-                <h3 className="text-sm font-medium text-neutral-900 mb-3">
-                  Price Range
-                </h3>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    value={priceRange.min}
-                    onChange={(e) =>
-                      setPriceRange({ ...priceRange, min: e.target.value })
-                    }
-                    placeholder="Min"
-                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
-                  />
-                  <input
-                    type="number"
-                    value={priceRange.max}
-                    onChange={(e) =>
-                      setPriceRange({ ...priceRange, max: e.target.value })
-                    }
-                    placeholder="Max"
-                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
-                  />
-                </div>
-              </div>
-
-              {/* Clear Filters */}
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="w-full py-2.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 border border-neutral-200 rounded-lg transition-colors"
-                >
-                  Clear all filters
-                </button>
-              )}
             </div>
           </aside>
 
@@ -421,17 +456,17 @@ function ProductsContent() {
                       <div
                         className={`group h-full ${
                           viewMode === "grid"
-                            ? "bg-neutral-50 rounded-2xl p-4 hover:bg-neutral-100 flex flex-col"
-                            : "flex gap-6 bg-neutral-50 rounded-xl p-4 hover:bg-neutral-100"
-                        } transition-colors cursor-pointer`}
+                            ? "bg-white border border-neutral-200 rounded-xl p-3 hover:shadow-md flex flex-col"
+                            : "flex gap-4 bg-white border border-neutral-200 rounded-xl p-3 hover:shadow-md"
+                        } transition-all cursor-pointer`}
                       >
                         {/* Image */}
                         <div
                           className={`${
                             viewMode === "grid"
-                              ? "aspect-square mb-4"
-                              : "w-32 h-32 flex-shrink-0"
-                          } bg-white rounded-xl flex items-center justify-center relative overflow-hidden`}
+                              ? "aspect-[4/3] mb-3"
+                              : "w-28 h-28 flex-shrink-0"
+                          } bg-neutral-50 rounded-lg flex items-center justify-center relative overflow-hidden`}
                         >
                           {product.images && product.images.length > 0 ? (
                             <Image
