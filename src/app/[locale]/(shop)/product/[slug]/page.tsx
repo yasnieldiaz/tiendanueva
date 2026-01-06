@@ -273,9 +273,9 @@ export default function ProductPage() {
   if (!product) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center">
-        <p className="text-xl text-neutral-500 mb-4">Product not found</p>
+        <p className="text-xl text-neutral-500 mb-4">{t("notFound")}</p>
         <Link href={`/${locale}/products`} className="text-blue-600 underline">
-          Back to products
+          {t("backToProducts")}
         </Link>
       </div>
     );
@@ -296,7 +296,7 @@ export default function ProductPage() {
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2 text-sm">
             <Link href={`/${locale}`} className="text-neutral-500 hover:text-blue-600">
-              Strona główna
+              {tNav("home")}
             </Link>
             <span className="text-neutral-300">/</span>
             {product.category && (
@@ -391,7 +391,7 @@ export default function ProductPage() {
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shrink-0"
                 >
                   <Pencil className="w-4 h-4" />
-                  Editar
+                  {t("edit")}
                 </Link>
               )}
             </div>
@@ -488,7 +488,7 @@ export default function ProductPage() {
                   disabled={product.stock === 0}
                   className="flex-1 sm:flex-none py-3 px-6 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                 >
-                  Buy Now
+                  {t("buyNow")}
                 </button>
               </div>
             </div>
@@ -497,11 +497,11 @@ export default function ProductPage() {
             <div className="mt-4 flex items-center gap-6 text-sm">
               <button className="flex items-center gap-2 text-neutral-600 hover:text-blue-600 transition-colors">
                 <GitCompare className="w-4 h-4" />
-                Add to compare
+                {t("addToCompare")}
               </button>
               <button className="flex items-center gap-2 text-neutral-600 hover:text-red-500 transition-colors">
                 <Heart className="w-4 h-4" />
-                Add to wishlist
+                {t("addToWishlist")}
               </button>
             </div>
 
@@ -509,7 +509,7 @@ export default function ProductPage() {
             <div className="mt-6 p-3 bg-neutral-100 rounded-lg">
               <div className="flex items-center gap-2 text-sm text-neutral-700">
                 <Eye className="w-4 h-4 text-blue-500" />
-                <span><strong>{watchingCount}</strong> People watching this product now!</span>
+                <span><strong>{watchingCount}</strong> {t("peopleWatching")}</span>
               </div>
             </div>
 
@@ -519,22 +519,22 @@ export default function ProductPage() {
                 <div className="flex items-start gap-3">
                   <Store className="w-5 h-5 text-neutral-500 mt-0.5 flex-shrink-0" />
                   <div className="min-w-0">
-                    <p className="font-medium text-neutral-900 text-sm sm:text-base">Odbiór ze sklepu Drone-Partss</p>
-                    <p className="text-xs sm:text-sm text-neutral-500">Do odebrania dzisiaj</p>
+                    <p className="font-medium text-neutral-900 text-sm sm:text-base">{t("storePickup")}</p>
+                    <p className="text-xs sm:text-sm text-neutral-500">{t("pickupToday")}</p>
                   </div>
                 </div>
-                <span className="text-green-600 font-medium text-sm sm:text-base ml-8 sm:ml-0 flex-shrink-0">Bezpłatnie</span>
+                <span className="text-green-600 font-medium text-sm sm:text-base ml-8 sm:ml-0 flex-shrink-0">{t("free")}</span>
               </div>
               <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                 <div className="flex items-start gap-3">
                   <Truck className="w-5 h-5 text-neutral-500 mt-0.5 flex-shrink-0" />
                   <div className="min-w-0">
-                    <p className="font-medium text-neutral-900 text-sm sm:text-base">Courier delivery</p>
-                    <p className="text-xs sm:text-sm text-neutral-500">Nasz kurier dostarczy pod wskazany adres</p>
+                    <p className="font-medium text-neutral-900 text-sm sm:text-base">{t("courierDelivery")}</p>
+                    <p className="text-xs sm:text-sm text-neutral-500">{t("courierDesc")}</p>
                   </div>
                 </div>
                 <div className="text-left sm:text-right ml-8 sm:ml-0 flex-shrink-0">
-                  <span className="text-neutral-500 text-xs sm:text-sm">24 Godziny</span>
+                  <span className="text-neutral-500 text-xs sm:text-sm">24 {t("hours")}</span>
                   <p className="font-medium text-sm sm:text-base">17,80 zł</p>
                 </div>
               </div>
@@ -544,12 +544,12 @@ export default function ProductPage() {
                     <span className="text-yellow-500 text-xs font-bold">DHL</span>
                   </div>
                   <div className="min-w-0">
-                    <p className="font-medium text-neutral-900 text-sm sm:text-base">DHL Courier delivery</p>
-                    <p className="text-xs sm:text-sm text-neutral-500">Kurier DHL dostarczy pod wskazany adres</p>
+                    <p className="font-medium text-neutral-900 text-sm sm:text-base">{t("dhlDelivery")}</p>
+                    <p className="text-xs sm:text-sm text-neutral-500">{t("dhlDesc")}</p>
                   </div>
                 </div>
                 <div className="text-left sm:text-right ml-8 sm:ml-0 flex-shrink-0">
-                  <span className="text-neutral-500 text-xs sm:text-sm">24-48 Godziny</span>
+                  <span className="text-neutral-500 text-xs sm:text-sm">24-48 {t("hours")}</span>
                   <p className="font-medium text-sm sm:text-base">17,80 zł</p>
                 </div>
               </div>
@@ -560,26 +560,26 @@ export default function ProductPage() {
               <div className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Shield className="w-5 h-5 text-green-500" />
-                  <span className="text-neutral-900">Gwarancja 2 lata</span>
+                  <span className="text-neutral-900">{t("warranty")}</span>
                 </div>
                 <Link href="#" className="text-blue-600 text-sm hover:underline">
-                  Więcej szczegółów
+                  {t("moreDetails")}
                 </Link>
               </div>
               <div className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <RotateCcw className="w-5 h-5 text-blue-500" />
-                  <span className="text-neutral-900">Bezpłatne 14-dniowe zwroty</span>
+                  <span className="text-neutral-900">{t("freeReturns")}</span>
                 </div>
                 <Link href="#" className="text-blue-600 text-sm hover:underline">
-                  Więcej szczegółów
+                  {t("moreDetails")}
                 </Link>
               </div>
             </div>
 
             {/* Payment Methods */}
             <div className="mt-6">
-              <span className="text-sm text-neutral-600 block mb-2">Payment Methods:</span>
+              <span className="text-sm text-neutral-600 block mb-2">{t("paymentMethods")}:</span>
               <div className="flex items-center gap-2 flex-wrap">
                 <div className="px-2 sm:px-3 py-1.5 bg-[#003087] rounded text-white text-[10px] sm:text-xs font-bold">PayPal</div>
                 <div className="px-2 sm:px-3 py-1.5 bg-[#1A1F71] rounded text-white text-[10px] sm:text-xs font-bold">VISA</div>
