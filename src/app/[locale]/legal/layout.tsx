@@ -80,10 +80,10 @@ export default function LegalLayout({
       <Header />
       <div className="min-h-screen bg-neutral-50">
         {/* Header Banner */}
-        <div className="bg-gradient-to-r from-neutral-900 to-neutral-800">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-neutral-400 mb-4">
+          <nav className="flex items-center gap-2 text-sm text-blue-200 mb-4">
             <Link
               href={`/${locale}`}
               className="flex items-center gap-1 hover:text-white transition-colors"
@@ -98,7 +98,7 @@ export default function LegalLayout({
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
             {t.legalInfo}
           </h1>
-          <p className="text-neutral-400 text-lg">
+          <p className="text-blue-100 text-lg">
             {t.subtitle}
           </p>
         </div>

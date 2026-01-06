@@ -178,7 +178,7 @@ export default function ServicePage() {
       <Header />
       <div className="min-h-screen bg-neutral-50">
         {/* Hero Section */}
-        <div className="relative bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 overflow-hidden">
+        <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute inset-0" style={{
@@ -188,7 +188,7 @@ export default function ServicePage() {
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             {/* Breadcrumb */}
-            <nav className="flex items-center gap-2 text-sm text-neutral-400 mb-8">
+            <nav className="flex items-center gap-2 text-sm text-blue-200 mb-8">
               <Link
                 href={`/${locale}`}
                 className="flex items-center gap-1 hover:text-white transition-colors"
@@ -202,21 +202,21 @@ export default function ServicePage() {
 
             <div className="flex flex-col lg:flex-row items-center gap-12">
               <div className="flex-1 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600/20 rounded-full text-blue-400 text-sm font-medium mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-white text-sm font-medium mb-6">
                   <Wrench className="w-4 h-4" />
                   {t.subtitle}
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
                   {t.heroTitle}
                 </h1>
-                <p className="text-xl text-neutral-300 mb-8 max-w-2xl">
+                <p className="text-xl text-blue-100 mb-8 max-w-2xl">
                   {t.heroDescription}
                 </p>
                 <a
                   href="https://repair.drone-partss.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/25"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-700 font-semibold rounded-xl hover:bg-blue-50 transition-colors shadow-lg"
                 >
                   {t.portalButton}
                   <ExternalLink className="w-5 h-5" />
