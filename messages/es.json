@@ -162,7 +162,8 @@
     "register": "Registrarse",
     "logout": "Cerrar sesión",
     "admin": "Panel Admin",
-    "search": "Buscar productos..."
+    "search": "Buscar productos...",
+    "searchButton": "Buscar"
   },
   "hero": {
     "title": "Piezas para Drones",

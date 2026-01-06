@@ -162,7 +162,8 @@
     "register": "Register",
     "logout": "Logout",
     "admin": "Admin Panel",
-    "search": "Search products..."
+    "search": "Search products...",
+    "searchButton": "Search"
   },
   "hero": {
     "title": "Drone Parts",

@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { ChevronRight, ChevronLeft, Play, Truck, Shield, Headphones, CreditCard } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/store/cart";
 import { useCurrency } from "@/store/currency";
 
@@ -71,7 +71,25 @@ export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [brandProducts, setBrandProducts] = useState<{ brand: string; slug: string; products: Product[] }[]>([]);
   const [loading, setLoading] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Force video autoplay
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.muted = true;
+      video.play().catch(() => {
+        // Autoplay blocked, try again on user interaction
+        const playOnInteraction = () => {
+          video.play();
+          document.removeEventListener('click', playOnInteraction);
+        };
+        document.addEventListener('click', playOnInteraction);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchProducts() {
@@ -88,6 +106,38 @@ export default function HomePage() {
       }
     }
     fetchProducts();
+  }, []);
+
+  // Fetch products by brand (XAG, Autel, FIMI)
+  useEffect(() => {
+    async function fetchBrandProducts() {
+      try {
+        const targetBrands = [
+          { name: "XAG", slug: "xag" },
+          { name: "Autel", slug: "autel" },
+          { name: "FIMI", slug: "fimi" },
+        ];
+        const brandsWithProducts: { brand: string; slug: string; products: Product[] }[] = [];
+
+        for (const brand of targetBrands) {
+          const productsRes = await fetch(`/api/products?brand=${brand.slug}&limit=8`);
+          if (productsRes.ok) {
+            const data = await productsRes.json();
+            if (data.products && data.products.length > 0) {
+              brandsWithProducts.push({
+                brand: brand.name,
+                slug: brand.slug,
+                products: data.products,
+              });
+            }
+          }
+        }
+        setBrandProducts(brandsWithProducts);
+      } catch (error) {
+        console.error("Error fetching brand products:", error);
+      }
+    }
+    fetchBrandProducts();
   }, []);
 
   useEffect(() => {
@@ -110,117 +160,26 @@ export default function HomePage() {
 
   return (
     <div className="bg-white">
-      {/* Hero Carousel */}
-      <section className="relative bg-neutral-100 overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className={`relative min-h-[500px] md:min-h-[600px] bg-gradient-to-r ${heroSlides[currentSlide].gradient}`}
-          >
-            <div className="container mx-auto px-4 py-16 md:py-20">
-              <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[400px] md:min-h-[500px]">
-                <motion.div
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                >
-                  <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm text-white text-sm font-medium rounded-full mb-6">
-                    {t("titleHighlight")}
-                  </span>
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
-                    {heroSlides[currentSlide].title}
-                  </h1>
-                  <p className="text-xl md:text-2xl text-white/90 font-medium mb-4">
-                    {heroSlides[currentSlide].subtitle}
-                  </p>
-                  <p className="text-base md:text-lg text-white/70 mb-8 max-w-lg">
-                    {heroSlides[currentSlide].description}
-                  </p>
-                  <div className="flex flex-wrap items-center gap-4 md:gap-6">
-                    <span className="text-2xl md:text-3xl font-bold text-white">
-                      From {heroSlides[currentSlide].price}
-                    </span>
-                    <Link href={`/${locale}/products`}>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="px-6 md:px-8 py-3 bg-white text-neutral-900 font-semibold rounded-xl hover:bg-neutral-100 transition-colors"
-                      >
-                        {t("cta")}
-                      </motion.button>
-                    </Link>
-                    <button className="flex items-center gap-2 text-white hover:text-white/80 transition-colors">
-                      <Play className="w-5 h-5" />
-                      <span className="font-medium hidden sm:inline">Watch Video</span>
-                    </button>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  className="relative hidden lg:flex items-center justify-center"
-                >
-                  <div className="relative w-full max-w-md aspect-square">
-                    <div className="absolute inset-0 bg-white/5 rounded-full blur-3xl" />
-                    <motion.div
-                      animate={{ y: [-10, 10, -10] }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <div className="w-64 h-64 bg-white/10 backdrop-blur-xl rounded-3xl flex items-center justify-center border border-white/20 shadow-2xl">
-                        <span className="text-[120px]">🛸</span>
-                      </div>
-                    </motion.div>
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0"
-                    >
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
-                        <span className="text-2xl">📷</span>
-                      </div>
-                    </motion.div>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Carousel Controls */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
-          <button
-            onClick={prevSlide}
-            className="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <div className="flex gap-2">
-            {heroSlides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  setIsAutoPlaying(false);
-                  setCurrentSlide(i);
-                }}
-                className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                  i === currentSlide ? "bg-white" : "bg-white/40"
-                }`}
-              />
-            ))}
-          </div>
-          <button
-            onClick={nextSlide}
-            className="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-colors"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+      {/* Hero Video Section */}
+      <section className="relative bg-black overflow-hidden">
+        {/* Local Video - Full Screen, cropped to hide subtitles */}
+        {/* Mobile: more aggressive crop, Desktop: normal crop */}
+        <div className="relative w-full overflow-hidden h-[50vh] md:h-[70vh] md:max-h-[600px]">
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="absolute w-auto h-auto min-w-full min-h-full object-cover"
+            style={{
+              top: '40%',
+              left: '50%',
+              transform: 'translate(-50%, -50%) scale(2)',
+            }}
+            src="/videos/hero-video.mp4"
+          />
         </div>
       </section>
 
@@ -379,6 +338,110 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
+      {/* Products by Brand */}
+      {brandProducts.map((brandSection, brandIndex) => (
+        <section key={brandSection.slug} className={`py-16 ${brandIndex % 2 === 0 ? 'bg-neutral-50' : 'bg-white'}`}>
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-neutral-900">{brandSection.brand}</h2>
+                <p className="text-neutral-500 mt-1">{tProducts("featuredSubtitle")}</p>
+              </div>
+              <Link
+                href={`/${locale}/products?brand=${brandSection.slug}`}
+                className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1"
+              >
+                {tProducts("viewDetails")}
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {brandSection.products.slice(0, 8).map((product, i) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className="h-full"
+                >
+                  <Link href={`/${locale}/product/${product.slug}`} className="h-full block">
+                    <div className="group bg-white rounded-2xl p-4 hover:shadow-lg transition-all cursor-pointer h-full flex flex-col border border-neutral-100">
+                      <div className="aspect-square relative mb-4 flex items-center justify-center bg-neutral-50 rounded-xl overflow-hidden">
+                        {product.images && product.images.length > 0 ? (
+                          <Image
+                            src={product.images[0].url}
+                            alt={product.images[0].alt || product.name}
+                            fill
+                            className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                            sizes="(max-width: 768px) 50vw, 25vw"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-neutral-100">
+                            <span className="text-5xl mb-2">🛸</span>
+                            <span className="text-xs text-neutral-400 font-medium">{product.brand?.name || "Dron"}</span>
+                          </div>
+                        )}
+                        {product.stock === 0 && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <span className="px-3 py-1 bg-red-600 text-white text-sm font-medium rounded-full">
+                              {tProducts("outOfStock")}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-col flex-grow">
+                        <h3 className="font-semibold text-neutral-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm min-h-[2.5rem]">
+                          {product.name}
+                        </h3>
+                        <span className="text-xs text-neutral-500 h-4">
+                          {product.category?.name || ""}
+                        </span>
+                        <div className="flex items-center justify-between mt-auto pt-2">
+                          <div>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-base font-bold text-neutral-900">
+                                {formatPrice(product.price)}
+                              </span>
+                            </div>
+                            <span className="text-xs text-neutral-400">
+                              {formatPrice(product.price * 1.23)} brutto
+                            </span>
+                          </div>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              if (product.stock > 0) {
+                                addItem({
+                                  productId: product.id,
+                                  name: product.name,
+                                  price: product.price,
+                                  quantity: 1,
+                                  image: product.images?.[0]?.url,
+                                  brand: product.brand?.name,
+                                  stock: product.stock,
+                                });
+                              }
+                            }}
+                            disabled={product.stock === 0}
+                            className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {product.stock === 0 ? tProducts("outOfStock") : tProducts("addToCart")}
+                          </motion.button>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ))}
 
       {/* Features */}
       <section className="py-16 bg-neutral-50">

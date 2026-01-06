@@ -145,6 +145,7 @@ const menuCategories = [
 
 export default function Header() {
   const t = useTranslations("common");
+  const tNav = useTranslations("nav");
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
@@ -302,7 +303,7 @@ export default function Header() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleSearchKeyDown}
                   onFocus={() => searchQuery.length >= 2 && setShowResults(true)}
-                  placeholder="Szukaj produktów..."
+                  placeholder={tNav("search")}
                   className="w-full px-4 py-2.5 pl-10 pr-20 bg-neutral-100 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 {isSearching ? (
@@ -314,7 +315,7 @@ export default function Header() {
                   type="submit"
                   className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-colors"
                 >
-                  Szukaj
+                  {tNav("searchButton")}
                 </button>
               </div>
             </form>
@@ -511,7 +512,7 @@ export default function Header() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
-                    placeholder="Szukaj produktów..."
+                    placeholder={tNav("search")}
                     autoFocus
                     className="w-full px-4 py-2.5 pl-10 bg-neutral-100 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -521,7 +522,7 @@ export default function Header() {
                   type="submit"
                   className="px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  Szukaj
+                  {tNav("searchButton")}
                 </button>
               </form>
             </motion.div>

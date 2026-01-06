@@ -162,7 +162,8 @@
     "register": "Zarejestruj się",
     "logout": "Wyloguj się",
     "admin": "Panel Admin",
-    "search": "Szukaj produktów..."
+    "search": "Szukaj produktów...",
+    "searchButton": "Szukaj"
   },
   "hero": {
     "title": "Części do Dronów",
