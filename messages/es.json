@@ -338,6 +338,11 @@
     "viewAll": "Ver todos",
     "home": "Inicio",
     "products": "Productos",
-    "login": "Iniciar sesión"
+    "login": "Iniciar sesión",
+    "service": "Servicio Técnico",
+    "contact": "Contacto",
+    "shipping": "Envío y Devoluciones",
+    "terms": "Términos",
+    "privacy": "Privacidad"
   }
 }

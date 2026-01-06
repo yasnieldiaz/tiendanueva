@@ -36,14 +36,14 @@ interface SearchResult {
   brand: { name: string } | null;
 }
 
-// Main navigation menu items
+// Main navigation menu items - using translation keys
 const mainNavItems = [
-  { name: "Home", href: "", isHome: true },
-  { name: "Serwis", href: "/service" },
-  { name: "Kontakt", href: "/contact" },
-  { name: "Dostawa I Zwrot", href: "/legal/shipping" },
-  { name: "Regulamin", href: "/legal/terms" },
-  { name: "Prywatność", href: "/legal/privacy" },
+  { key: "home", href: "", isHome: true },
+  { key: "service", href: "/service" },
+  { key: "contact", href: "/contact" },
+  { key: "shipping", href: "/legal/shipping" },
+  { key: "terms", href: "/legal/terms" },
+  { key: "privacy", href: "/legal/privacy" },
 ];
 
 // Menu categories structure based on drone-partss.com
@@ -477,7 +477,7 @@ export default function Header() {
                 className="hidden sm:flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors"
               >
                 <User className="w-4 h-4" />
-                <span>Zaloguj</span>
+                <span>{t("login")}</span>
               </Link>
             )}
 
@@ -601,7 +601,7 @@ export default function Header() {
               const isActive = isNavActive(item.href, item.isHome);
               return (
                 <Link
-                  key={item.name}
+                  key={item.key}
                   href={item.isHome ? `/${locale}` : `/${locale}${item.href}`}
                   className={`px-5 py-2 text-sm font-medium rounded-full transition-all ${
                     isActive
@@ -609,7 +609,7 @@ export default function Header() {
                       : "text-neutral-700 hover:bg-neutral-200"
                   }`}
                 >
-                  {item.name}
+                  {t(item.key)}
                 </Link>
               );
             })}
@@ -632,7 +632,7 @@ export default function Header() {
                 const isActive = isNavActive(item.href, item.isHome);
                 return (
                   <Link
-                    key={item.name}
+                    key={item.key}
                     href={item.isHome ? `/${locale}` : `/${locale}${item.href}`}
                     onClick={() => setMobileMenuOpen(false)}
                     className={`block px-4 py-3 rounded-lg font-medium ${
@@ -641,7 +641,7 @@ export default function Header() {
                         : "text-neutral-700 hover:bg-neutral-50"
                     }`}
                   >
-                    {item.name}
+                    {t(item.key)}
                   </Link>
                 );
               })}
@@ -683,7 +683,7 @@ export default function Header() {
                     onClick={() => setMobileMenuOpen(false)}
                     className="block px-4 py-3 bg-blue-600 text-white text-center font-medium rounded-lg"
                   >
-                    Zaloguj się
+                    {t("login")}
                   </Link>
                 </>
               )}

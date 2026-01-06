@@ -338,6 +338,11 @@
     "viewAll": "Zobacz wszystkie",
     "home": "Strona główna",
     "products": "Produkty",
-    "login": "Zaloguj się"
+    "login": "Zaloguj się",
+    "service": "Serwis",
+    "contact": "Kontakt",
+    "shipping": "Dostawa i Zwroty",
+    "terms": "Regulamin",
+    "privacy": "Prywatność"
   }
 }
