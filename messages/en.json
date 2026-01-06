@@ -232,7 +232,9 @@
     "freeReturns": "Free 14-day returns",
     "moreDetails": "More details",
     "inStock": "in stock",
-    "outOfStock": "Out of stock"
+    "outOfStock": "Out of stock",
+    "gross": "gross",
+    "withVat": "incl. VAT"
   },
   "cart": {
     "title": "Your Cart",

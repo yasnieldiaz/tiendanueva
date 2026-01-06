@@ -232,7 +232,9 @@
     "freeReturns": "Bezpłatne 14-dniowe zwroty",
     "moreDetails": "Więcej szczegółów",
     "inStock": "w magazynie",
-    "outOfStock": "Brak w magazynie"
+    "outOfStock": "Brak w magazynie",
+    "gross": "brutto",
+    "withVat": "z VAT"
   },
   "cart": {
     "title": "Twój Koszyk",

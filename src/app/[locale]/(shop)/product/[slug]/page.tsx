@@ -420,7 +420,7 @@ export default function ProductPage() {
                   <span className="text-sm text-neutral-500">+ VAT 23%</span>
                 </div>
                 <div className="text-sm text-neutral-500">
-                  {formatPrice(product.price * 1.23)} brutto (z VAT)
+                  {formatPrice(product.price * 1.23)} {t("gross")} ({t("withVat")})
                 </div>
               </div>
               {product.comparePrice && (
@@ -431,12 +431,12 @@ export default function ProductPage() {
               {product.stock > 0 ? (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 border border-green-200 text-green-700 text-sm font-medium rounded-full">
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  {product.stock} w magazynie
+                  {product.stock} {t("inStock")}
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 border border-red-200 text-red-700 text-sm font-medium rounded-full">
                   <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                  Brak w magazynie
+                  {t("outOfStock")}
                 </span>
               )}
             </div>
@@ -477,7 +477,7 @@ export default function ProductPage() {
                   ) : (
                     <>
                       <ShoppingCart className="w-5 h-5" />
-                      <span>Dodaj Do Koszyka</span>
+                      <span>{tProducts("addToCart")}</span>
                     </>
                   )}
                 </button>
@@ -627,7 +627,7 @@ export default function ProductPage() {
                           {formatPrice(related.price)} <span className="text-xs font-normal text-neutral-500">+ VAT</span>
                         </p>
                         <p className="text-xs text-neutral-400">
-                          {formatPrice(related.price * 1.23)} brutto
+                          {formatPrice(related.price * 1.23)} {t("gross")}
                         </p>
                       </div>
                     </div>

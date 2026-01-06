@@ -232,7 +232,9 @@
     "freeReturns": "Devoluciones gratis 14 días",
     "moreDetails": "Más detalles",
     "inStock": "en stock",
-    "outOfStock": "Agotado"
+    "outOfStock": "Agotado",
+    "gross": "bruto",
+    "withVat": "con IVA"
   },
   "cart": {
     "title": "Tu Carrito",
