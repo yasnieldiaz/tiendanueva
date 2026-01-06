@@ -29,12 +29,54 @@ interface Settings {
   gls_price: string;
   free_shipping_threshold: string;
 
+  // InPost API
+  inpost_api_enabled: string;
+  inpost_api_token: string;
+  inpost_organization_id: string;
+  inpost_sender_email: string;
+  inpost_sender_phone: string;
+  inpost_sender_name: string;
+  inpost_sender_address: string;
+  inpost_sender_city: string;
+  inpost_sender_postcode: string;
+
+  // GLS API
+  gls_api_enabled: string;
+  gls_api_username: string;
+  gls_api_password: string;
+  gls_sender_name: string;
+  gls_sender_address: string;
+  gls_sender_city: string;
+  gls_sender_postcode: string;
+  gls_sender_country: string;
+
   // Payments
   stripe_publishable_key: string;
   stripe_secret_key: string;
   cod_enabled: string;
   cod_fee: string;
   przelewy24_enabled: string;
+
+  // Bank Transfer
+  bank_transfer_enabled: string;
+  // EUR Account
+  bank_eur_enabled: string;
+  bank_eur_name: string;
+  bank_eur_holder: string;
+  bank_eur_iban: string;
+  bank_eur_swift: string;
+  // USD Account
+  bank_usd_enabled: string;
+  bank_usd_name: string;
+  bank_usd_holder: string;
+  bank_usd_iban: string;
+  bank_usd_swift: string;
+  // PLN Account
+  bank_pln_enabled: string;
+  bank_pln_name: string;
+  bank_pln_holder: string;
+  bank_pln_iban: string;
+  bank_pln_swift: string;
 
   // Email
   smtp_host: string;
@@ -72,12 +114,48 @@ const defaultSettings: Settings = {
   inpost_price: "18",
   gls_price: "24",
   free_shipping_threshold: "5000",
+  // InPost API
+  inpost_api_enabled: "false",
+  inpost_api_token: "",
+  inpost_organization_id: "",
+  inpost_sender_email: "",
+  inpost_sender_phone: "",
+  inpost_sender_name: "Drone-Partss",
+  inpost_sender_address: "ul. Smolna 14",
+  inpost_sender_city: "Rybnik",
+  inpost_sender_postcode: "44-200",
+  // GLS API
+  gls_api_enabled: "false",
+  gls_api_username: "",
+  gls_api_password: "",
+  gls_sender_name: "Drone-Partss",
+  gls_sender_address: "ul. Smolna 14",
+  gls_sender_city: "Rybnik",
+  gls_sender_postcode: "44-200",
+  gls_sender_country: "PL",
   // Payments
   stripe_publishable_key: "",
   stripe_secret_key: "",
   cod_enabled: "true",
   cod_fee: "10",
   przelewy24_enabled: "true",
+  // Bank Transfer
+  bank_transfer_enabled: "false",
+  bank_eur_enabled: "false",
+  bank_eur_name: "",
+  bank_eur_holder: "",
+  bank_eur_iban: "",
+  bank_eur_swift: "",
+  bank_usd_enabled: "false",
+  bank_usd_name: "",
+  bank_usd_holder: "",
+  bank_usd_iban: "",
+  bank_usd_swift: "",
+  bank_pln_enabled: "false",
+  bank_pln_name: "",
+  bank_pln_holder: "",
+  bank_pln_iban: "",
+  bank_pln_swift: "",
   // Email
   smtp_host: "",
   smtp_port: "587",
@@ -319,6 +397,276 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
+
+              {/* InPost API Section */}
+              <div className="border border-neutral-200 rounded-xl p-6 mt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                      <span className="text-2xl">📦</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-neutral-900">InPost ShipX API</h3>
+                      <p className="text-sm text-neutral-500">Automatyczne generowanie etykiet InPost/Paczkomaty</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.inpost_api_enabled === "true"}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          inpost_api_enabled: e.target.checked ? "true" : "false",
+                        })
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div>
+                  </label>
+                </div>
+
+                {settings.inpost_api_enabled === "true" && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                      <div className="flex items-start gap-2">
+                        <Info className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                        <div className="text-sm text-yellow-800">
+                          <p className="font-medium mb-1">Jak uzyskać dostęp do API?</p>
+                          <p>Zarejestruj się w <a href="https://manager.paczkomaty.pl" target="_blank" rel="noopener noreferrer" className="underline font-medium">InPost Manager</a> i wygeneruj token API w ustawieniach konta.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Token API
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPasswords.inpost ? "text" : "password"}
+                            value={settings.inpost_api_token}
+                            onChange={(e) => setSettings({ ...settings, inpost_api_token: e.target.value })}
+                            className="w-full px-4 py-3 pr-12 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 font-mono text-sm"
+                            placeholder="eyJ..."
+                          />
+                          <button
+                            type="button"
+                            onClick={() => togglePassword("inpost")}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                          >
+                            {showPasswords.inpost ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Organization ID
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.inpost_organization_id}
+                          onChange={(e) => setSettings({ ...settings, inpost_organization_id: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                          placeholder="123456"
+                        />
+                      </div>
+                    </div>
+
+                    <h4 className="font-medium text-neutral-900 mt-4">Dane nadawcy</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">Nazwa firmy</label>
+                        <input
+                          type="text"
+                          value={settings.inpost_sender_name}
+                          onChange={(e) => setSettings({ ...settings, inpost_sender_name: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">Email</label>
+                        <input
+                          type="email"
+                          value={settings.inpost_sender_email}
+                          onChange={(e) => setSettings({ ...settings, inpost_sender_email: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                          placeholder="admin@drone-partss.com"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">Telefon</label>
+                        <input
+                          type="text"
+                          value={settings.inpost_sender_phone}
+                          onChange={(e) => setSettings({ ...settings, inpost_sender_phone: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                          placeholder="+48784608733"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">Adres</label>
+                        <input
+                          type="text"
+                          value={settings.inpost_sender_address}
+                          onChange={(e) => setSettings({ ...settings, inpost_sender_address: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">Miasto</label>
+                        <input
+                          type="text"
+                          value={settings.inpost_sender_city}
+                          onChange={(e) => setSettings({ ...settings, inpost_sender_city: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">Kod pocztowy</label>
+                        <input
+                          type="text"
+                          value={settings.inpost_sender_postcode}
+                          onChange={(e) => setSettings({ ...settings, inpost_sender_postcode: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                          placeholder="44-200"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* GLS API Section */}
+              <div className="border border-neutral-200 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                      <Truck className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-neutral-900">GLS Web API</h3>
+                      <p className="text-sm text-neutral-500">Automatyczne generowanie etykiet GLS</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.gls_api_enabled === "true"}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          gls_api_enabled: e.target.checked ? "true" : "false",
+                        })
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+
+                {settings.gls_api_enabled === "true" && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                      <div className="flex items-start gap-2">
+                        <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <div className="text-sm text-blue-800">
+                          <p className="font-medium mb-1">Jak uzyskać dostęp do API?</p>
+                          <p>Skontaktuj się z GLS Poland aby uzyskać dane dostępowe do Web API.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Username / Customer ID
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.gls_api_username}
+                          onChange={(e) => setSettings({ ...settings, gls_api_username: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                          placeholder="2000000000"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Password
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPasswords.gls ? "text" : "password"}
+                            value={settings.gls_api_password}
+                            onChange={(e) => setSettings({ ...settings, gls_api_password: e.target.value })}
+                            className="w-full px-4 py-3 pr-12 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                            placeholder="••••••••"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => togglePassword("gls")}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                          >
+                            {showPasswords.gls ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <h4 className="font-medium text-neutral-900 mt-4">Dane nadawcy</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">Nazwa firmy</label>
+                        <input
+                          type="text"
+                          value={settings.gls_sender_name}
+                          onChange={(e) => setSettings({ ...settings, gls_sender_name: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">Adres</label>
+                        <input
+                          type="text"
+                          value={settings.gls_sender_address}
+                          onChange={(e) => setSettings({ ...settings, gls_sender_address: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">Miasto</label>
+                        <input
+                          type="text"
+                          value={settings.gls_sender_city}
+                          onChange={(e) => setSettings({ ...settings, gls_sender_city: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">Kod pocztowy</label>
+                        <input
+                          type="text"
+                          value={settings.gls_sender_postcode}
+                          onChange={(e) => setSettings({ ...settings, gls_sender_postcode: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                          placeholder="44-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">Kraj</label>
+                        <input
+                          type="text"
+                          value={settings.gls_sender_country}
+                          onChange={(e) => setSettings({ ...settings, gls_sender_country: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                          placeholder="PL"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </motion.div>
           )}
 
@@ -485,6 +833,267 @@ export default function SettingsPage() {
                 </div>
               </div>
 
+              {/* Bank Transfer Section */}
+              <div className="border border-neutral-200 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                      <Building2 className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-neutral-900">Przelew bankowy</h3>
+                      <p className="text-sm text-neutral-500">Płatność tradycyjnym przelewem na konto</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.bank_transfer_enabled === "true"}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          bank_transfer_enabled: e.target.checked ? "true" : "false",
+                        })
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                  </label>
+                </div>
+
+                {settings.bank_transfer_enabled === "true" && (
+                  <div className="space-y-6 mt-6">
+                    {/* EUR Account */}
+                    <div className="border border-neutral-200 rounded-xl p-4 bg-neutral-50">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">🇪🇺</span>
+                          <h4 className="font-semibold text-neutral-900">Konto EUR (Euro)</h4>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.bank_eur_enabled === "true"}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                bank_eur_enabled: e.target.checked ? "true" : "false",
+                              })
+                            }
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-neutral-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                        </label>
+                      </div>
+                      {settings.bank_eur_enabled === "true" && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              Nazwa banku
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.bank_eur_name}
+                              onChange={(e) => setSettings({ ...settings, bank_eur_name: e.target.value })}
+                              className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                              placeholder="np. ING Bank"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              Właściciel konta
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.bank_eur_holder}
+                              onChange={(e) => setSettings({ ...settings, bank_eur_holder: e.target.value })}
+                              className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                              placeholder="np. Drone-Partss Sp. z o.o."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              IBAN
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.bank_eur_iban}
+                              onChange={(e) => setSettings({ ...settings, bank_eur_iban: e.target.value })}
+                              className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 font-mono"
+                              placeholder="PL00 0000 0000 0000 0000 0000 0000"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              SWIFT/BIC
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.bank_eur_swift}
+                              onChange={(e) => setSettings({ ...settings, bank_eur_swift: e.target.value })}
+                              className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 font-mono"
+                              placeholder="np. INGBPLPW"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* USD Account */}
+                    <div className="border border-neutral-200 rounded-xl p-4 bg-neutral-50">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">🇺🇸</span>
+                          <h4 className="font-semibold text-neutral-900">Konto USD (Dolar)</h4>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.bank_usd_enabled === "true"}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                bank_usd_enabled: e.target.checked ? "true" : "false",
+                              })
+                            }
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-neutral-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                        </label>
+                      </div>
+                      {settings.bank_usd_enabled === "true" && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              Nazwa banku
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.bank_usd_name}
+                              onChange={(e) => setSettings({ ...settings, bank_usd_name: e.target.value })}
+                              className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                              placeholder="np. Bank of America"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              Właściciel konta
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.bank_usd_holder}
+                              onChange={(e) => setSettings({ ...settings, bank_usd_holder: e.target.value })}
+                              className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                              placeholder="np. Drone-Partss LLC"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              IBAN / Account Number
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.bank_usd_iban}
+                              onChange={(e) => setSettings({ ...settings, bank_usd_iban: e.target.value })}
+                              className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 font-mono"
+                              placeholder="Numer konta"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              SWIFT/BIC / Routing
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.bank_usd_swift}
+                              onChange={(e) => setSettings({ ...settings, bank_usd_swift: e.target.value })}
+                              className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 font-mono"
+                              placeholder="np. BOFAUS3N"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* PLN Account */}
+                    <div className="border border-neutral-200 rounded-xl p-4 bg-neutral-50">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">🇵🇱</span>
+                          <h4 className="font-semibold text-neutral-900">Konto PLN (Złoty)</h4>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings.bank_pln_enabled === "true"}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                bank_pln_enabled: e.target.checked ? "true" : "false",
+                              })
+                            }
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-neutral-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                        </label>
+                      </div>
+                      {settings.bank_pln_enabled === "true" && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              Nazwa banku
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.bank_pln_name}
+                              onChange={(e) => setSettings({ ...settings, bank_pln_name: e.target.value })}
+                              className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                              placeholder="np. PKO Bank Polski"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              Właściciel konta
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.bank_pln_holder}
+                              onChange={(e) => setSettings({ ...settings, bank_pln_holder: e.target.value })}
+                              className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                              placeholder="np. Drone-Partss Sp. z o.o."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              Numer konta
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.bank_pln_iban}
+                              onChange={(e) => setSettings({ ...settings, bank_pln_iban: e.target.value })}
+                              className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 font-mono"
+                              placeholder="00 0000 0000 0000 0000 0000 0000"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              SWIFT/BIC
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.bank_pln_swift}
+                              onChange={(e) => setSettings({ ...settings, bank_pln_swift: e.target.value })}
+                              className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 font-mono"
+                              placeholder="np. BPKOPLPW"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Payment Methods Summary */}
               <div className="bg-neutral-50 rounded-xl p-4">
                 <h4 className="font-medium text-neutral-900 mb-3">Aktywne metody płatności:</h4>
@@ -507,7 +1116,15 @@ export default function SettingsPage() {
                       Przy odbiorze (+{settings.cod_fee} zł)
                     </span>
                   )}
-                  {settings.przelewy24_enabled !== "true" && settings.cod_enabled !== "true" && (
+                  {settings.bank_transfer_enabled === "true" && (
+                    <span className="px-3 py-1.5 bg-purple-100 border border-purple-200 rounded-lg text-sm font-medium text-purple-700">
+                      Przelew bankowy
+                      {settings.bank_eur_enabled === "true" && " (EUR)"}
+                      {settings.bank_usd_enabled === "true" && " (USD)"}
+                      {settings.bank_pln_enabled === "true" && " (PLN)"}
+                    </span>
+                  )}
+                  {settings.przelewy24_enabled !== "true" && settings.cod_enabled !== "true" && settings.bank_transfer_enabled !== "true" && (
                     <span className="text-sm text-red-600">Brak aktywnych metod płatności!</span>
                   )}
                 </div>

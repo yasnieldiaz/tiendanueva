@@ -73,11 +73,13 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href={`/${locale}`} className="flex items-center gap-3 mb-6">
-              <img
-                src="https://drone-partss.com/wp-content/uploads/2024/11/LogoDrone.png"
-                alt="Drone-Partss"
-                className="h-12 w-auto"
-              />
+              <div className="bg-white rounded-lg px-3 py-2">
+                <img
+                  src="https://drone-partss.com/wp-content/uploads/2024/11/LogoDrone.png"
+                  alt="Drone-Partss"
+                  className="h-10 w-auto object-contain"
+                />
+              </div>
             </Link>
             <p className="text-neutral-400 mb-6 leading-relaxed max-w-md">
               Twój zaufany dostawca profesjonalnych dronów i akcesoriów.

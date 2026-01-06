@@ -45,7 +45,15 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     const body = await request.json();
-    const { items, shippingAddress } = body;
+    const {
+      items,
+      shippingAddress,
+      shippingCost,
+      paymentMethod,
+      shippingMethod,
+      paczkomatId,
+      paczkomatAddress
+    } = body;
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -60,7 +68,7 @@ export async function POST(request: Request) {
       subtotal += item.price * item.quantity;
     }
 
-    const shipping = subtotal >= 100 ? 0 : 9.99;
+    const shipping = shippingCost || (subtotal >= 5000 ? 0 : (shippingMethod === "gls" ? 24 : 18));
     const tax = subtotal * 0.23;
     const total = subtotal + shipping + tax;
 
@@ -70,16 +78,26 @@ export async function POST(request: Request) {
     });
     const orderNumber = (lastOrder?.orderNumber || 1000) + 1;
 
+    // Prepare shipping address with Paczkomat info if applicable
+    const shippingData = {
+      ...shippingAddress,
+      shippingMethod,
+      paczkomatId: shippingMethod === "inpost" ? paczkomatId : undefined,
+      paczkomatAddress: shippingMethod === "inpost" ? paczkomatAddress : undefined,
+    };
+
     const order = await prisma.order.create({
       data: {
         orderNumber,
-        userId: session?.user?.id || "guest",
+        ...(session?.user?.id ? { userId: session.user.id } : {}),
         subtotal,
         shippingCost: shipping,
         tax,
         total,
-        shippingAddress: JSON.stringify(shippingAddress),
-        status: "PENDING",
+        shippingAddress: JSON.stringify(shippingData),
+        status: paymentMethod === "cod" ? "PROCESSING" : "PENDING",
+        paymentMethod: paymentMethod || "przelewy24",
+        carrier: shippingMethod === "inpost" ? "InPost" : "GLS",
         items: {
           create: items.map((item: { productId: string; name: string; price: number; quantity: number; variant?: string }) => ({
             productId: item.productId,

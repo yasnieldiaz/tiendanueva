@@ -13,7 +13,15 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     const body = await request.json();
-    const { items, shippingAddress, paymentMethod, shippingCost } = body;
+    const {
+      items,
+      shippingAddress,
+      paymentMethod,
+      shippingCost,
+      shippingMethod,
+      paczkomatId,
+      paczkomatAddress
+    } = body;
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -58,17 +66,26 @@ export async function POST(request: Request) {
     });
     const orderNumber = (lastOrder?.orderNumber || 1000) + 1;
 
+    // Prepare shipping address with Paczkomat info if applicable
+    const shippingData = {
+      ...shippingAddress,
+      shippingMethod,
+      paczkomatId: shippingMethod === "inpost" ? paczkomatId : undefined,
+      paczkomatAddress: shippingMethod === "inpost" ? paczkomatAddress : undefined,
+    };
+
     const order = await prisma.order.create({
       data: {
         orderNumber,
-        userId: session?.user?.id || "guest",
+        ...(session?.user?.id ? { userId: session.user.id } : {}),
         subtotal,
         shippingCost: shipping,
         tax: 0, // VAT included in prices
         total,
-        shippingAddress: JSON.stringify(shippingAddress),
+        shippingAddress: JSON.stringify(shippingData),
         status: "PENDING",
         paymentMethod: paymentMethod || "przelewy24",
+        carrier: shippingMethod === "inpost" ? "InPost" : "GLS",
         items: {
           create: items.map((item: { productId: string; name: string; price: number; quantity: number; variant?: string }) => ({
             productId: item.productId,

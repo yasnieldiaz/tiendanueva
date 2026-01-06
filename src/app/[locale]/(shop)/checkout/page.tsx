@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useRef, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -18,6 +18,9 @@ import {
   ShoppingBag,
   Banknote,
   Building2,
+  Search,
+  MapPin,
+  X,
 } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { useCurrency } from "@/store/currency";
@@ -51,6 +54,8 @@ interface ShippingForm {
   country: string;
   companyName: string;
   vatNumber: string;
+  paczkomatId: string;
+  paczkomatAddress: string;
 }
 
 interface VatValidation {
@@ -98,7 +103,14 @@ function CheckoutContent() {
     country: "Poland",
     companyName: "",
     vatNumber: "",
+    paczkomatId: "",
+    paczkomatAddress: "",
   });
+  const [showPaczkomatSearch, setShowPaczkomatSearch] = useState(false);
+  const [paczkomatSearchQuery, setPaczkomatSearchQuery] = useState("");
+  const [paczkomatResults, setPaczkomatResults] = useState<Array<{id: string; name: string; address: string; city: string; description?: string; postCode?: string; distance?: number}>>([]);
+  const [isSearchingPaczkomat, setIsSearchingPaczkomat] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const subtotalNet = getTotalPrice(); // Prices are now net (without VAT)
   const vatRate = 0.23;
@@ -129,6 +141,138 @@ function CheckoutContent() {
       });
     }
   };
+
+  // Geocode address using OpenStreetMap Nominatim
+  const geocodeAddress = async (address: string): Promise<{lat: number; lon: number} | null> => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address + ', Poland')}&limit=1`,
+        { headers: { 'Accept-Language': 'pl' } }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        if (data.length > 0) {
+          return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+        }
+      }
+    } catch (error) {
+      console.error("Geocoding error:", error);
+    }
+    return null;
+  };
+
+  // Search for Paczkomaty using InPost API with geolocation
+  const searchPaczkomaty = async (query: string) => {
+    if (query.length < 3) {
+      setPaczkomatResults([]);
+      return;
+    }
+
+    setIsSearchingPaczkomat(true);
+    try {
+      const trimmedQuery = query.trim();
+
+      // First, try to geocode the address to get coordinates
+      const coords = await geocodeAddress(trimmedQuery);
+
+      let lockers: Array<{
+        id: string;
+        name: string;
+        address: string;
+        city: string;
+        description: string;
+        postCode: string;
+        distance?: number;
+      }> = [];
+
+      if (coords) {
+        // Search by coordinates - finds nearest Paczkomaty
+        const response = await fetch(
+          `https://api-pl-points.easypack24.net/v1/points?relative_point=${coords.lat},${coords.lon}&type=parcel_locker&limit=15&status=Operating`
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          lockers = data.items?.map((item: {
+            name: string;
+            status: string;
+            distance?: number;
+            location_description?: string;
+            address_details: { city: string; street: string; building_number: string; post_code: string }
+          }) => ({
+            id: item.name,
+            name: item.name,
+            address: `${item.address_details.street} ${item.address_details.building_number}`,
+            city: item.address_details.city,
+            description: item.location_description || '',
+            postCode: item.address_details.post_code,
+            distance: item.distance,
+          })) || [];
+        }
+      }
+
+      // Fallback: if geocoding failed or no results, try direct city/postal search
+      if (lockers.length === 0) {
+        const isPostCode = /^\d{2}[-]?\d{3}$/.test(trimmedQuery.replace(/\s/g, ''));
+        let searchParams = isPostCode
+          ? `post_code=${trimmedQuery.replace(/[-\s]/g, '')}`
+          : `city=${encodeURIComponent(trimmedQuery.split(',')[0].split(' ')[0])}`;
+
+        const response = await fetch(
+          `https://api-pl-points.easypack24.net/v1/points?${searchParams}&type=parcel_locker&limit=15&status=Operating`
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          lockers = data.items?.map((item: {
+            name: string;
+            location_description?: string;
+            address_details: { city: string; street: string; building_number: string; post_code: string }
+          }) => ({
+            id: item.name,
+            name: item.name,
+            address: `${item.address_details.street} ${item.address_details.building_number}`,
+            city: item.address_details.city,
+            description: item.location_description || '',
+            postCode: item.address_details.post_code,
+          })) || [];
+        }
+      }
+
+      setPaczkomatResults(lockers);
+    } catch (error) {
+      console.error("Error searching Paczkomaty:", error);
+      setPaczkomatResults([]);
+    } finally {
+      setIsSearchingPaczkomat(false);
+    }
+  };
+
+  const selectPaczkomat = (paczkomat: {id: string; name: string; address: string; city: string}) => {
+    setShippingForm({
+      ...shippingForm,
+      paczkomatId: paczkomat.id,
+      paczkomatAddress: `${paczkomat.name} - ${paczkomat.address}, ${paczkomat.city}`,
+    });
+    setShowPaczkomatSearch(false);
+    setPaczkomatResults([]);
+    setPaczkomatSearchQuery("");
+  };
+
+  // Debounced search handler
+  const handlePaczkomatSearch = useCallback((value: string) => {
+    setPaczkomatSearchQuery(value);
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Set new timeout for debounced search
+    searchTimeoutRef.current = setTimeout(() => {
+      searchPaczkomaty(value);
+    }, 500); // Wait 500ms after user stops typing
+  }, []);
 
   const validateVatNumber = async () => {
     if (!shippingForm.vatNumber.trim()) {
@@ -179,10 +323,22 @@ function CheckoutContent() {
   };
 
   const validateShipping = () => {
-    const required = ["firstName", "lastName", "email", "phone", "address", "city", "postalCode"];
+    const required = ["firstName", "lastName", "email", "phone"];
+
+    // For GLS, require full address
+    if (selectedShipping === "gls") {
+      required.push("address", "city", "postalCode");
+    }
+
+    // For InPost, require Paczkomat selection
+    if (selectedShipping === "inpost" && !shippingForm.paczkomatId) {
+      setError("Wybierz Paczkomat dla dostawy InPost");
+      return false;
+    }
+
     for (const field of required) {
       if (!shippingForm[field as keyof ShippingForm]) {
-        setError(`Please fill in all required fields`);
+        setError(`Proszę wypełnić wszystkie wymagane pola`);
         return false;
       }
     }
@@ -203,23 +359,28 @@ function CheckoutContent() {
     setError("");
 
     try {
+      const orderData = {
+        items: items.map((item) => ({
+          productId: item.productId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          variant: item.variant,
+        })),
+        shippingAddress: shippingForm,
+        paymentMethod: paymentMethod === "przelewy24" ? "przelewy24" : "cod",
+        shippingCost: shippingNet + shippingVat,
+        shippingMethod: selectedShipping, // "inpost" or "gls"
+        paczkomatId: selectedShipping === "inpost" ? shippingForm.paczkomatId : undefined,
+        paczkomatAddress: selectedShipping === "inpost" ? shippingForm.paczkomatAddress : undefined,
+      };
+
       if (paymentMethod === "przelewy24") {
         // Przelewy24 through Stripe
         const response = await fetch("/api/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            items: items.map((item) => ({
-              productId: item.productId,
-              name: item.name,
-              price: item.price,
-              quantity: item.quantity,
-              variant: item.variant,
-            })),
-            shippingAddress: shippingForm,
-            paymentMethod: "przelewy24",
-            shippingCost: shippingNet + shippingVat,
-          }),
+          body: JSON.stringify(orderData),
         });
 
         const data = await response.json();
@@ -235,18 +396,7 @@ function CheckoutContent() {
         const response = await fetch("/api/orders", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            items: items.map((item) => ({
-              productId: item.productId,
-              name: item.name,
-              price: item.price,
-              quantity: item.quantity,
-              variant: item.variant,
-            })),
-            shippingAddress: shippingForm,
-            paymentMethod: "cod",
-            shippingCost: shippingNet + shippingVat,
-          }),
+          body: JSON.stringify(orderData),
         });
 
         const data = await response.json();
@@ -750,7 +900,12 @@ function CheckoutContent() {
                     return (
                       <button
                         key={option.id}
-                        onClick={() => setSelectedShipping(option.id)}
+                        onClick={() => {
+                          setSelectedShipping(option.id);
+                          if (option.id !== "inpost") {
+                            setShippingForm(prev => ({ ...prev, paczkomatId: "", paczkomatAddress: "" }));
+                          }
+                        }}
                         className={`w-full p-2.5 rounded-lg border transition-all text-left flex items-center gap-2 ${
                           selectedShipping === option.id
                             ? "border-blue-500 bg-blue-50"
@@ -774,6 +929,90 @@ function CheckoutContent() {
                     );
                   })}
                 </div>
+
+                {/* Paczkomat Selector for InPost */}
+                {selectedShipping === "inpost" && (
+                  <div className="mt-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Package className="w-4 h-4 text-yellow-600" />
+                      <span className="text-sm font-medium text-yellow-800">Wybierz Paczkomat</span>
+                    </div>
+
+                    {shippingForm.paczkomatId ? (
+                      <div className="flex items-center gap-2 p-2 bg-white rounded border border-yellow-300">
+                        <MapPin className="w-4 h-4 text-yellow-600 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-neutral-900 truncate">{shippingForm.paczkomatId}</p>
+                          <p className="text-xs text-neutral-500 truncate">{shippingForm.paczkomatAddress}</p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setShippingForm(prev => ({ ...prev, paczkomatId: "", paczkomatAddress: "" }));
+                            setShowPaczkomatSearch(true);
+                          }}
+                          className="p-1 hover:bg-neutral-100 rounded"
+                        >
+                          <X className="w-4 h-4 text-neutral-400" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                          <input
+                            type="text"
+                            value={paczkomatSearchQuery}
+                            onChange={(e) => handlePaczkomatSearch(e.target.value)}
+                            placeholder="Wpisz adres, np: Smolna 14, Rybnik"
+                            className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                          />
+                          {isSearchingPaczkomat && (
+                            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yellow-600 animate-spin" />
+                          )}
+                        </div>
+                        <p className="text-xs text-yellow-700 mt-1">
+                          Wpisz ulicę i miasto - znajdziemy najbliższe paczkomaty
+                        </p>
+
+                        {paczkomatResults.length > 0 && (
+                          <div className="max-h-56 overflow-y-auto bg-white rounded-lg border border-neutral-200 shadow-lg">
+                            {paczkomatResults.map((paczkomat) => (
+                              <button
+                                key={paczkomat.id}
+                                onClick={() => selectPaczkomat(paczkomat)}
+                                className="w-full p-2.5 text-left hover:bg-yellow-50 transition-colors flex items-start gap-2 border-b border-neutral-100 last:border-b-0"
+                              >
+                                <MapPin className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <p className="text-sm font-bold text-yellow-700">{paczkomat.id}</p>
+                                    {paczkomat.distance && (
+                                      <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded font-medium">
+                                        {paczkomat.distance < 1000
+                                          ? `${Math.round(paczkomat.distance)} m`
+                                          : `${(paczkomat.distance / 1000).toFixed(1)} km`}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-neutral-700">{paczkomat.address}, {paczkomat.city}</p>
+                                  {paczkomat.description && (
+                                    <p className="text-xs text-neutral-500 truncate">{paczkomat.description}</p>
+                                  )}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        {paczkomatSearchQuery.length >= 2 && paczkomatResults.length === 0 && !isSearchingPaczkomat && (
+                          <p className="text-xs text-neutral-500 text-center py-2">
+                            Nie znaleziono paczkomatów. Spróbuj inną nazwę miasta.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-neutral-200 mt-4 pt-4 space-y-3">
