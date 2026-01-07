@@ -141,6 +141,12 @@ model Product {
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([isActive, isFeatured])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([price])
+  @@index([createdAt])
 }
 
 model ProductImage {

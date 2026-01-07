@@ -2,12 +2,34 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
-import { ChevronRight, ChevronLeft, Play, Truck, Shield, Headphones, CreditCard } from "lucide-react";
+import { ChevronRight, ChevronLeft, Truck, Shield, Headphones, CreditCard } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useCart } from "@/store/cart";
 import { useCurrency } from "@/store/currency";
+
+// Slider configuration
+const heroSlides = [
+  {
+    id: 1,
+    image: "/images/slider/slide1-repair.jpg",
+    title: "Drone Repair Service",
+    subtitle: "Expert Technicians",
+    description: "Professional repair and maintenance for all drone brands",
+    buttonText: "Contact Us",
+    buttonLink: "/contact",
+  },
+  {
+    id: 2,
+    image: "/images/slider/slide2-service.jpg",
+    title: "Technical Support",
+    subtitle: "Certified Service",
+    description: "Diagnostics, calibration and software updates",
+    buttonText: "Learn More",
+    buttonLink: "/contact",
+  },
+];
 
 interface ProductImage {
   id: string;
@@ -50,45 +72,62 @@ export default function HomePageClient() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [brandProducts, setBrandProducts] = useState<BrandSection[]>([]);
   const [loading, setLoading] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  // Fetch featured products
-  useEffect(() => {
-    async function fetchFeaturedProducts() {
-      try {
-        const res = await fetch("/api/products?featured=true&limit=8");
-        if (res.ok) {
-          const data = await res.json();
-          setFeaturedProducts(data.products || []);
-        }
-      } catch (error) {
-        console.error("Error fetching featured products:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchFeaturedProducts();
+  // Slider navigation
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
   }, []);
 
-  // Fetch products by brand (XAG, Autel, FIMI)
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  }, []);
+
+  const goToSlide = useCallback((index: number) => {
+    setCurrentSlide(index);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 5000);
+  }, []);
+
+  // Autoplay effect
   useEffect(() => {
-    async function fetchBrandProducts() {
+    if (!isAutoPlaying) return;
+    const interval = setInterval(nextSlide, 5000);
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, nextSlide]);
+
+  // Fetch all products in parallel for better performance
+  useEffect(() => {
+    async function fetchAllProducts() {
       try {
         const targetBrands = [
           { name: "XAG", slug: "xag" },
           { name: "Autel", slug: "autel" },
           { name: "FIMI", slug: "fimi" },
         ];
-        const brandsWithProducts: BrandSection[] = [];
 
-        for (const brand of targetBrands) {
-          const productsRes = await fetch(`/api/products?brand=${brand.slug}&limit=8`);
-          if (productsRes.ok) {
-            const data = await productsRes.json();
+        // Fetch featured products and all brand products in parallel
+        const [featuredRes, ...brandResponses] = await Promise.all([
+          fetch("/api/products?featured=true&limit=8"),
+          ...targetBrands.map(brand => fetch(`/api/products?brand=${brand.slug}&limit=8`))
+        ]);
+
+        // Process featured products
+        if (featuredRes.ok) {
+          const data = await featuredRes.json();
+          setFeaturedProducts(data.products || []);
+        }
+
+        // Process brand products
+        const brandsWithProducts: BrandSection[] = [];
+        for (let i = 0; i < brandResponses.length; i++) {
+          if (brandResponses[i].ok) {
+            const data = await brandResponses[i].json();
             if (data.products && data.products.length > 0) {
               brandsWithProducts.push({
-                brand: brand.name,
-                slug: brand.slug,
+                brand: targetBrands[i].name,
+                slug: targetBrands[i].slug,
                 products: data.products,
               });
             }
@@ -96,50 +135,73 @@ export default function HomePageClient() {
         }
         setBrandProducts(brandsWithProducts);
       } catch (error) {
-        console.error("Error fetching brand products:", error);
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
       }
     }
-    fetchBrandProducts();
+    fetchAllProducts();
   }, []);
 
-  // Force video autoplay
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.muted = true;
-      video.play().catch(() => {
-        // Autoplay blocked, try again on user interaction
-        const playOnInteraction = () => {
-          video.play();
-          document.removeEventListener('click', playOnInteraction);
-        };
-        document.addEventListener('click', playOnInteraction);
-      });
-    }
-  }, []);
 
   return (
     <div className="bg-white">
-      {/* Hero Video Section */}
+      {/* Hero Slider Section */}
       <section className="relative bg-black overflow-hidden">
-        {/* Local Video - Full Screen, cropped to hide subtitles */}
-        {/* Mobile: more aggressive crop, Desktop: normal crop */}
-        <div className="relative w-full overflow-hidden h-[50vh] md:h-[70vh] md:max-h-[600px]">
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className="absolute w-auto h-auto min-w-full min-h-full object-cover"
-            style={{
-              top: '40%',
-              left: '50%',
-              transform: 'translate(-50%, -50%) scale(2)',
-            }}
-            src="/videos/hero-video.mp4"
-          />
+        <div className="relative w-full h-[50vh] md:h-[70vh] md:max-h-[600px]">
+          {/* Slides */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.7 }}
+              className="absolute inset-0"
+            >
+              {/* Background Image */}
+              <Image
+                src={heroSlides[currentSlide].image}
+                alt={heroSlides[currentSlide].title}
+                fill
+                className="object-cover"
+                priority={currentSlide === 0}
+                sizes="100vw"
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Navigation Arrows */}
+          <button
+            onClick={() => { prevSlide(); setIsAutoPlaying(false); setTimeout(() => setIsAutoPlaying(true), 5000); }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 md:p-3 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full transition-colors z-10"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-white" />
+          </button>
+          <button
+            onClick={() => { nextSlide(); setIsAutoPlaying(false); setTimeout(() => setIsAutoPlaying(true), 5000); }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 md:p-3 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full transition-colors z-10"
+            aria-label="Next slide"
+          >
+            <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-white" />
+          </button>
+
+          {/* Dot Indicators */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+            {heroSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all ${
+                  index === currentSlide
+                    ? "bg-white w-8 md:w-10"
+                    : "bg-white/50 hover:bg-white/80"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
