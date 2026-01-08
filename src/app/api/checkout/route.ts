@@ -141,8 +141,8 @@ export async function POST(request: Request) {
       payment_method_types: ["p24", "card", "blik"], // Przelewy24, Card, and BLIK
       line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.NEXTAUTH_URL || "http://localhost:3001"}/checkout/success?orderId=${order.id}`,
-      cancel_url: `${process.env.NEXTAUTH_URL || "http://localhost:3001"}/checkout?canceled=true`,
+      success_url: `${process.env.NEXTAUTH_URL || "http://localhost:3001"}/${locale || "pl"}/checkout/success?orderId=${order.id}`,
+      cancel_url: `${process.env.NEXTAUTH_URL || "http://localhost:3001"}/${locale || "pl"}/checkout?canceled=true`,
       customer_email: shippingAddress.email, // Required for P24
       metadata: {
         orderId: order.id,
