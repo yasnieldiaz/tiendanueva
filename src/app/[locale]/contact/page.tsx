@@ -61,7 +61,8 @@ const translations = {
     hoursValue: "Lun - Vie: 9:00 - 17:00",
     weekend: "Sab - Dom: Cerrado",
     findUs: "Encuentranos",
-    companyName: "DroneParts Sp. z o.o.",
+    companyName: "IMEGA Yasniel Diaz Marrero",
+    companyNip: "PL6472457939",
     companyAddress: "ul. Smolna 14",
     companyCity: "44-200 Rybnik, Polonia",
     subjects: [
@@ -103,7 +104,8 @@ const translations = {
     hoursValue: "Mon - Fri: 9:00 AM - 5:00 PM",
     weekend: "Sat - Sun: Closed",
     findUs: "Find us",
-    companyName: "DroneParts Sp. z o.o.",
+    companyName: "IMEGA Yasniel Diaz Marrero",
+    companyNip: "PL6472457939",
     companyAddress: "ul. Smolna 14",
     companyCity: "44-200 Rybnik, Poland",
     subjects: [
@@ -145,7 +147,8 @@ const translations = {
     hoursValue: "Pon - Pt: 9:00 - 17:00",
     weekend: "Sob - Nd: Zamkniete",
     findUs: "Znajdz nas",
-    companyName: "DroneParts Sp. z o.o.",
+    companyName: "IMEGA Yasniel Diaz Marrero",
+    companyNip: "PL6472457939",
     companyAddress: "ul. Smolna 14",
     companyCity: "44-200 Rybnik, Polska",
     subjects: [
@@ -204,11 +207,21 @@ export default function ContactPage() {
 
     setStatus("loading");
 
-    // Simulate API call
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setStatus("success");
+        setFormData({ name: "", email: "", subject: "", message: "" });
+      } else {
+        setStatus("error");
+      }
     } catch {
       setStatus("error");
     }
@@ -305,7 +318,7 @@ export default function ContactPage() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder={t.namePlaceholder}
-                      className={`w-full px-4 py-3 rounded-xl border ${
+                      className={`w-full px-4 py-3 h-[50px] rounded-xl border ${
                         errors.name ? "border-red-500" : "border-neutral-300"
                       } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors`}
                     />
@@ -326,7 +339,7 @@ export default function ContactPage() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder={t.emailPlaceholder}
-                      className={`w-full px-4 py-3 rounded-xl border ${
+                      className={`w-full px-4 py-3 h-[50px] rounded-xl border ${
                         errors.email ? "border-red-500" : "border-neutral-300"
                       } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors`}
                     />
@@ -345,9 +358,9 @@ export default function ContactPage() {
                       name="subject"
                       value={formData.subject}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 rounded-xl border ${
+                      className={`w-full px-4 py-3 h-[50px] rounded-xl border ${
                         errors.subject ? "border-red-500" : "border-neutral-300"
-                      } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors bg-white`}
+                      } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors bg-white cursor-pointer`}
                     >
                       <option value="">{t.subjectPlaceholder}</option>
                       {t.subjects.map((subject, idx) => (
@@ -419,7 +432,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-neutral-900">{t.companyName}</p>
-                    <p className="text-neutral-600 text-sm">NIP: 6423235808</p>
+                    <p className="text-neutral-600 text-sm">NIP: {t.companyNip}</p>
                   </div>
                 </div>
 
@@ -442,8 +455,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="font-medium text-neutral-700">{t.phone}</p>
-                    <a href="tel:+48123456789" className="text-blue-600 hover:underline">
-                      +48 123 456 789
+                    <a href="tel:+48784608733" className="text-blue-600 hover:underline">
+                      +48 784 608 733
                     </a>
                   </div>
                 </div>
@@ -455,8 +468,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="font-medium text-neutral-700">{t.emailLabel}</p>
-                    <a href="mailto:info@drone-partss.com" className="text-blue-600 hover:underline">
-                      info@drone-partss.com
+                    <a href="mailto:admin@drone-partss.com" className="text-blue-600 hover:underline">
+                      admin@drone-partss.com
                     </a>
                   </div>
                 </div>
