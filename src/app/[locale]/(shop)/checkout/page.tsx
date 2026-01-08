@@ -30,14 +30,14 @@ const shippingOptions = [
   {
     id: "inpost",
     name: "InPost Paczkomaty",
-    description: "Dostawa do paczkomatu 24-48h",
+    description: "Entrega en Paczkomat 24-48h",
     price: 18,
     icon: Package,
   },
   {
     id: "gls",
     name: "GLS Kurier",
-    description: "Dostawa kurierem 24-48h",
+    description: "Entrega por mensajero 24-48h",
     price: 24,
     icon: Truck,
   },
@@ -332,7 +332,7 @@ function CheckoutContent() {
 
     // For InPost, require Paczkomat selection
     if (selectedShipping === "inpost" && !shippingForm.paczkomatId) {
-      setError("Wybierz Paczkomat dla dostawy InPost");
+      setError("Selecciona un Paczkomat para la entrega InPost");
       return false;
     }
 
@@ -443,7 +443,7 @@ function CheckoutContent() {
               className="flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Cart
+              {t("backToCart")}
             </Link>
           </div>
           <h1 className="text-2xl font-bold text-neutral-900 mt-4">{t("title")}</h1>
@@ -504,7 +504,7 @@ function CheckoutContent() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Imię / First Name *
+                      {t("firstName")} *
                     </label>
                     <input
                       type="text"
@@ -516,7 +516,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Nazwisko / Last Name *
+                      {t("lastName")} *
                     </label>
                     <input
                       type="text"
@@ -528,7 +528,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      E-mail *
+                      {t("email")} *
                     </label>
                     <input
                       type="email"
@@ -540,7 +540,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Telefon / Phone *
+                      {t("phone")} *
                     </label>
                     <input
                       type="tel"
@@ -552,7 +552,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Adres / Address *
+                      {t("address")} *
                     </label>
                     <input
                       type="text"
@@ -564,7 +564,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Miasto / City *
+                      {t("city")} *
                     </label>
                     <input
                       type="text"
@@ -576,7 +576,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Kod pocztowy *
+                      {t("postalCode")} *
                     </label>
                     <input
                       type="text"
@@ -588,7 +588,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Kraj / Country
+                      {t("country")}
                     </label>
                     <select
                       name="country"
@@ -596,33 +596,33 @@ function CheckoutContent() {
                       onChange={handleInputChange}
                       className="w-full h-[50px] px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 cursor-pointer"
                     >
-                      <option value="Poland">Polska (PL)</option>
-                      <option value="Germany">Niemcy (DE)</option>
-                      <option value="Spain">Hiszpania (ES)</option>
-                      <option value="France">Francja (FR)</option>
-                      <option value="Italy">Włochy (IT)</option>
-                      <option value="Netherlands">Holandia (NL)</option>
-                      <option value="Czech Republic">Czechy (CZ)</option>
+                      <option value="Poland">Polonia (PL)</option>
+                      <option value="Germany">Alemania (DE)</option>
+                      <option value="Spain">España (ES)</option>
+                      <option value="France">Francia (FR)</option>
+                      <option value="Italy">Italia (IT)</option>
+                      <option value="Netherlands">Países Bajos (NL)</option>
+                      <option value="Czech Republic">República Checa (CZ)</option>
                       <option value="Austria">Austria (AT)</option>
-                      <option value="Belgium">Belgia (BE)</option>
-                      <option value="Slovakia">Słowacja (SK)</option>
-                      <option value="Lithuania">Litwa (LT)</option>
-                      <option value="Latvia">Łotwa (LV)</option>
+                      <option value="Belgium">Bélgica (BE)</option>
+                      <option value="Slovakia">Eslovaquia (SK)</option>
+                      <option value="Lithuania">Lituania (LT)</option>
+                      <option value="Latvia">Letonia (LV)</option>
                       <option value="Estonia">Estonia (EE)</option>
-                      <option value="Sweden">Szwecja (SE)</option>
-                      <option value="Denmark">Dania (DK)</option>
+                      <option value="Sweden">Suecia (SE)</option>
+                      <option value="Denmark">Dinamarca (DK)</option>
                       <option value="Finland">Finlandia (FI)</option>
-                      <option value="Ireland">Irlandia (IE)</option>
-                      <option value="Portugal">Portugalia (PT)</option>
-                      <option value="Greece">Grecja (EL)</option>
-                      <option value="Hungary">Węgry (HU)</option>
-                      <option value="Romania">Rumunia (RO)</option>
-                      <option value="Bulgaria">Bułgaria (BG)</option>
-                      <option value="Croatia">Chorwacja (HR)</option>
-                      <option value="Slovenia">Słowenia (SI)</option>
-                      <option value="Luxembourg">Luksemburg (LU)</option>
+                      <option value="Ireland">Irlanda (IE)</option>
+                      <option value="Portugal">Portugal (PT)</option>
+                      <option value="Greece">Grecia (EL)</option>
+                      <option value="Hungary">Hungría (HU)</option>
+                      <option value="Romania">Rumanía (RO)</option>
+                      <option value="Bulgaria">Bulgaria (BG)</option>
+                      <option value="Croatia">Croacia (HR)</option>
+                      <option value="Slovenia">Eslovenia (SI)</option>
+                      <option value="Luxembourg">Luxemburgo (LU)</option>
                       <option value="Malta">Malta (MT)</option>
-                      <option value="Cyprus">Cypr (CY)</option>
+                      <option value="Cyprus">Chipre (CY)</option>
                     </select>
                   </div>
                 </div>
@@ -638,7 +638,7 @@ function CheckoutContent() {
                       className="w-5 h-5 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900"
                     />
                     <label htmlFor="businessPurchase" className="text-sm font-medium text-neutral-700">
-                      Zakup na firmę / Faktura VAT
+                      {t("companyPurchase")}
                     </label>
                   </div>
 
@@ -651,21 +651,21 @@ function CheckoutContent() {
                     >
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Nazwa firmy / Company Name
+                          {t("companyName")}
                         </label>
                         <input
                           type="text"
                           name="companyName"
                           value={shippingForm.companyName}
                           onChange={handleInputChange}
-                          placeholder="np. Firma Sp. z o.o."
+                          placeholder="ej. Empresa S.L."
                           className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
                         />
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          NIP / VAT Number (EU)
+                          {t("vatNumber")}
                         </label>
                         <div className="flex gap-2">
                           <input
@@ -673,7 +673,7 @@ function CheckoutContent() {
                             name="vatNumber"
                             value={shippingForm.vatNumber}
                             onChange={handleInputChange}
-                            placeholder="np. PL1234567890 lub ES12345678A"
+                            placeholder="ej. ES12345678A o DE123456789"
                             className="flex-1 px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
                           />
                           <button
@@ -687,11 +687,11 @@ function CheckoutContent() {
                             ) : (
                               <Check className="w-4 h-4" />
                             )}
-                            Sprawdź VIES
+                            Verificar VIES
                           </button>
                         </div>
                         <p className="text-xs text-neutral-500 mt-1">
-                          Wprowadź numer VAT z prefiksem kraju (np. ES, DE, FR)
+                          Introduce el número de IVA con prefijo del país (ej. ES, DE, FR)
                         </p>
                       </div>
 
@@ -723,12 +723,12 @@ function CheckoutContent() {
                             </p>
                             {vatValidation.companyName && (
                               <p className="text-sm text-neutral-600 mt-1">
-                                Firma: {vatValidation.companyName}
+                                Empresa: {vatValidation.companyName}
                               </p>
                             )}
                             {vatValidation.vatExempt && (
                               <p className="text-sm text-green-600 mt-1 font-medium">
-                                Transakcja wewnątrzwspólnotowa - VAT 0%
+                                Transacción intracomunitaria - IVA 0%
                               </p>
                             )}
                           </div>
@@ -744,7 +744,7 @@ function CheckoutContent() {
                   onClick={handleContinueToPayment}
                   className="w-full mt-6 py-4 bg-neutral-900 text-white font-semibold rounded-xl hover:bg-neutral-800"
                 >
-                  Continue to Payment
+                  {t("continueToPayment")}
                 </motion.button>
               </motion.div>
             )}
@@ -883,7 +883,7 @@ function CheckoutContent() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.name}</p>
-                      <p className="text-sm text-neutral-500">Ilość: {item.quantity}</p>
+                      <p className="text-sm text-neutral-500">{t("quantity")}: {item.quantity}</p>
                       <p className="font-medium">{formatPrice(item.price * item.quantity)} <span className="text-xs text-neutral-500">+ VAT</span></p>
                     </div>
                   </div>
@@ -892,7 +892,7 @@ function CheckoutContent() {
 
               {/* Shipping Selection */}
               <div className="border-t border-neutral-200 mt-4 pt-4">
-                <h3 className="text-sm font-medium text-neutral-700 mb-3">Dostawa</h3>
+                <h3 className="text-sm font-medium text-neutral-700 mb-3">{t("delivery")}</h3>
                 <div className="space-y-2">
                   {shippingOptions.map((option) => {
                     const Icon = option.icon;
@@ -935,7 +935,7 @@ function CheckoutContent() {
                   <div className="mt-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                     <div className="flex items-center gap-2 mb-2">
                       <Package className="w-4 h-4 text-yellow-600" />
-                      <span className="text-sm font-medium text-yellow-800">Wybierz Paczkomat</span>
+                      <span className="text-sm font-medium text-yellow-800">{t("selectPaczkomat")}</span>
                     </div>
 
                     {shippingForm.paczkomatId ? (
@@ -963,7 +963,7 @@ function CheckoutContent() {
                             type="text"
                             value={paczkomatSearchQuery}
                             onChange={(e) => handlePaczkomatSearch(e.target.value)}
-                            placeholder="Wpisz adres, np: Smolna 14, Rybnik"
+                            placeholder="Introduce dirección, ej: Gran Vía 14, Madrid"
                             className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
                           />
                           {isSearchingPaczkomat && (
@@ -971,7 +971,7 @@ function CheckoutContent() {
                           )}
                         </div>
                         <p className="text-xs text-yellow-700 mt-1">
-                          Wpisz ulicę i miasto - znajdziemy najbliższe paczkomaty
+                          Introduce calle y ciudad - encontraremos los paczkomats más cercanos
                         </p>
 
                         {paczkomatResults.length > 0 && (
@@ -1006,7 +1006,7 @@ function CheckoutContent() {
 
                         {paczkomatSearchQuery.length >= 2 && paczkomatResults.length === 0 && !isSearchingPaczkomat && (
                           <p className="text-xs text-neutral-500 text-center py-2">
-                            Nie znaleziono paczkomatów. Spróbuj inną nazwę miasta.
+                            No se encontraron paczkomats. Intenta con otra ciudad.
                           </p>
                         )}
                       </div>
@@ -1062,7 +1062,7 @@ function CheckoutContent() {
 
               <div className="mt-6 flex items-center gap-2 text-sm text-neutral-500">
                 <Shield className="w-4 h-4" />
-                <span>Bezpieczne płatności przez Przelewy24</span>
+                <span>Pagos seguros con Przelewy24</span>
               </div>
             </div>
           </div>

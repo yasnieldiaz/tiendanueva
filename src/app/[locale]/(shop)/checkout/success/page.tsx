@@ -75,7 +75,7 @@ function SuccessContent() {
             transition={{ delay: 0.5 }}
             className="bg-neutral-50 rounded-2xl p-6 mb-8"
           >
-            <p className="text-sm text-neutral-500 mb-1">Order Number</p>
+            <p className="text-sm text-neutral-500 mb-1">{t("orderNumber")}</p>
             <p className="text-2xl font-bold text-neutral-900">#{orderNumber}</p>
           </motion.div>
         )}
@@ -92,8 +92,8 @@ function SuccessContent() {
               <CheckCircle className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="font-medium text-neutral-900">Order Confirmed</p>
-              <p className="text-sm text-neutral-500">Your order has been placed successfully</p>
+              <p className="font-medium text-neutral-900">{t("orderConfirmed")}</p>
+              <p className="text-sm text-neutral-500">{t("orderConfirmedDesc")}</p>
             </div>
           </div>
 
@@ -102,8 +102,8 @@ function SuccessContent() {
               <Package className="w-5 h-5 text-neutral-400" />
             </div>
             <div>
-              <p className="font-medium text-neutral-400">Processing</p>
-              <p className="text-sm text-neutral-400">We&apos;re preparing your order</p>
+              <p className="font-medium text-neutral-400">{t("processingOrder")}</p>
+              <p className="text-sm text-neutral-400">{t("processingOrderDesc")}</p>
             </div>
           </div>
 
@@ -112,8 +112,8 @@ function SuccessContent() {
               <Truck className="w-5 h-5 text-neutral-400" />
             </div>
             <div>
-              <p className="font-medium text-neutral-400">Shipping</p>
-              <p className="text-sm text-neutral-400">Estimated delivery: 2-5 business days</p>
+              <p className="font-medium text-neutral-400">{t("shipping")}</p>
+              <p className="text-sm text-neutral-400">{t("shippingDesc")}</p>
             </div>
           </div>
         </motion.div>
@@ -127,7 +127,7 @@ function SuccessContent() {
         >
           <Mail className="w-5 h-5 text-blue-600 flex-shrink-0" />
           <p className="text-sm text-blue-700 text-left">
-            A confirmation email has been sent with your order details.
+            {t("emailNotice")}
           </p>
         </motion.div>
 
@@ -144,14 +144,14 @@ function SuccessContent() {
               whileTap={{ scale: 0.98 }}
               className="w-full flex items-center justify-center gap-2 py-4 bg-neutral-900 text-white font-semibold rounded-xl hover:bg-neutral-800"
             >
-              Continue Shopping
+              {t("continueShopping")}
               <ArrowRight className="w-5 h-5" />
             </motion.button>
           </Link>
 
           <Link href={`/${locale}`}>
             <button className="w-full py-3 text-neutral-600 font-medium hover:text-neutral-900">
-              Back to Home
+              {t("backToHome")}
             </button>
           </Link>
         </motion.div>
