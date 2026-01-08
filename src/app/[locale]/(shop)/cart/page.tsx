@@ -168,11 +168,11 @@ export default function CartPage() {
                   {/* Image */}
                   <div className="w-32 h-32 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-xl overflow-hidden flex-shrink-0 relative">
                     {item.image ? (
-                      <Image
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
                         src={item.image}
                         alt={item.name}
-                        fill
-                        className="object-cover"
+                        className="absolute inset-0 w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">

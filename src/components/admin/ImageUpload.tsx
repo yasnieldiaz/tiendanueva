@@ -160,11 +160,11 @@ export default function ImageUpload({
               exit={{ opacity: 0, scale: 0.8 }}
               className="relative aspect-square bg-neutral-100 rounded-xl overflow-hidden group"
             >
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={url}
                 alt={`Imagen ${index + 1}`}
-                fill
-                className="object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
               />
 
               {/* Overlay with actions */}

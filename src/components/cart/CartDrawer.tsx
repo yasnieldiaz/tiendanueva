@@ -77,11 +77,11 @@ export default function CartDrawer() {
                       {/* Image */}
                       <div className="w-20 h-20 bg-neutral-100 rounded-lg overflow-hidden flex-shrink-0 relative">
                         {item.image ? (
-                          <Image
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
                             src={item.image}
                             alt={item.name}
-                            fill
-                            className="object-cover"
+                            className="absolute inset-0 w-full h-full object-cover"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">

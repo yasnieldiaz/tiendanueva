@@ -132,13 +132,11 @@ function ImageGallery({
           className="relative w-full h-full max-w-5xl max-h-[80vh] mx-4"
           onClick={(e) => e.stopPropagation()}
         >
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={images[currentIndex].url}
             alt={images[currentIndex].alt || "Product image"}
-            fill
-            className="object-contain"
-            sizes="100vw"
-            priority
+            className="absolute inset-0 w-full h-full object-contain"
           />
         </div>
 
@@ -180,12 +178,11 @@ function ImageGallery({
                   currentIndex === index ? "border-white" : "border-transparent opacity-60 hover:opacity-100"
                 }`}
               >
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={image.url}
                   alt={image.alt || `Thumbnail ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="64px"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               </button>
             ))}
@@ -326,13 +323,11 @@ export default function ProductPage() {
               onClick={() => setGalleryOpen(true)}
             >
               {product.images && product.images.length > 0 ? (
-                <Image
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
                   src={product.images[selectedImageIndex].url}
                   alt={product.images[selectedImageIndex].alt || product.name}
-                  fill
-                  className="object-contain p-4"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  priority
+                  className="absolute inset-0 w-full h-full object-contain p-4"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-neutral-100">
@@ -365,12 +360,11 @@ export default function ProductPage() {
                         : "border-neutral-200 hover:border-neutral-400"
                     }`}
                   >
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={image.url}
                       alt={image.alt || `${product.name} ${index + 1}`}
-                      fill
-                      className="object-contain p-1"
-                      sizes="80px"
+                      className="absolute inset-0 w-full h-full object-contain p-1"
                     />
                   </button>
                 ))}
@@ -604,12 +598,11 @@ export default function ProductPage() {
                   <div className="bg-white border border-neutral-200 rounded-lg p-4 hover:shadow-lg transition-shadow group h-full flex flex-col">
                     <div className="aspect-square bg-neutral-50 rounded-lg flex items-center justify-center mb-4 relative overflow-hidden">
                       {related.images && related.images.length > 0 ? (
-                        <Image
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
                           src={related.images[0].url}
                           alt={related.images[0].alt || related.name}
-                          fill
-                          className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                          sizes="(max-width: 768px) 50vw, 25vw"
+                          className="absolute inset-0 w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
                         <span className="text-5xl">🛸</span>

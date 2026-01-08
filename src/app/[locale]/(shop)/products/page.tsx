@@ -399,12 +399,11 @@ function ProductsContent() {
                           } bg-neutral-50 rounded-lg flex items-center justify-center relative overflow-hidden`}
                         >
                           {product.images && product.images.length > 0 ? (
-                            <Image
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img
                               src={product.images[0].url}
                               alt={product.images[0].alt || product.name}
-                              fill
-                              className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                              sizes="(max-width: 768px) 50vw, 33vw"
+                              className="absolute inset-0 w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
                                 target.style.display = 'none';

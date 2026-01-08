@@ -264,12 +264,11 @@ export default function HomePageClient() {
                   <div className="group bg-neutral-50 rounded-2xl p-4 hover:bg-neutral-100 transition-colors cursor-pointer h-full flex flex-col">
                     <div className="aspect-square relative mb-4 flex items-center justify-center bg-white rounded-xl overflow-hidden">
                       {product.images && product.images.length > 0 ? (
-                        <Image
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
                           src={product.images[0].url}
                           alt={product.images[0].alt || product.name}
-                          fill
-                          className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                          sizes="(max-width: 768px) 50vw, 25vw"
+                          className="absolute inset-0 w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
@@ -393,12 +392,11 @@ export default function HomePageClient() {
                     <div className="group bg-white rounded-2xl p-4 hover:shadow-lg transition-all cursor-pointer h-full flex flex-col border border-neutral-100">
                       <div className="aspect-square relative mb-4 flex items-center justify-center bg-neutral-50 rounded-xl overflow-hidden">
                         {product.images && product.images.length > 0 ? (
-                          <Image
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
                             src={product.images[0].url}
                             alt={product.images[0].alt || product.name}
-                            fill
-                            className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                            sizes="(max-width: 768px) 50vw, 25vw"
+                            className="absolute inset-0 w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
                           <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-neutral-100">
