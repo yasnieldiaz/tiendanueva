@@ -5,9 +5,20 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { notifyNewOrder } from "@/lib/notifications";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder", {
-  apiVersion: "2025-12-15.clover",
-});
+// Get Stripe key from database settings or env
+async function getStripeKey(): Promise<string> {
+  try {
+    const setting = await prisma.setting.findUnique({
+      where: { key: "stripe_secret_key" },
+    });
+    if (setting?.value && setting.value.length > 10) {
+      return setting.value;
+    }
+  } catch (e) {
+    console.error("[CHECKOUT] Error reading Stripe key from DB:", e);
+  }
+  return process.env.STRIPE_SECRET_KEY || "";
+}
 
 export async function POST(request: Request) {
   try {
@@ -112,6 +123,18 @@ export async function POST(request: Request) {
         quantity: 1,
       });
     }
+
+    // Get Stripe key from settings
+    const stripeSecretKey = await getStripeKey();
+    if (!stripeSecretKey || stripeSecretKey.length < 20) {
+      console.error("[CHECKOUT] Stripe key not configured");
+      return NextResponse.json(
+        { error: "Payment gateway not configured. Please contact administrator." },
+        { status: 500 }
+      );
+    }
+
+    const stripe = new Stripe(stripeSecretKey);
 
     // Create Stripe checkout session with Przelewy24
     const stripeSession = await stripe.checkout.sessions.create({
