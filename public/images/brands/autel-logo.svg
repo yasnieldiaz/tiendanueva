@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" fill="none">
+  <rect width="200" height="80" fill="white"/>
+  <text x="100" y="52" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#e63946">AUTEL</text>
+  <text x="100" y="68" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#666">ROBOTICS</text>
+</svg>

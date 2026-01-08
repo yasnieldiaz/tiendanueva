@@ -55,12 +55,9 @@ interface BrandSection {
 }
 
 const categories = [
-  { name: "DJI Mavic 4", slug: "dji-mavic-4", icon: "🛸" },
-  { name: "DJI Mini 5 Pro", slug: "dji-mini-5-pro", icon: "✈️" },
-  { name: "DJI Enterprise", slug: "dji-enterprise", icon: "🎯" },
-  { name: "Autel Max", slug: "autel-max", icon: "🎮" },
-  { name: "XAG Agricultural", slug: "xag-agricultural", icon: "🌾" },
-  { name: "Batteries", slug: "batteries", icon: "🔋" },
+  { name: "DJI Enterprise", slug: "dji-enterprise", logo: "/images/brands/dji-logo.svg" },
+  { name: "Autel", slug: "autel", logo: "/images/brands/autel-logo.svg" },
+  { name: "XAG", slug: "xag", logo: "/images/brands/xag-logo.svg" },
 ];
 
 export default function HomePageClient() {
@@ -205,22 +202,30 @@ export default function HomePageClient() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Brand Partners */}
       <section className="py-12 bg-neutral-50">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {categories.map((category, i) => (
               <motion.div
                 key={category.slug}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
+                transition={{ delay: i * 0.1 }}
               >
-                <Link href={`/${locale}/products?category=${category.slug}`}>
-                  <div className="group bg-white rounded-2xl p-6 text-center hover:shadow-lg transition-all cursor-pointer">
-                    <span className="text-4xl block mb-3">{category.icon}</span>
-                    <h3 className="font-medium text-neutral-900 group-hover:text-blue-600 transition-colors">
+                <Link href={`/${locale}/products?brand=${category.slug}`}>
+                  <div className="group bg-white rounded-2xl p-8 text-center hover:shadow-xl transition-all cursor-pointer border border-neutral-100">
+                    <div className="h-16 flex items-center justify-center mb-4">
+                      <Image
+                        src={category.logo}
+                        alt={category.name}
+                        width={140}
+                        height={60}
+                        className="object-contain grayscale group-hover:grayscale-0 transition-all"
+                      />
+                    </div>
+                    <h3 className="font-semibold text-lg text-neutral-900 group-hover:text-blue-600 transition-colors">
                       {category.name}
                     </h3>
                   </div>
