@@ -64,6 +64,7 @@ export async function PUT(
     const {
       name,
       slug,
+      sku,
       description,
       price,
       stock,
@@ -88,6 +89,7 @@ export async function PUT(
         data: {
           name,
           slug,
+          sku: sku || null,
           description,
           price: parseFloat(price),
           stock: parseInt(stock),
