@@ -135,7 +135,7 @@ export default function CartPage() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-neutral-50 border-b border-neutral-200">
-        <div className="max-w-[1504px] mx-auto px-6 py-8">
+        <div className="max-w-[1504px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="flex items-center gap-4 mb-4">
             <Link
               href="/products"
@@ -152,8 +152,8 @@ export default function CartPage() {
         </div>
       </div>
 
-      <div className="max-w-[1504px] mx-auto px-6 py-12">
-        <div className="grid lg:grid-cols-3 gap-12">
+      <div className="max-w-[1504px] mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Cart Items */}
           <div className="lg:col-span-2">
             <div className="space-y-6">
@@ -163,10 +163,10 @@ export default function CartPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="flex gap-6 p-6 bg-neutral-50 rounded-2xl"
+                  className="flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 bg-neutral-50 rounded-2xl"
                 >
                   {/* Image */}
-                  <div className="w-32 h-32 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-xl overflow-hidden flex-shrink-0 relative">
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-xl overflow-hidden flex-shrink-0 relative mx-auto sm:mx-0">
                     {item.image ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
@@ -183,12 +183,12 @@ export default function CartPage() {
 
                   {/* Details */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
                         {item.brand && (
                           <span className="text-sm text-neutral-500">{item.brand}</span>
                         )}
-                        <h3 className="font-semibold text-neutral-900 text-lg">
+                        <h3 className="font-semibold text-neutral-900 text-base sm:text-lg line-clamp-2">
                           {item.name}
                         </h3>
                         {item.variant && (
@@ -197,15 +197,30 @@ export default function CartPage() {
                       </div>
                       <button
                         onClick={() => removeItem(item.productId)}
-                        className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-between mt-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
+                      {/* Price - shown first on mobile */}
+                      <div className="text-left sm:text-right order-1 sm:order-2">
+                        <p className="text-lg sm:text-xl font-bold text-neutral-900">
+                          {formatPrice(item.price * item.quantity)} <span className="text-xs font-normal text-neutral-500">+ VAT</span>
+                        </p>
+                        <p className="text-sm text-neutral-400">
+                          {formatPrice(item.price * item.quantity * 1.23)} brutto
+                        </p>
+                        {item.quantity > 1 && (
+                          <p className="text-xs text-neutral-400">
+                            {formatPrice(item.price)} {lt.perUnit}
+                          </p>
+                        )}
+                      </div>
+
                       {/* Quantity */}
-                      <div className="flex items-center border border-neutral-200 rounded-lg bg-white">
+                      <div className="flex items-center border border-neutral-200 rounded-lg bg-white order-2 sm:order-1 w-fit">
                         <button
                           onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                           className="p-2.5 text-neutral-400 hover:text-neutral-900 transition-colors"
@@ -220,21 +235,6 @@ export default function CartPage() {
                         >
                           <Plus className="w-4 h-4" />
                         </button>
-                      </div>
-
-                      {/* Price */}
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-neutral-900">
-                          {formatPrice(item.price * item.quantity)} <span className="text-xs font-normal text-neutral-500">+ VAT</span>
-                        </p>
-                        <p className="text-sm text-neutral-400">
-                          {formatPrice(item.price * item.quantity * 1.23)} brutto
-                        </p>
-                        {item.quantity > 1 && (
-                          <p className="text-xs text-neutral-400">
-                            {formatPrice(item.price)} {lt.perUnit}
-                          </p>
-                        )}
                       </div>
                     </div>
                   </div>
