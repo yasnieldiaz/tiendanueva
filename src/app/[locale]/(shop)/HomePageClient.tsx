@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
 import { ChevronRight, ChevronLeft, Truck, Shield, Headphones, CreditCard } from "lucide-react";
 import Link from "next/link";
@@ -143,30 +142,72 @@ export default function HomePageClient() {
 
   return (
     <div className="bg-white">
+      {/* CSS Animations */}
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fade-in-up {
+          animation: fadeInUp 0.5s ease-out forwards;
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+        .product-card {
+          opacity: 0;
+          animation: fadeInUp 0.4s ease-out forwards;
+        }
+        .product-card:nth-child(1) { animation-delay: 0.05s; }
+        .product-card:nth-child(2) { animation-delay: 0.1s; }
+        .product-card:nth-child(3) { animation-delay: 0.15s; }
+        .product-card:nth-child(4) { animation-delay: 0.2s; }
+        .product-card:nth-child(5) { animation-delay: 0.25s; }
+        .product-card:nth-child(6) { animation-delay: 0.3s; }
+        .product-card:nth-child(7) { animation-delay: 0.35s; }
+        .product-card:nth-child(8) { animation-delay: 0.4s; }
+        .brand-card {
+          opacity: 0;
+          animation: fadeInUp 0.4s ease-out forwards;
+        }
+        .brand-card:nth-child(1) { animation-delay: 0.1s; }
+        .brand-card:nth-child(2) { animation-delay: 0.2s; }
+        .brand-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card {
+          opacity: 0;
+          animation: fadeInUp 0.4s ease-out forwards;
+        }
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+      `}</style>
+
       {/* Hero Slider Section */}
       <section className="relative bg-black overflow-hidden">
         <div className="relative w-full h-[50vh] md:h-[70vh] md:max-h-[600px]">
           {/* Slides */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentSlide}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.7 }}
-              className="absolute inset-0"
+          {heroSlides.map((slide, index) => (
+            <div
+              key={slide.id}
+              className={`absolute inset-0 transition-opacity duration-700 ${
+                index === currentSlide ? 'opacity-100' : 'opacity-0'
+              }`}
             >
-              {/* Background Image */}
               <Image
-                src={heroSlides[currentSlide].image}
-                alt={heroSlides[currentSlide].title}
+                src={slide.image}
+                alt={slide.title}
                 fill
                 className="object-cover"
-                priority={currentSlide === 0}
+                priority={index === 0}
                 sizes="100vw"
               />
-            </motion.div>
-          </AnimatePresence>
+            </div>
+          ))}
 
           {/* Navigation Arrows */}
           <button
@@ -190,10 +231,10 @@ export default function HomePageClient() {
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all ${
+                className={`h-2.5 md:h-3 rounded-full transition-all ${
                   index === currentSlide
                     ? "bg-white w-8 md:w-10"
-                    : "bg-white/50 hover:bg-white/80"
+                    : "bg-white/50 hover:bg-white/80 w-2.5 md:w-3"
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -206,14 +247,8 @@ export default function HomePageClient() {
       <section className="py-12 bg-neutral-50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {categories.map((category, i) => (
-              <motion.div
-                key={category.slug}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
+            {categories.map((category) => (
+              <div key={category.slug} className="brand-card">
                 <Link href={`/${locale}/products?brand=${category.slug}`}>
                   <div className="group bg-white rounded-2xl p-8 text-center hover:shadow-xl transition-all cursor-pointer border border-neutral-100">
                     <div className="h-16 flex items-center justify-center mb-4">
@@ -230,7 +265,7 @@ export default function HomePageClient() {
                     </h3>
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -256,15 +291,8 @@ export default function HomePageClient() {
             </div>
           ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.slice(0, 8).map((product, i) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="h-full"
-              >
+            {featuredProducts.slice(0, 8).map((product) => (
+              <div key={product.id} className="product-card h-full">
                 <Link href={`/${locale}/product/${product.slug}`} className="h-full block">
                   <div className="group bg-neutral-50 rounded-2xl p-4 hover:bg-neutral-100 transition-colors cursor-pointer h-full flex flex-col">
                     <div className="aspect-square relative mb-4 flex items-center justify-center bg-white rounded-xl overflow-hidden">
@@ -288,13 +316,7 @@ export default function HomePageClient() {
                         />
                       ) : (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-neutral-100">
-                          <motion.span
-                            className="text-5xl mb-2"
-                            whileHover={{ scale: 1.1, rotate: 5 }}
-                            transition={{ type: "spring", stiffness: 300 }}
-                          >
-                            🛸
-                          </motion.span>
+                          <span className="text-5xl mb-2">🛸</span>
                           <span className="text-xs text-neutral-400 font-medium">{product.brand?.name || "Dron"}</span>
                         </div>
                       )}
@@ -332,9 +354,7 @@ export default function HomePageClient() {
                             {formatPrice(product.price * 1.23)} brutto
                           </span>
                         </div>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
+                        <button
                           onClick={(e) => {
                             e.preventDefault();
                             if (product.stock > 0) {
@@ -350,15 +370,15 @@ export default function HomePageClient() {
                             }
                           }}
                           disabled={product.stock === 0}
-                          className="px-3 py-1.5 bg-neutral-900 text-white text-xs font-medium rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-1.5 bg-neutral-900 text-white text-xs font-medium rounded-lg hover:bg-neutral-800 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {product.stock === 0 ? "Sold Out" : tProducts("addToCart")}
-                        </motion.button>
+                        </button>
                       </div>
                     </div>
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
           )}
@@ -384,15 +404,8 @@ export default function HomePageClient() {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {brandSection.products.slice(0, 8).map((product, i) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05 }}
-                  className="h-full"
-                >
+              {brandSection.products.slice(0, 8).map((product) => (
+                <div key={product.id} className="product-card h-full">
                   <Link href={`/${locale}/product/${product.slug}`} className="h-full block">
                     <div className="group bg-white rounded-2xl p-4 hover:shadow-lg transition-all cursor-pointer h-full flex flex-col border border-neutral-100">
                       <div className="aspect-square relative mb-4 flex items-center justify-center bg-neutral-50 rounded-xl overflow-hidden">
@@ -435,9 +448,7 @@ export default function HomePageClient() {
                               {formatPrice(product.price * 1.23)} brutto
                             </span>
                           </div>
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                          <button
                             onClick={(e) => {
                               e.preventDefault();
                               if (product.stock > 0) {
@@ -453,15 +464,15 @@ export default function HomePageClient() {
                               }
                             }}
                             disabled={product.stock === 0}
-                            className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {product.stock === 0 ? tProducts("outOfStock") : tProducts("addToCart")}
-                          </motion.button>
+                          </button>
                         </div>
                       </div>
                     </div>
                   </Link>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -478,14 +489,7 @@ export default function HomePageClient() {
               { icon: Headphones, title: "24/7 Support", desc: "Expert assistance available" },
               { icon: CreditCard, title: "Secure Payment", desc: "100% secure checkout" },
             ].map((feature, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="flex items-start gap-4"
-              >
+              <div key={i} className="feature-card flex items-start gap-4">
                 <div className="p-3 bg-white rounded-xl shadow-sm">
                   <feature.icon className="w-6 h-6 text-neutral-700" />
                 </div>
@@ -493,7 +497,7 @@ export default function HomePageClient() {
                   <h3 className="font-semibold text-neutral-900">{feature.title}</h3>
                   <p className="text-sm text-neutral-500 mt-1">{feature.desc}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -515,13 +519,9 @@ export default function HomePageClient() {
                 placeholder="Enter your email"
                 className="flex-1 px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
               />
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-6 py-3 bg-white text-neutral-900 font-semibold rounded-xl hover:bg-neutral-100 transition-colors"
-              >
+              <button className="px-6 py-3 bg-white text-neutral-900 font-semibold rounded-xl hover:bg-neutral-100 hover:scale-[1.02] active:scale-[0.98] transition-all">
                 Subscribe
-              </motion.button>
+              </button>
             </div>
           </div>
         </div>
