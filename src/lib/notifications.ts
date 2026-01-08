@@ -67,8 +67,10 @@ async function createTransporter() {
 
 // Send email
 async function sendEmail(to: string, subject: string, html: string) {
+  console.log(`[EMAIL] sendEmail called - to: ${to}, subject: ${subject}`);
   try {
     const settings = await getSettings();
+    console.log(`[EMAIL] SMTP settings - host: ${settings.smtp_host}, user: ${settings.smtp_user}, from: ${settings.smtp_from_email}`);
     const transporter = await createTransporter();
 
     if (!transporter) {
@@ -76,7 +78,7 @@ async function sendEmail(to: string, subject: string, html: string) {
       return false;
     }
 
-    console.log(`[EMAIL] Sending to: ${to}, subject: ${subject}`);
+    console.log(`[EMAIL] Transporter created, sending to: ${to}`);
 
     await transporter.sendMail({
       from: `"${settings.smtp_from_name || "Drone-Partss"}" <${settings.smtp_from_email || settings.smtp_user}>`,

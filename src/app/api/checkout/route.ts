@@ -132,6 +132,7 @@ export async function POST(request: Request) {
     });
 
     // Send new order notification (email + SMS)
+    console.log("[CHECKOUT] About to send notification for order #" + orderNumber);
     try {
       await notifyNewOrder({
         orderNumber,
@@ -140,8 +141,9 @@ export async function POST(request: Request) {
         customerPhone: shippingAddress.phone,
         total,
       });
+      console.log("[CHECKOUT] Notification sent successfully for order #" + orderNumber);
     } catch (notifyError) {
-      console.error("Error sending order notification:", notifyError);
+      console.error("[CHECKOUT] Error sending order notification:", notifyError);
       // Don't fail the request if notification fails
     }
 
