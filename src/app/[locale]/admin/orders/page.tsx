@@ -237,6 +237,9 @@ export default function AdminOrdersPage() {
                     Order
                   </th>
                   <th className="text-left py-4 px-6 text-sm font-medium text-neutral-500">
+                    Customer
+                  </th>
+                  <th className="text-left py-4 px-6 text-sm font-medium text-neutral-500">
                     Date
                   </th>
                   <th className="text-left py-4 px-6 text-sm font-medium text-neutral-500">
@@ -266,6 +269,20 @@ export default function AdminOrdersPage() {
                       <span className="font-medium text-neutral-900">
                         #{order.orderNumber}
                       </span>
+                    </td>
+                    <td className="py-4 px-6">
+                      {(() => {
+                        try {
+                          const address = JSON.parse(order.shippingAddress);
+                          return (
+                            <span className="text-neutral-900">
+                              {address.firstName} {address.lastName}
+                            </span>
+                          );
+                        } catch {
+                          return <span className="text-neutral-400">-</span>;
+                        }
+                      })()}
                     </td>
                     <td className="py-4 px-6 text-neutral-600">
                       {new Date(order.createdAt).toLocaleDateString()}
