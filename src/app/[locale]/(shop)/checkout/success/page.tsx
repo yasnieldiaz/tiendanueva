@@ -18,15 +18,20 @@ function SuccessContent() {
     // Fetch order number from API
     if (orderId) {
       fetch(`/api/orders/${orderId}`)
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Order not found");
+          }
+          return res.json();
+        })
         .then((data) => {
           if (data.orderNumber) {
             setOrderNumber(data.orderNumber);
           }
         })
-        .catch(() => {
-          // Generate a fallback display order number
-          setOrderNumber(Math.floor(Math.random() * 9000) + 1000);
+        .catch((err) => {
+          console.error("Error fetching order:", err);
+          // Don't show a fake number, just leave it null
         });
     }
   }, [orderId]);

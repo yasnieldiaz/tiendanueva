@@ -260,7 +260,17 @@
     "placeOrder": "Złóż zamówienie",
     "processing": "Przetwarzanie...",
     "success": "Zamówienie złożone!",
-    "successMessage": "Dziękujemy za zakupy. Otrzymasz email z potwierdzeniem."
+    "successMessage": "Dziękujemy za zakupy. Otrzymasz email z potwierdzeniem.",
+    "orderNumber": "Numer zamówienia",
+    "orderConfirmed": "Zamówienie potwierdzone",
+    "orderConfirmedDesc": "Twoje zamówienie zostało przyjęte",
+    "processingOrder": "Przetwarzanie zamówienia",
+    "processingOrderDesc": "Przygotowujemy Twoje zamówienie",
+    "shipping": "Wysyłka",
+    "shippingDesc": "Twoje zamówienie jest w drodze",
+    "emailNotice": "Wyślemy Ci e-mail z potwierdzeniem i informacją o śledzeniu przesyłki.",
+    "continueShopping": "Kontynuuj zakupy",
+    "backToHome": "Wróć do strony głównej"
   },
   "account": {
     "title": "Moje Konto",

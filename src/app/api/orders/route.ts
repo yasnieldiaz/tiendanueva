@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { notifyNewOrder } from "@/lib/notifications";
 
 export async function GET() {
   try {
@@ -112,6 +113,21 @@ export async function POST(request: Request) {
         items: true,
       },
     });
+
+    // Send notification for COD orders
+    console.log("[ORDERS] About to send notification for order #" + orderNumber);
+    try {
+      await notifyNewOrder({
+        orderNumber,
+        customerName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+        customerEmail: shippingAddress.email,
+        customerPhone: shippingAddress.phone,
+        total,
+      });
+      console.log("[ORDERS] Notification sent successfully for order #" + orderNumber);
+    } catch (notifyError) {
+      console.error("[ORDERS] Error sending notification:", notifyError);
+    }
 
     return NextResponse.json(order, { status: 201 });
   } catch (error) {

@@ -260,7 +260,17 @@
     "placeOrder": "Place Order",
     "processing": "Processing...",
     "success": "Order Placed!",
-    "successMessage": "Thank you for your purchase. You will receive a confirmation email."
+    "successMessage": "Thank you for your purchase. You will receive a confirmation email.",
+    "orderNumber": "Order Number",
+    "orderConfirmed": "Order Confirmed",
+    "orderConfirmedDesc": "Your order has been received",
+    "processingOrder": "Processing Order",
+    "processingOrderDesc": "We are preparing your order",
+    "shipping": "Shipping",
+    "shippingDesc": "Your order is on the way",
+    "emailNotice": "We will send you an email with confirmation and tracking information.",
+    "continueShopping": "Continue Shopping",
+    "backToHome": "Back to Home"
   },
   "account": {
     "title": "My Account",
