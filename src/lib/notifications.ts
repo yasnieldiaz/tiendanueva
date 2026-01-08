@@ -642,10 +642,6 @@ export async function notifyOrderShipped(order: OrderInfo) {
   const settings = await getSettings();
   const locale = getLocale(order.locale);
 
-  if (settings.notify_on_shipped !== "true") {
-    return false;
-  }
-
   const subjects = getEmailSubjects(locale);
   const customerHtml = generateShippedEmailTemplate(order, locale);
   await sendEmail(
@@ -669,6 +665,192 @@ export async function notifyOrderShipped(order: OrderInfo) {
     };
     await sendSMS(order.customerPhone, smsMessages[locale]);
   }
+
+  return true;
+}
+
+// Status change email template
+function generateStatusChangeEmailTemplate(order: OrderInfo, locale: Locale, status: string): string {
+  const statusMessages: Record<Locale, Record<string, { title: string; message: string; color: string; icon: string }>> = {
+    pl: {
+      PROCESSING: {
+        title: "Twoje zamówienie jest w realizacji!",
+        message: "Rozpoczęliśmy przygotowywanie Twojego zamówienia. Powiadomimy Cię, gdy zostanie wysłane.",
+        color: "#3B82F6",
+        icon: "📦"
+      },
+      CANCELLED: {
+        title: "Zamówienie anulowane",
+        message: "Twoje zamówienie zostało anulowane. Jeśli masz pytania, skontaktuj się z nami.",
+        color: "#EF4444",
+        icon: "❌"
+      },
+      DELIVERED: {
+        title: "Zamówienie dostarczone!",
+        message: "Twoje zamówienie zostało dostarczone. Dziękujemy za zakupy w Drone-Partss!",
+        color: "#10B981",
+        icon: "✅"
+      },
+      PENDING: {
+        title: "Oczekujemy na płatność",
+        message: "Twoje zamówienie czeka na potwierdzenie płatności. Po otrzymaniu płatności rozpoczniemy realizację.",
+        color: "#F59E0B",
+        icon: "⏳"
+      },
+    },
+    en: {
+      PROCESSING: {
+        title: "Your order is being processed!",
+        message: "We have started preparing your order. We will notify you when it ships.",
+        color: "#3B82F6",
+        icon: "📦"
+      },
+      CANCELLED: {
+        title: "Order Cancelled",
+        message: "Your order has been cancelled. If you have any questions, please contact us.",
+        color: "#EF4444",
+        icon: "❌"
+      },
+      DELIVERED: {
+        title: "Order Delivered!",
+        message: "Your order has been delivered. Thank you for shopping at Drone-Partss!",
+        color: "#10B981",
+        icon: "✅"
+      },
+      PENDING: {
+        title: "Awaiting Payment",
+        message: "Your order is awaiting payment confirmation. Once we receive payment, we will start processing.",
+        color: "#F59E0B",
+        icon: "⏳"
+      },
+    },
+    es: {
+      PROCESSING: {
+        title: "¡Tu pedido está en proceso!",
+        message: "Hemos comenzado a preparar tu pedido. Te notificaremos cuando sea enviado.",
+        color: "#3B82F6",
+        icon: "📦"
+      },
+      CANCELLED: {
+        title: "Pedido Cancelado",
+        message: "Tu pedido ha sido cancelado. Si tienes preguntas, contáctanos.",
+        color: "#EF4444",
+        icon: "❌"
+      },
+      DELIVERED: {
+        title: "¡Pedido Entregado!",
+        message: "Tu pedido ha sido entregado. ¡Gracias por comprar en Drone-Partss!",
+        color: "#10B981",
+        icon: "✅"
+      },
+      PENDING: {
+        title: "Esperando Pago",
+        message: "Tu pedido está esperando confirmación de pago. Una vez recibido, comenzaremos el proceso.",
+        color: "#F59E0B",
+        icon: "⏳"
+      },
+    },
+  };
+
+  const t = emailTranslations[locale];
+  const statusInfo = statusMessages[locale][status] || statusMessages[locale].PROCESSING;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: Arial, sans-serif;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: #1a1a1a; padding: 30px; border-radius: 8px 8px 0 0; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 28px;">Drone-Partss</h1>
+    </div>
+
+    <div style="background: white; padding: 30px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <div style="width: 60px; height: 60px; background: ${statusInfo.color}20; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 30px;">${statusInfo.icon}</span>
+        </div>
+        <h2 style="color: #1a1a1a; margin: 0 0 10px;">${statusInfo.title}</h2>
+        <p style="color: #666; margin: 0;">${statusInfo.message}</p>
+      </div>
+
+      <div style="background: #f8f8f8; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 30px;">
+        <p style="color: #666; margin: 0 0 5px; font-size: 14px;">${t.orderNumber}</p>
+        <p style="color: #1a1a1a; margin: 0; font-size: 28px; font-weight: bold;">#${order.orderNumber}</p>
+      </div>
+
+      <table style="width: 100%; margin: 20px 0; background: #f8f8f8; border-radius: 8px;">
+        <tr>
+          <td style="padding: 15px; font-weight: bold; font-size: 18px;">${t.total}</td>
+          <td style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px;">${order.total.toFixed(2)} zł</td>
+        </tr>
+      </table>
+
+      <div style="text-align: center; margin-top: 30px;">
+        <a href="${process.env.NEXTAUTH_URL || "https://tienda.esix.online"}/${locale}/products"
+           style="display: inline-block; background: #1a1a1a; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+          ${t.continueShopping}
+        </a>
+      </div>
+    </div>
+
+    <div style="background: #1a1a1a; padding: 20px; border-radius: 0 0 8px 8px; text-align: center;">
+      <p style="color: #999; margin: 0 0 10px; font-size: 12px;">
+        ${t.questions} <a href="mailto:admin@drone-partss.com" style="color: #8B5CF6;">admin@drone-partss.com</a>
+      </p>
+      <p style="color: #666; margin: 0; font-size: 11px;">
+        © ${new Date().getFullYear()} Drone-Partss. ${t.allRightsReserved}
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+// Notification when order status changes
+export async function notifyOrderStatusChange(order: OrderInfo, newStatus: string) {
+  const locale = getLocale(order.locale);
+
+  console.log(`[NOTIFY] Status change notification for order #${order.orderNumber} to ${newStatus} (locale: ${locale})`);
+
+  // Don't send email for SHIPPED status - that's handled by notifyOrderShipped with tracking info
+  if (newStatus === "SHIPPED") {
+    return false;
+  }
+
+  const statusSubjects: Record<Locale, Record<string, string>> = {
+    pl: {
+      PROCESSING: `Zamówienie #${order.orderNumber} - W realizacji`,
+      CANCELLED: `Zamówienie #${order.orderNumber} - Anulowane`,
+      DELIVERED: `Zamówienie #${order.orderNumber} - Dostarczone`,
+      PENDING: `Zamówienie #${order.orderNumber} - Oczekuje na płatność`,
+    },
+    en: {
+      PROCESSING: `Order #${order.orderNumber} - Processing`,
+      CANCELLED: `Order #${order.orderNumber} - Cancelled`,
+      DELIVERED: `Order #${order.orderNumber} - Delivered`,
+      PENDING: `Order #${order.orderNumber} - Awaiting Payment`,
+    },
+    es: {
+      PROCESSING: `Pedido #${order.orderNumber} - En proceso`,
+      CANCELLED: `Pedido #${order.orderNumber} - Cancelado`,
+      DELIVERED: `Pedido #${order.orderNumber} - Entregado`,
+      PENDING: `Pedido #${order.orderNumber} - Esperando pago`,
+    },
+  };
+
+  const subject = statusSubjects[locale][newStatus];
+  if (!subject) {
+    console.log(`[NOTIFY] No email template for status: ${newStatus}`);
+    return false;
+  }
+
+  const html = generateStatusChangeEmailTemplate(order, locale, newStatus);
+  await sendEmail(order.customerEmail, subject, html);
 
   return true;
 }

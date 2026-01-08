@@ -50,12 +50,23 @@ interface Settings {
   gls_sender_postcode: string;
   gls_sender_country: string;
 
-  // Payments
+  // Payments - Przelewy24 Direct
+  przelewy24_enabled: string;
+  przelewy24_merchant_id: string;
+  przelewy24_shop_id: string;
+  przelewy24_crc_key: string;
+  przelewy24_api_key: string;
+  przelewy24_mode: string;
+  przelewy24_title: string;
+  przelewy24_description: string;
+
+  // Stripe (fallback)
   stripe_publishable_key: string;
   stripe_secret_key: string;
+
+  // COD
   cod_enabled: string;
   cod_fee: string;
-  przelewy24_enabled: string;
 
   // Bank Transfer
   bank_transfer_enabled: string;
@@ -133,12 +144,23 @@ const defaultSettings: Settings = {
   gls_sender_city: "Rybnik",
   gls_sender_postcode: "44-200",
   gls_sender_country: "PL",
-  // Payments
+  // Payments - Przelewy24 Direct
+  przelewy24_enabled: "true",
+  przelewy24_merchant_id: "",
+  przelewy24_shop_id: "",
+  przelewy24_crc_key: "",
+  przelewy24_api_key: "",
+  przelewy24_mode: "sandbox",
+  przelewy24_title: "Przelewy24",
+  przelewy24_description: "Szybkie przelewy, BLIK, karty płatnicze",
+
+  // Stripe (fallback)
   stripe_publishable_key: "",
   stripe_secret_key: "",
+
+  // COD
   cod_enabled: "true",
   cod_fee: "10",
-  przelewy24_enabled: "true",
   // Bank Transfer
   bank_transfer_enabled: "false",
   bank_eur_enabled: "false",
@@ -701,26 +723,162 @@ export default function SettingsPage() {
                       }
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                   </label>
                 </div>
 
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl mb-4">
-                  <div className="flex items-start gap-2">
-                    <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                    <div className="text-sm text-blue-800">
-                      <p className="font-medium mb-1">Przelewy24 przez Stripe</p>
-                      <p>Przelewy24 jest obsługiwane przez Stripe. Aby aktywować, włącz metodę płatności P24 w panelu Stripe.</p>
-                      <a
-                        href="https://dashboard.stripe.com/settings/payment_methods"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 mt-2 text-blue-600 hover:underline font-medium"
-                      >
-                        Otwórz ustawienia Stripe
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
+                {settings.przelewy24_enabled === "true" && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                      <div className="flex items-start gap-2">
+                        <Info className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                        <div className="text-sm text-red-800">
+                          <p className="font-medium mb-1">Dane z panelu Przelewy24</p>
+                          <p>Zaloguj się do <a href="https://panel.przelewy24.pl" target="_blank" rel="noopener noreferrer" className="underline font-medium">panelu Przelewy24</a> aby pobrać dane konfiguracyjne ze zakładki &quot;Moje dane&quot;.</p>
+                        </div>
+                      </div>
                     </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Tytuł
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.przelewy24_title}
+                          onChange={(e) => setSettings({ ...settings, przelewy24_title: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                          placeholder="Przelewy24"
+                        />
+                        <p className="text-xs text-neutral-500 mt-1">Tekst który zobaczą klienci podczas dokonywania zakupu</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Tryb modułu
+                        </label>
+                        <select
+                          value={settings.przelewy24_mode}
+                          onChange={(e) => setSettings({ ...settings, przelewy24_mode: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                        >
+                          <option value="sandbox">Sandbox (testowy)</option>
+                          <option value="live">Produkcyjny (live)</option>
+                        </select>
+                        <p className="text-xs text-neutral-500 mt-1">Tryb przeprowadzania transakcji</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          ID Sprzedawcy (Merchant ID)
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.przelewy24_merchant_id}
+                          onChange={(e) => setSettings({ ...settings, przelewy24_merchant_id: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                          placeholder="57442"
+                        />
+                        <p className="text-xs text-neutral-500 mt-1">Identyfikator sprzedawcy nadany w systemie Przelewy24</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          ID Sklepu (Shop ID)
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.przelewy24_shop_id}
+                          onChange={(e) => setSettings({ ...settings, przelewy24_shop_id: e.target.value })}
+                          className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                          placeholder="57442"
+                        />
+                        <p className="text-xs text-neutral-500 mt-1">Identyfikator sklepu nadany w systemie Przelewy24</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Klucz CRC
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPasswords.p24crc ? "text" : "password"}
+                            value={settings.przelewy24_crc_key}
+                            onChange={(e) => setSettings({ ...settings, przelewy24_crc_key: e.target.value })}
+                            className="w-full px-4 py-3 pr-12 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 font-mono text-sm"
+                            placeholder="7121d1d1a86a24a2"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => togglePassword("p24crc")}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                          >
+                            {showPasswords.p24crc ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-1">Klucz do CRC nadany w systemie Przelewy24</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Klucz API
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPasswords.p24api ? "text" : "password"}
+                            value={settings.przelewy24_api_key}
+                            onChange={(e) => setSettings({ ...settings, przelewy24_api_key: e.target.value })}
+                            className="w-full px-4 py-3 pr-12 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 font-mono text-sm"
+                            placeholder="a3c305d5e748a49cf8de772423321a3c"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => togglePassword("p24api")}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                          >
+                            {showPasswords.p24api ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-1">Klucz API należy pobrać z panelu Przelewy24 z zakładki Moje dane</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Opis
+                      </label>
+                      <textarea
+                        value={settings.przelewy24_description}
+                        onChange={(e) => setSettings({ ...settings, przelewy24_description: e.target.value })}
+                        rows={2}
+                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 resize-none"
+                        placeholder="Szybkie przelewy, BLIK, karty płatnicze"
+                      />
+                      <p className="text-xs text-neutral-500 mt-1">Tekst który zobaczą klienci przy wyborze metody płatności</p>
+                    </div>
+
+                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <p className="text-xs text-amber-800">
+                        <strong>Webhook URL:</strong> Dodaj ten adres w panelu Przelewy24 jako adres powrotny:
+                        <br />
+                        <code className="bg-amber-100 px-1 rounded text-xs">{typeof window !== 'undefined' ? window.location.origin : 'https://tienda.esix.online'}/api/webhooks/przelewy24</code>
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Stripe (Fallback) Section */}
+              <div className="border border-neutral-200 rounded-xl p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <CreditCard className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-neutral-900">Stripe (Opcjonalne)</h3>
+                    <p className="text-sm text-neutral-500">Alternatywna bramka płatności dla kart międzynarodowych</p>
                   </div>
                 </div>
 
@@ -766,16 +924,6 @@ export default function SettingsPage() {
                       </button>
                     </div>
                   </div>
-                </div>
-
-                <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                  <p className="text-xs text-amber-800">
-                    <strong>Ważne:</strong> Po wprowadzeniu kluczy, dodaj je również do pliku <code className="bg-amber-100 px-1 rounded">.env</code>:
-                    <br />
-                    <code className="text-xs">NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...</code>
-                    <br />
-                    <code className="text-xs">STRIPE_SECRET_KEY=sk_live_...</code>
-                  </p>
                 </div>
               </div>
 
