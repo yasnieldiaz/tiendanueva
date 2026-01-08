@@ -27,9 +27,10 @@ async function getSettings(): Promise<Record<string, string>> {
   return settingsObj;
 }
 
-// GLS Poland Web API URL
-const GLS_API_URL = "https://ade-test.gls-poland.com/adeplus/pm1/ade_webapi2.php";
-// Production: "https://ade.gls-poland.com/adeplus/pm1/ade_webapi2.php"
+// GLS Poland Web API URL - Production
+const GLS_API_URL = process.env.GLS_TEST_MODE === "true"
+  ? "https://ade-test.gls-poland.com/adeplus/pm1/ade_webapi2.php"
+  : "https://ade.gls-poland.com/adeplus/pm1/ade_webapi2.php";
 
 export async function createGLSShipment(data: ShipmentData): Promise<{
   success: boolean;
@@ -40,12 +41,23 @@ export async function createGLSShipment(data: ShipmentData): Promise<{
   try {
     const settings = await getSettings();
 
+    console.log("[GLS] Creating shipment for order:", data.orderNumber);
+    console.log("[GLS] Using API URL:", GLS_API_URL);
+    console.log("[GLS] Settings:", {
+      gls_api_enabled: settings.gls_api_enabled || "NOT SET",
+      gls_api_username: settings.gls_api_username || "NOT SET",
+      gls_sender_name: settings.gls_sender_name || "NOT SET",
+      gls_sender_city: settings.gls_sender_city || "NOT SET",
+    });
+
     if (settings.gls_api_enabled !== "true") {
-      return { success: false, error: "GLS API nie jest włączone" };
+      console.log("[GLS] API is disabled");
+      return { success: false, error: "GLS API no está activado" };
     }
 
     if (!settings.gls_api_username || !settings.gls_api_password) {
-      return { success: false, error: "Brak konfiguracji GLS API" };
+      console.log("[GLS] Missing credentials");
+      return { success: false, error: "Faltan credenciales de GLS API" };
     }
 
     // GLS uses SOAP-like XML requests
@@ -90,6 +102,8 @@ export async function createGLSShipment(data: ShipmentData): Promise<{
       consign: [consignment],
     };
 
+    console.log("[GLS] Sending request to:", GLS_API_URL);
+
     const response = await fetch(GLS_API_URL, {
       method: "POST",
       headers: {
@@ -98,21 +112,25 @@ export async function createGLSShipment(data: ShipmentData): Promise<{
       body: JSON.stringify(requestBody),
     });
 
+    console.log("[GLS] Response status:", response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("GLS API error:", errorText);
+      console.error("[GLS] API error response:", errorText);
       return {
         success: false,
-        error: "Błąd połączenia z API GLS",
+        error: `Error de conexión con GLS API (HTTP ${response.status})`,
       };
     }
 
     const result = await response.json();
+    console.log("[GLS] API response:", JSON.stringify(result, null, 2));
 
     if (result.status === "E") {
+      console.error("[GLS] API returned error:", result.error_description);
       return {
         success: false,
-        error: result.error_description || "Błąd API GLS",
+        error: result.error_description || "Error de GLS API",
       };
     }
 

@@ -47,9 +47,18 @@ async function sendEmail(to: string, subject: string, html: string) {
     const transporter = await createTransporter();
 
     if (!transporter) {
-      console.log("Email not configured, skipping...");
+      console.log("[EMAIL] SMTP not configured - missing host, user or password");
+      console.log("[EMAIL] Settings:", {
+        smtp_host: settings.smtp_host || "NOT SET",
+        smtp_user: settings.smtp_user || "NOT SET",
+        smtp_password: settings.smtp_password ? "SET" : "NOT SET",
+        smtp_port: settings.smtp_port || "587 (default)",
+      });
       return false;
     }
+
+    console.log(`[EMAIL] Sending to: ${to}, subject: ${subject}`);
+    console.log(`[EMAIL] SMTP config: ${settings.smtp_host}:${settings.smtp_port || "587"}`);
 
     await transporter.sendMail({
       from: `"${settings.smtp_from_name || "DroneParts"}" <${settings.smtp_from_email || settings.smtp_user}>`,
@@ -58,9 +67,17 @@ async function sendEmail(to: string, subject: string, html: string) {
       html,
     });
 
+    console.log(`[EMAIL] Successfully sent to: ${to}`);
     return true;
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("[EMAIL] Error sending email:", error);
+    if (error instanceof Error) {
+      console.error("[EMAIL] Error details:", {
+        message: error.message,
+        name: error.name,
+        stack: error.stack?.split("\n").slice(0, 3).join("\n"),
+      });
+    }
     return false;
   }
 }
@@ -106,6 +123,13 @@ async function sendSMS(to: string, message: string) {
 // Notification when new order is received
 export async function notifyNewOrder(order: OrderInfo) {
   const settings = await getSettings();
+
+  console.log("[NOTIFY] New order notification triggered for order #" + order.orderNumber);
+  console.log("[NOTIFY] Settings:", {
+    notify_on_new_order: settings.notify_on_new_order || "NOT SET",
+    notify_admin_email: settings.notify_admin_email || "NOT SET",
+    notify_admin_phone: settings.notify_admin_phone || "NOT SET",
+  });
 
   // Email to admin
   if (settings.notify_on_new_order === "true" && settings.notify_admin_email) {
