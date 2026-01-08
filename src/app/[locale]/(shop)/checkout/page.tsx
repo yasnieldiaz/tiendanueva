@@ -373,6 +373,7 @@ function CheckoutContent() {
         shippingMethod: selectedShipping, // "inpost" or "gls"
         paczkomatId: selectedShipping === "inpost" ? shippingForm.paczkomatId : undefined,
         paczkomatAddress: selectedShipping === "inpost" ? shippingForm.paczkomatAddress : undefined,
+        locale, // Pass locale for multi-language emails
       };
 
       if (paymentMethod === "przelewy24") {

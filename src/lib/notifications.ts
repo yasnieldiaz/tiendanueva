@@ -34,6 +34,143 @@ interface OrderInfo {
   paymentMethod?: string;
   trackingNumber?: string;
   carrier?: string;
+  locale?: string;
+}
+
+type Locale = "pl" | "en" | "es";
+
+// Email translations for all supported languages
+const emailTranslations: Record<Locale, {
+  // Customer email - order confirmation
+  thankYou: string;
+  orderReceived: string;
+  orderNumber: string;
+  orderSummary: string;
+  subtotal: string;
+  shipping: string;
+  total: string;
+  shippingAddress: string;
+  nextSteps: string;
+  nextStepsDesc: string;
+  continueShopping: string;
+  questions: string;
+  allRightsReserved: string;
+  product: string;
+  qty: string;
+  price: string;
+  // Customer email - shipped
+  orderOnTheWay: string;
+  orderShipped: string;
+  carrier: string;
+  trackingNumber: string;
+  trackOn: string;
+  // Admin email
+  newOrder: string;
+  newOrderFrom: string;
+  billingInfo: string;
+  paymentMethod: string;
+  manageOrder: string;
+  inTheApp: string;
+  // Date locale
+  dateLocale: string;
+}> = {
+  pl: {
+    thankYou: "Dziękujemy za zamówienie!",
+    orderReceived: "Otrzymaliśmy Twoje zamówienie i je przetwarzamy.",
+    orderNumber: "Numer zamówienia",
+    orderSummary: "Podsumowanie zamówienia",
+    subtotal: "Suma częściowa",
+    shipping: "Wysyłka",
+    total: "Razem",
+    shippingAddress: "Adres dostawy",
+    nextSteps: "Kolejne kroki:",
+    nextStepsDesc: "Wyślemy Ci e-mail, gdy zamówienie zostanie wysłane z numerem śledzenia.",
+    continueShopping: "Kontynuuj zakupy",
+    questions: "Pytania? Skontaktuj się z nami",
+    allRightsReserved: "Wszelkie prawa zastrzeżone.",
+    product: "Produkt",
+    qty: "Ilość",
+    price: "Cena",
+    orderOnTheWay: "Twoje zamówienie jest w drodze!",
+    orderShipped: "zostało wysłane.",
+    carrier: "Przewoźnik",
+    trackingNumber: "Numer śledzenia",
+    trackOn: "Śledź na",
+    newOrder: "Nowe zamówienie",
+    newOrderFrom: "Otrzymałeś nowe zamówienie od",
+    billingInfo: "Dane do faktury",
+    paymentMethod: "Metoda płatności",
+    manageOrder: "Zarządzaj zamówieniem",
+    inTheApp: "w aplikacji.",
+    dateLocale: "pl-PL",
+  },
+  en: {
+    thankYou: "Thank you for your order!",
+    orderReceived: "We have received your order and are processing it.",
+    orderNumber: "Order Number",
+    orderSummary: "Order Summary",
+    subtotal: "Subtotal",
+    shipping: "Shipping",
+    total: "Total",
+    shippingAddress: "Shipping Address",
+    nextSteps: "Next Steps:",
+    nextStepsDesc: "We will send you an email when your order is shipped with tracking information.",
+    continueShopping: "Continue Shopping",
+    questions: "Questions? Contact us at",
+    allRightsReserved: "All rights reserved.",
+    product: "Product",
+    qty: "Qty",
+    price: "Price",
+    orderOnTheWay: "Your order is on the way!",
+    orderShipped: "has been shipped.",
+    carrier: "Carrier",
+    trackingNumber: "Tracking Number",
+    trackOn: "Track on",
+    newOrder: "New Order",
+    newOrderFrom: "You have received a new order from",
+    billingInfo: "Billing Information",
+    paymentMethod: "Payment Method",
+    manageOrder: "Manage order",
+    inTheApp: "in the app.",
+    dateLocale: "en-US",
+  },
+  es: {
+    thankYou: "¡Gracias por tu pedido!",
+    orderReceived: "Hemos recibido tu pedido y lo estamos procesando.",
+    orderNumber: "Número de pedido",
+    orderSummary: "Resumen del pedido",
+    subtotal: "Subtotal",
+    shipping: "Envío",
+    total: "Total",
+    shippingAddress: "Dirección de envío",
+    nextSteps: "Próximos pasos:",
+    nextStepsDesc: "Te enviaremos un email cuando tu pedido sea enviado con el número de seguimiento.",
+    continueShopping: "Seguir comprando",
+    questions: "¿Preguntas? Contáctanos en",
+    allRightsReserved: "Todos los derechos reservados.",
+    product: "Producto",
+    qty: "Cant.",
+    price: "Precio",
+    orderOnTheWay: "¡Tu pedido está en camino!",
+    orderShipped: "ha sido enviado.",
+    carrier: "Transportista",
+    trackingNumber: "Número de seguimiento",
+    trackOn: "Seguir en",
+    newOrder: "Nuevo pedido",
+    newOrderFrom: "Has recibido un nuevo pedido de",
+    billingInfo: "Datos de facturación",
+    paymentMethod: "Método de pago",
+    manageOrder: "Gestionar pedido",
+    inTheApp: "en la aplicación.",
+    dateLocale: "es-ES",
+  },
+};
+
+function getLocale(locale?: string): Locale {
+  if (locale === "pl" || locale === "en" || locale === "es") {
+    return locale;
+  }
+  return "pl"; // Default to Polish
 }
 
 // Get settings from database
@@ -125,7 +262,7 @@ async function sendSMS(to: string, message: string) {
 }
 
 // Generate items table HTML
-function generateItemsTable(items: OrderItem[]): string {
+function generateItemsTable(items: OrderItem[], t: typeof emailTranslations["pl"]): string {
   if (!items || items.length === 0) return "";
 
   const rows = items.map(item => `
@@ -140,9 +277,9 @@ function generateItemsTable(items: OrderItem[]): string {
     <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
       <thead>
         <tr style="background: #f8f8f8;">
-          <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e5e5;">Producto</th>
-          <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e5e5e5;">Cant.</th>
-          <th style="padding: 12px; text-align: right; border-bottom: 2px solid #e5e5e5;">Precio</th>
+          <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e5e5;">${t.product}</th>
+          <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e5e5e5;">${t.qty}</th>
+          <th style="padding: 12px; text-align: right; border-bottom: 2px solid #e5e5e5;">${t.price}</th>
         </tr>
       </thead>
       <tbody>
@@ -152,15 +289,16 @@ function generateItemsTable(items: OrderItem[]): string {
   `;
 }
 
-// Admin email template
+// Admin email template (always in Polish for admin)
 function generateAdminEmailTemplate(order: OrderInfo): string {
-  const date = new Date().toLocaleDateString("es-ES", {
+  const t = emailTranslations.pl;
+  const date = new Date().toLocaleDateString(t.dateLocale, {
     day: "numeric",
     month: "long",
     year: "numeric"
   });
 
-  const itemsTable = generateItemsTable(order.items || []);
+  const itemsTable = generateItemsTable(order.items || [], t);
   const address = order.shippingAddress;
 
   return `
@@ -173,17 +311,17 @@ function generateAdminEmailTemplate(order: OrderInfo): string {
 <body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: Arial, sans-serif;">
   <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: #8B5CF6; padding: 30px; border-radius: 8px 8px 0 0;">
-      <h1 style="color: white; margin: 0; font-size: 24px;">Nuevo pedido: ${order.orderNumber}</h1>
+      <h1 style="color: white; margin: 0; font-size: 24px;">${t.newOrder}: ${order.orderNumber}</h1>
     </div>
 
     <div style="background: white; padding: 30px; border-radius: 0 0 8px 8px;">
       <p style="color: #666; margin: 0 0 20px;">
-        Has recibido un nuevo pedido de <strong>${order.customerName}</strong>:
+        ${t.newOrderFrom} <strong>${order.customerName}</strong>:
       </p>
 
       <p style="margin: 0 0 20px;">
         <a href="${process.env.NEXTAUTH_URL || "https://tienda.esix.online"}/admin/orders" style="color: #8B5CF6; font-weight: bold;">
-          [Pedido ${order.orderNumber}]
+          [Zamówienie ${order.orderNumber}]
         </a>
         <span style="color: #8B5CF6; font-weight: bold;">(${date})</span>
       </p>
@@ -192,19 +330,19 @@ function generateAdminEmailTemplate(order: OrderInfo): string {
 
       <table style="width: 100%; margin: 20px 0;">
         <tr>
-          <td style="padding: 8px 0; border-bottom: 1px solid #e5e5e5;"><strong>Subtotal:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e5e5;"><strong>${t.subtotal}:</strong></td>
           <td style="padding: 8px 0; border-bottom: 1px solid #e5e5e5; text-align: right;">${(order.subtotal || order.total).toFixed(2)} zł</td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; border-bottom: 1px solid #e5e5e5;"><strong>Envío:</strong></td>
-          <td style="padding: 8px 0; border-bottom: 1px solid #e5e5e5; text-align: right;">${(order.shippingCost || 0).toFixed(2)} zł ${order.carrier ? `por ${order.carrier}` : ""}</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e5e5;"><strong>${t.shipping}:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e5e5; text-align: right;">${(order.shippingCost || 0).toFixed(2)} zł ${order.carrier ? `(${order.carrier})` : ""}</td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; border-bottom: 1px solid #e5e5e5;"><strong>Método de pago:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e5e5;"><strong>${t.paymentMethod}:</strong></td>
           <td style="padding: 8px 0; border-bottom: 1px solid #e5e5e5; text-align: right;">${order.paymentMethod || "Przelewy24"}</td>
         </tr>
         <tr>
-          <td style="padding: 12px 0;"><strong style="font-size: 18px;">Total:</strong></td>
+          <td style="padding: 12px 0;"><strong style="font-size: 18px;">${t.total}:</strong></td>
           <td style="padding: 12px 0; text-align: right;"><strong style="font-size: 18px;">${order.total.toFixed(2)} zł</strong></td>
         </tr>
       </table>
@@ -212,7 +350,7 @@ function generateAdminEmailTemplate(order: OrderInfo): string {
       ${address ? `
       <div style="display: flex; margin-top: 30px;">
         <div style="flex: 1; padding-right: 20px;">
-          <h3 style="color: #8B5CF6; margin: 0 0 15px; font-size: 16px;">Datos de facturación</h3>
+          <h3 style="color: #8B5CF6; margin: 0 0 15px; font-size: 16px;">${t.billingInfo}</h3>
           <div style="background: #f8f8f8; padding: 15px; border-radius: 4px;">
             <p style="margin: 0 0 5px;">${address.firstName} ${address.lastName}</p>
             ${address.companyName ? `<p style="margin: 0 0 5px;">${address.companyName}</p>` : ""}
@@ -223,7 +361,7 @@ function generateAdminEmailTemplate(order: OrderInfo): string {
           </div>
         </div>
         <div style="flex: 1; padding-left: 20px;">
-          <h3 style="color: #8B5CF6; margin: 0 0 15px; font-size: 16px;">Dirección de envío</h3>
+          <h3 style="color: #8B5CF6; margin: 0 0 15px; font-size: 16px;">${t.shippingAddress}</h3>
           <div style="background: #f8f8f8; padding: 15px; border-radius: 4px;">
             <p style="margin: 0 0 5px;">${address.firstName} ${address.lastName}</p>
             <p style="margin: 0 0 5px;">${address.address}</p>
@@ -233,16 +371,16 @@ function generateAdminEmailTemplate(order: OrderInfo): string {
       </div>
       ` : ""}
 
-      <p style="margin: 30px 0 10px; color: #666;">Todo va bien.</p>
+      <p style="margin: 30px 0 10px; color: #666;">Wszystko w porządku.</p>
       <p style="margin: 0;">
         <a href="${process.env.NEXTAUTH_URL || "https://tienda.esix.online"}/admin/orders" style="color: #8B5CF6;">
-          Gestionar pedido
-        </a> en la aplicación.
+          ${t.manageOrder}
+        </a> ${t.inTheApp}
       </p>
     </div>
 
     <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-      <p style="margin: 0;">Drone-Partss - Piezas para Drones</p>
+      <p style="margin: 0;">Drone-Partss - Części do Dronów</p>
     </div>
   </div>
 </body>
@@ -250,15 +388,16 @@ function generateAdminEmailTemplate(order: OrderInfo): string {
   `;
 }
 
-// Customer email template
-function generateCustomerEmailTemplate(order: OrderInfo): string {
-  const date = new Date().toLocaleDateString("es-ES", {
+// Customer email template (in customer's language)
+function generateCustomerEmailTemplate(order: OrderInfo, locale: Locale): string {
+  const t = emailTranslations[locale];
+  const date = new Date().toLocaleDateString(t.dateLocale, {
     day: "numeric",
     month: "long",
     year: "numeric"
   });
 
-  const itemsTable = generateItemsTable(order.items || []);
+  const itemsTable = generateItemsTable(order.items || [], t);
   const address = order.shippingAddress;
 
   return `
@@ -272,7 +411,7 @@ function generateCustomerEmailTemplate(order: OrderInfo): string {
   <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: #1a1a1a; padding: 30px; border-radius: 8px 8px 0 0; text-align: center;">
       <h1 style="color: white; margin: 0; font-size: 28px;">Drone-Partss</h1>
-      <p style="color: #999; margin: 10px 0 0;">Piezas para Drones</p>
+      <p style="color: #999; margin: 10px 0 0;">Drone Parts</p>
     </div>
 
     <div style="background: white; padding: 30px;">
@@ -280,36 +419,36 @@ function generateCustomerEmailTemplate(order: OrderInfo): string {
         <div style="width: 60px; height: 60px; background: #10B981; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
           <span style="color: white; font-size: 30px;">✓</span>
         </div>
-        <h2 style="color: #1a1a1a; margin: 0 0 10px;">¡Gracias por tu pedido!</h2>
-        <p style="color: #666; margin: 0;">Hemos recibido tu pedido y estamos procesándolo.</p>
+        <h2 style="color: #1a1a1a; margin: 0 0 10px;">${t.thankYou}</h2>
+        <p style="color: #666; margin: 0;">${t.orderReceived}</p>
       </div>
 
       <div style="background: #f8f8f8; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 30px;">
-        <p style="color: #666; margin: 0 0 5px; font-size: 14px;">Número de pedido</p>
+        <p style="color: #666; margin: 0 0 5px; font-size: 14px;">${t.orderNumber}</p>
         <p style="color: #1a1a1a; margin: 0; font-size: 28px; font-weight: bold;">#${order.orderNumber}</p>
         <p style="color: #666; margin: 10px 0 0; font-size: 14px;">${date}</p>
       </div>
 
-      <h3 style="color: #1a1a1a; margin: 0 0 15px; font-size: 16px;">Resumen del pedido</h3>
+      <h3 style="color: #1a1a1a; margin: 0 0 15px; font-size: 16px;">${t.orderSummary}</h3>
       ${itemsTable}
 
       <table style="width: 100%; margin: 20px 0; background: #f8f8f8; border-radius: 8px;">
         <tr>
-          <td style="padding: 12px 15px; border-bottom: 1px solid #e5e5e5;">Subtotal</td>
+          <td style="padding: 12px 15px; border-bottom: 1px solid #e5e5e5;">${t.subtotal}</td>
           <td style="padding: 12px 15px; border-bottom: 1px solid #e5e5e5; text-align: right;">${(order.subtotal || order.total).toFixed(2)} zł</td>
         </tr>
         <tr>
-          <td style="padding: 12px 15px; border-bottom: 1px solid #e5e5e5;">Envío (${order.carrier || "Estándar"})</td>
+          <td style="padding: 12px 15px; border-bottom: 1px solid #e5e5e5;">${t.shipping} (${order.carrier || "Standard"})</td>
           <td style="padding: 12px 15px; border-bottom: 1px solid #e5e5e5; text-align: right;">${(order.shippingCost || 0).toFixed(2)} zł</td>
         </tr>
         <tr>
-          <td style="padding: 15px; font-weight: bold; font-size: 18px;">Total</td>
+          <td style="padding: 15px; font-weight: bold; font-size: 18px;">${t.total}</td>
           <td style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px;">${order.total.toFixed(2)} zł</td>
         </tr>
       </table>
 
       ${address ? `
-      <h3 style="color: #1a1a1a; margin: 30px 0 15px; font-size: 16px;">Dirección de envío</h3>
+      <h3 style="color: #1a1a1a; margin: 30px 0 15px; font-size: 16px;">${t.shippingAddress}</h3>
       <div style="background: #f8f8f8; padding: 15px; border-radius: 8px;">
         <p style="margin: 0 0 5px;"><strong>${address.firstName} ${address.lastName}</strong></p>
         <p style="margin: 0 0 5px; color: #666;">${address.address}</p>
@@ -320,25 +459,25 @@ function generateCustomerEmailTemplate(order: OrderInfo): string {
 
       <div style="background: #EEF2FF; padding: 20px; border-radius: 8px; margin: 30px 0;">
         <p style="margin: 0; color: #4F46E5;">
-          <strong>📧 Próximos pasos:</strong><br>
-          Te enviaremos un email cuando tu pedido sea enviado con el número de seguimiento.
+          <strong>${t.nextSteps}</strong><br>
+          ${t.nextStepsDesc}
         </p>
       </div>
 
       <div style="text-align: center; margin-top: 30px;">
-        <a href="${process.env.NEXTAUTH_URL || "https://tienda.esix.online"}/products"
+        <a href="${process.env.NEXTAUTH_URL || "https://tienda.esix.online"}/${locale}/products"
            style="display: inline-block; background: #1a1a1a; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-          Seguir comprando
+          ${t.continueShopping}
         </a>
       </div>
     </div>
 
     <div style="background: #1a1a1a; padding: 20px; border-radius: 0 0 8px 8px; text-align: center;">
       <p style="color: #999; margin: 0 0 10px; font-size: 12px;">
-        ¿Preguntas? Contáctanos en <a href="mailto:admin@drone-partss.com" style="color: #8B5CF6;">admin@drone-partss.com</a>
+        ${t.questions} <a href="mailto:admin@drone-partss.com" style="color: #8B5CF6;">admin@drone-partss.com</a>
       </p>
       <p style="color: #666; margin: 0; font-size: 11px;">
-        © ${new Date().getFullYear()} Drone-Partss. Todos los derechos reservados.
+        © ${new Date().getFullYear()} Drone-Partss. ${t.allRightsReserved}
       </p>
     </div>
   </div>
@@ -347,11 +486,93 @@ function generateCustomerEmailTemplate(order: OrderInfo): string {
   `;
 }
 
+// Shipped email template (in customer's language)
+function generateShippedEmailTemplate(order: OrderInfo, locale: Locale): string {
+  const t = emailTranslations[locale];
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: Arial, sans-serif;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: #1a1a1a; padding: 30px; border-radius: 8px 8px 0 0; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 28px;">Drone-Partss</h1>
+    </div>
+
+    <div style="background: white; padding: 30px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <div style="width: 60px; height: 60px; background: #8B5CF6; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
+          <span style="color: white; font-size: 30px;">📦</span>
+        </div>
+        <h2 style="color: #1a1a1a; margin: 0 0 10px;">${t.orderOnTheWay}</h2>
+        <p style="color: #666; margin: 0;">#${order.orderNumber} ${t.orderShipped}</p>
+      </div>
+
+      <div style="background: #f8f8f8; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+        <p style="margin: 0 0 10px;"><strong>${t.carrier}:</strong> ${order.carrier || "GLS"}</p>
+        ${order.trackingNumber ? `<p style="margin: 0;"><strong>${t.trackingNumber}:</strong> <code style="background: #e5e5e5; padding: 2px 8px; border-radius: 4px;">${order.trackingNumber}</code></p>` : ""}
+      </div>
+
+      ${order.trackingNumber ? `
+      <div style="text-align: center; margin: 30px 0;">
+        ${order.carrier === "InPost" ? `
+        <a href="https://inpost.pl/sledzenie-przesylek?number=${order.trackingNumber}"
+           style="display: inline-block; background: #FFCD00; color: #1a1a1a; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+          ${t.trackOn} InPost
+        </a>
+        ` : `
+        <a href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=${order.trackingNumber}"
+           style="display: inline-block; background: #003087; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+          ${t.trackOn} GLS
+        </a>
+        `}
+      </div>
+      ` : ""}
+    </div>
+
+    <div style="background: #1a1a1a; padding: 20px; border-radius: 0 0 8px 8px; text-align: center;">
+      <p style="color: #999; margin: 0; font-size: 12px;">
+        © ${new Date().getFullYear()} Drone-Partss. ${t.allRightsReserved}
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+// Get email subject translations
+function getEmailSubjects(locale: Locale) {
+  const subjects = {
+    pl: {
+      orderConfirmation: (orderNumber: number) => `Potwierdzenie zamówienia #${orderNumber} - Drone-Partss`,
+      orderShipped: (orderNumber: number) => `Twoje zamówienie #${orderNumber} zostało wysłane - Drone-Partss`,
+      adminNewOrder: (orderNumber: number, total: number) => `Nowe zamówienie #${orderNumber} - ${total.toFixed(2)} zł`,
+    },
+    en: {
+      orderConfirmation: (orderNumber: number) => `Order Confirmation #${orderNumber} - Drone-Partss`,
+      orderShipped: (orderNumber: number) => `Your order #${orderNumber} has been shipped - Drone-Partss`,
+      adminNewOrder: (orderNumber: number, total: number) => `New order #${orderNumber} - ${total.toFixed(2)} zł`,
+    },
+    es: {
+      orderConfirmation: (orderNumber: number) => `Confirmación de pedido #${orderNumber} - Drone-Partss`,
+      orderShipped: (orderNumber: number) => `Tu pedido #${orderNumber} ha sido enviado - Drone-Partss`,
+      adminNewOrder: (orderNumber: number, total: number) => `Nuevo pedido #${orderNumber} - ${total.toFixed(2)} zł`,
+    },
+  };
+  return subjects[locale];
+}
+
 // Notification when new order is received
 export async function notifyNewOrder(order: OrderInfo) {
   const settings = await getSettings();
+  const locale = getLocale(order.locale);
 
-  console.log("[NOTIFY] New order notification triggered for order #" + order.orderNumber);
+  console.log("[NOTIFY] New order notification triggered for order #" + order.orderNumber + " (locale: " + locale + ")");
 
   // Fetch full order details if not provided
   if (!order.items || order.items.length === 0) {
@@ -385,12 +606,14 @@ export async function notifyNewOrder(order: OrderInfo) {
     }
   }
 
-  // Email to admin
+  const subjects = getEmailSubjects(locale);
+
+  // Email to admin (always in Polish)
   if (settings.notify_on_new_order === "true" && settings.notify_admin_email) {
     const adminHtml = generateAdminEmailTemplate(order);
     await sendEmail(
       settings.notify_admin_email,
-      `Nuevo pedido #${order.orderNumber} - ${order.total.toFixed(2)} zł`,
+      getEmailSubjects("pl").adminNewOrder(order.orderNumber, order.total),
       adminHtml
     );
   }
@@ -399,99 +622,52 @@ export async function notifyNewOrder(order: OrderInfo) {
   if (settings.notify_on_new_order === "true" && settings.notify_admin_phone) {
     await sendSMS(
       settings.notify_admin_phone,
-      `Nuevo pedido #${order.orderNumber} - ${order.total.toFixed(2)} zł - ${order.customerName}`
+      `Nowe zamówienie #${order.orderNumber} - ${order.total.toFixed(2)} zł - ${order.customerName}`
     );
   }
 
-  // Email to customer
-  const customerHtml = generateCustomerEmailTemplate(order);
+  // Email to customer (in their language)
+  const customerHtml = generateCustomerEmailTemplate(order, locale);
   await sendEmail(
     order.customerEmail,
-    `Confirmación de pedido #${order.orderNumber} - Drone-Partss`,
+    subjects.orderConfirmation(order.orderNumber),
     customerHtml
   );
 
   return true;
 }
 
-// Shipped email template
-function generateShippedEmailTemplate(order: OrderInfo): string {
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: Arial, sans-serif;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-    <div style="background: #1a1a1a; padding: 30px; border-radius: 8px 8px 0 0; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 28px;">Drone-Partss</h1>
-    </div>
-
-    <div style="background: white; padding: 30px;">
-      <div style="text-align: center; margin-bottom: 30px;">
-        <div style="width: 60px; height: 60px; background: #8B5CF6; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
-          <span style="color: white; font-size: 30px;">📦</span>
-        </div>
-        <h2 style="color: #1a1a1a; margin: 0 0 10px;">¡Tu pedido está en camino!</h2>
-        <p style="color: #666; margin: 0;">El pedido #${order.orderNumber} ha sido enviado.</p>
-      </div>
-
-      <div style="background: #f8f8f8; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-        <p style="margin: 0 0 10px;"><strong>Transportista:</strong> ${order.carrier || "GLS"}</p>
-        ${order.trackingNumber ? `<p style="margin: 0;"><strong>Número de seguimiento:</strong> <code style="background: #e5e5e5; padding: 2px 8px; border-radius: 4px;">${order.trackingNumber}</code></p>` : ""}
-      </div>
-
-      ${order.trackingNumber ? `
-      <div style="text-align: center; margin: 30px 0;">
-        ${order.carrier === "InPost" ? `
-        <a href="https://inpost.pl/sledzenie-przesylek?number=${order.trackingNumber}"
-           style="display: inline-block; background: #FFCD00; color: #1a1a1a; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-          Seguir en InPost
-        </a>
-        ` : `
-        <a href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=${order.trackingNumber}"
-           style="display: inline-block; background: #003087; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-          Seguir en GLS
-        </a>
-        `}
-      </div>
-      ` : ""}
-    </div>
-
-    <div style="background: #1a1a1a; padding: 20px; border-radius: 0 0 8px 8px; text-align: center;">
-      <p style="color: #999; margin: 0; font-size: 12px;">
-        © ${new Date().getFullYear()} Drone-Partss. Todos los derechos reservados.
-      </p>
-    </div>
-  </div>
-</body>
-</html>
-  `;
-}
-
 // Notification when order is shipped
 export async function notifyOrderShipped(order: OrderInfo) {
   const settings = await getSettings();
+  const locale = getLocale(order.locale);
 
   if (settings.notify_on_shipped !== "true") {
     return false;
   }
 
-  const customerHtml = generateShippedEmailTemplate(order);
+  const subjects = getEmailSubjects(locale);
+  const customerHtml = generateShippedEmailTemplate(order, locale);
   await sendEmail(
     order.customerEmail,
-    `Tu pedido #${order.orderNumber} ha sido enviado - Drone-Partss`,
+    subjects.orderShipped(order.orderNumber),
     customerHtml
   );
 
   // SMS to customer if phone provided
   if (order.customerPhone) {
-    const smsMessage = order.trackingNumber
-      ? `Tu pedido #${order.orderNumber} ha sido enviado. Tracking: ${order.trackingNumber} - Drone-Partss`
-      : `Tu pedido #${order.orderNumber} ha sido enviado - Drone-Partss`;
-    await sendSMS(order.customerPhone, smsMessage);
+    const smsMessages = {
+      pl: order.trackingNumber
+        ? `Twoje zamówienie #${order.orderNumber} zostało wysłane. Śledzenie: ${order.trackingNumber} - Drone-Partss`
+        : `Twoje zamówienie #${order.orderNumber} zostało wysłane - Drone-Partss`,
+      en: order.trackingNumber
+        ? `Your order #${order.orderNumber} has been shipped. Tracking: ${order.trackingNumber} - Drone-Partss`
+        : `Your order #${order.orderNumber} has been shipped - Drone-Partss`,
+      es: order.trackingNumber
+        ? `Tu pedido #${order.orderNumber} ha sido enviado. Seguimiento: ${order.trackingNumber} - Drone-Partss`
+        : `Tu pedido #${order.orderNumber} ha sido enviado - Drone-Partss`,
+    };
+    await sendSMS(order.customerPhone, smsMessages[locale]);
   }
 
   return true;

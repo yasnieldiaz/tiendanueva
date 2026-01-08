@@ -53,7 +53,8 @@ export async function POST(request: Request) {
       paymentMethod,
       shippingMethod,
       paczkomatId,
-      paczkomatAddress
+      paczkomatAddress,
+      locale
     } = body;
 
     if (!items || items.length === 0) {
@@ -123,6 +124,7 @@ export async function POST(request: Request) {
         customerEmail: shippingAddress.email,
         customerPhone: shippingAddress.phone,
         total,
+        locale,
       });
       console.log("[ORDERS] Notification sent successfully for order #" + orderNumber);
     } catch (notifyError) {
