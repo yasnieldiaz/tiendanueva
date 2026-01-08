@@ -4,7 +4,6 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Mail, Lock, Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
 
@@ -44,57 +43,119 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex">
-      {/* Left Side - Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 lg:px-16 xl:px-24">
-        <div className="max-w-md w-full mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Dynamic Particle Animations */}
+      <style>{`
+        @keyframes float-up {
+          0%, 100% { transform: translateY(0) translateX(0); }
+          25% { transform: translateY(-30px) translateX(10px); }
+          50% { transform: translateY(-15px) translateX(-5px); }
+          75% { transform: translateY(-40px) translateX(15px); }
+        }
+        @keyframes float-diagonal {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(20px, -25px) scale(1.2); }
+          66% { transform: translate(-15px, -35px) scale(0.9); }
+        }
+        @keyframes float-wave {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          25% { transform: translateY(-20px) rotate(90deg); }
+          50% { transform: translateY(-10px) rotate(180deg); }
+          75% { transform: translateY(-30px) rotate(270deg); }
+        }
+        @keyframes pulse-glow {
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(1.3); }
+        }
+        @keyframes orbit {
+          0% { transform: rotate(0deg) translateX(40px) rotate(0deg); }
+          100% { transform: rotate(360deg) translateX(40px) rotate(-360deg); }
+        }
+        @keyframes drift {
+          0%, 100% { transform: translate(0, 0); }
+          20% { transform: translate(25px, -15px); }
+          40% { transform: translate(-10px, -30px); }
+          60% { transform: translate(15px, -20px); }
+          80% { transform: translate(-20px, -10px); }
+        }
+        .particle-1 { animation: float-up 6s ease-in-out infinite; }
+        .particle-2 { animation: float-diagonal 7s ease-in-out infinite; }
+        .particle-3 { animation: float-wave 5s ease-in-out infinite; }
+        .particle-4 { animation: drift 8s ease-in-out infinite; }
+        .particle-5 { animation: pulse-glow 4s ease-in-out infinite; }
+        .orbit-particle { animation: orbit 12s linear infinite; }
+      `}</style>
+
+      {/* Animated Particles - Various movements */}
+      <div className="absolute top-[10%] left-[8%] w-4 h-4 rounded-full bg-blue-400/50 particle-1" />
+      <div className="absolute top-[15%] right-[12%] w-5 h-5 rounded-full bg-orange-400/50 particle-2" />
+      <div className="absolute bottom-[25%] left-[15%] w-3 h-3 rounded-full bg-blue-300/40 particle-3" />
+      <div className="absolute bottom-[35%] right-[8%] w-4 h-4 rounded-full bg-orange-300/50 particle-4" />
+      <div className="absolute top-[45%] left-[5%] w-6 h-6 rounded-full bg-blue-400/30 particle-5" />
+      <div className="absolute top-[60%] right-[6%] w-3 h-3 rounded-full bg-orange-400/40 particle-1" style={{ animationDelay: '-2s' }} />
+      <div className="absolute top-[8%] left-[35%] w-3 h-3 rounded-full bg-gray-400/30 particle-2" style={{ animationDelay: '-1s' }} />
+      <div className="absolute bottom-[12%] right-[30%] w-4 h-4 rounded-full bg-blue-300/40 particle-4" style={{ animationDelay: '-3s' }} />
+      <div className="absolute top-[30%] left-[3%] w-5 h-5 rounded-full bg-orange-300/30 particle-3" style={{ animationDelay: '-1.5s' }} />
+      <div className="absolute top-[75%] right-[15%] w-3 h-3 rounded-full bg-blue-400/40 particle-1" style={{ animationDelay: '-4s' }} />
+      <div className="absolute bottom-[8%] left-[40%] w-4 h-4 rounded-full bg-gray-300/30 particle-2" style={{ animationDelay: '-2.5s' }} />
+      <div className="absolute top-[20%] right-[35%] w-3 h-3 rounded-full bg-orange-400/40 particle-4" style={{ animationDelay: '-0.5s' }} />
+
+      {/* Orbiting particles around center */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0">
+        <div className="orbit-particle w-2 h-2 rounded-full bg-blue-500/60" />
+      </div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0" style={{ animationDelay: '-4s' }}>
+        <div className="orbit-particle w-2 h-2 rounded-full bg-orange-500/60" style={{ animationDelay: '-6s', animationDuration: '15s' }} />
+      </div>
+
+      {/* Gradient orbs with pulse */}
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-200/25 rounded-full particle-5" style={{ animationDuration: '6s' }} />
+      <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-orange-200/25 rounded-full particle-5" style={{ animationDuration: '8s', animationDelay: '-2s' }} />
+
+      {/* Main Form Container */}
+      <div className="relative z-10 w-full max-w-md animate-[fadeIn_0.4s_ease-out]">
+        <style>{`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
+
+        {/* Card */}
+        <div className="bg-white/95 rounded-3xl shadow-xl border border-neutral-100 p-8">
           {/* Back Link */}
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-900 mb-8 transition-colors"
+            className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-900 mb-6 transition-colors text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
             {t("backToStore")}
           </Link>
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 mb-8">
-            <div className="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold">DP</span>
+          <Link href="/" className="flex items-center gap-3 mb-8 justify-center">
+            <div className="w-12 h-12 bg-neutral-900 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">DP</span>
             </div>
-            <span className="text-2xl font-semibold text-neutral-900">DroneParts</span>
+            <span className="text-2xl font-bold text-neutral-900">Drone-Partss</span>
           </Link>
 
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h1 className="text-3xl font-bold text-neutral-900 mb-2">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-neutral-900 mb-2">
               {t("welcomeBack")}
             </h1>
-            <p className="text-neutral-500 mb-8">
+            <p className="text-neutral-500 text-sm">
               {t("loginSubtitle")}
             </p>
-          </motion.div>
+          </div>
 
           {/* Form */}
-          <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            onSubmit={handleSubmit}
-            className="space-y-5"
-          >
+          <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm"
-              >
+              <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
                 {error}
-              </motion.div>
+              </div>
             )}
 
             {/* Email */}
@@ -110,7 +171,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   required
-                  className="w-full pl-12 pr-4 py-3.5 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -128,7 +189,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-12 pr-12 py-3.5 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full pl-12 pr-12 py-3.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
                 <button
                   type="button"
@@ -144,19 +205,17 @@ export default function LoginPage() {
             <div className="flex justify-end">
               <Link
                 href="/forgot-password"
-                className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors"
+                className="text-sm text-neutral-500 hover:text-blue-600 transition-colors"
               >
                 {t("forgotPassword")}
               </Link>
             </div>
 
             {/* Submit Button */}
-            <motion.button
+            <button
               type="submit"
               disabled={isLoading}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              className="w-full py-4 bg-neutral-900 text-white font-semibold rounded-xl hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-4 bg-neutral-900 text-white font-semibold rounded-xl hover:bg-neutral-800 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg"
             >
               {isLoading ? (
                 <>
@@ -166,139 +225,30 @@ export default function LoginPage() {
               ) : (
                 t("signIn")
               )}
-            </motion.button>
-          </motion.form>
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="my-6 flex items-center gap-4">
+            <div className="flex-1 h-px bg-neutral-200" />
+            <span className="text-xs text-neutral-400 uppercase">{t("noAccount")}</span>
+            <div className="flex-1 h-px bg-neutral-200" />
+          </div>
 
           {/* Register Link */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-center mt-8 text-neutral-600"
-          >
-            {t("noAccount")}{" "}
-            <Link
-              href={`/${locale}/register`}
-              className="font-semibold text-neutral-900 hover:underline"
+          <Link href={`/${locale}/register`} className="block">
+            <button
+              type="button"
+              className="w-full py-4 bg-white border-2 border-neutral-200 text-neutral-900 font-semibold rounded-xl hover:border-neutral-300 hover:bg-neutral-50 hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               {t("createAccount")}
-            </Link>
-          </motion.p>
+            </button>
+          </Link>
         </div>
-      </div>
 
-      {/* Right Side - Visual */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-50 via-white to-orange-50 items-center justify-center p-16">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative"
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-orange-400/20 rounded-full blur-3xl" />
-          <motion.div
-            animate={{ y: [-10, 10, -10] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="relative w-80 h-80 bg-white rounded-3xl flex items-center justify-center border border-neutral-200 shadow-2xl"
-          >
-            {/* Animated Drone SVG - Light Style */}
-            <svg width="180" height="180" viewBox="0 0 200 200" className="drop-shadow-2xl">
-              {/* Drone Body - White/Light Gray */}
-              <ellipse cx="100" cy="110" rx="35" ry="15" fill="#E5E7EB" />
-              <ellipse cx="100" cy="105" rx="30" ry="12" fill="#F3F4F6" />
-              <rect x="85" y="95" width="30" height="20" rx="5" fill="#FFFFFF" stroke="#D1D5DB" strokeWidth="1" />
-
-              {/* Camera - Blue accent */}
-              <circle cx="100" cy="120" r="8" fill="#1E40AF" />
-              <circle cx="100" cy="120" r="5" fill="#3B82F6" />
-              <circle cx="98" cy="118" r="2" fill="#BFDBFE" />
-
-              {/* Arms - Light gray */}
-              <line x1="70" y1="100" x2="30" y2="70" stroke="#D1D5DB" strokeWidth="6" strokeLinecap="round" />
-              <line x1="130" y1="100" x2="170" y2="70" stroke="#D1D5DB" strokeWidth="6" strokeLinecap="round" />
-              <line x1="70" y1="110" x2="30" y2="140" stroke="#D1D5DB" strokeWidth="6" strokeLinecap="round" />
-              <line x1="130" y1="110" x2="170" y2="140" stroke="#D1D5DB" strokeWidth="6" strokeLinecap="round" />
-
-              {/* Orange accent stripes on arms */}
-              <line x1="55" y1="90" x2="45" y2="80" stroke="#F97316" strokeWidth="3" strokeLinecap="round" />
-              <line x1="145" y1="90" x2="155" y2="80" stroke="#F97316" strokeWidth="3" strokeLinecap="round" />
-              <line x1="55" y1="120" x2="45" y2="130" stroke="#F97316" strokeWidth="3" strokeLinecap="round" />
-              <line x1="145" y1="120" x2="155" y2="130" stroke="#F97316" strokeWidth="3" strokeLinecap="round" />
-
-              {/* Motors - White with dark ring */}
-              <circle cx="30" cy="70" r="10" fill="#FFFFFF" stroke="#9CA3AF" strokeWidth="2" />
-              <circle cx="170" cy="70" r="10" fill="#FFFFFF" stroke="#9CA3AF" strokeWidth="2" />
-              <circle cx="30" cy="140" r="10" fill="#FFFFFF" stroke="#9CA3AF" strokeWidth="2" />
-              <circle cx="170" cy="140" r="10" fill="#FFFFFF" stroke="#9CA3AF" strokeWidth="2" />
-
-              {/* Motor centers */}
-              <circle cx="30" cy="70" r="4" fill="#6B7280" />
-              <circle cx="170" cy="70" r="4" fill="#6B7280" />
-              <circle cx="30" cy="140" r="4" fill="#6B7280" />
-              <circle cx="170" cy="140" r="4" fill="#6B7280" />
-
-              {/* Propellers with animation - Transparent/light */}
-              <motion.ellipse
-                cx="30" cy="70" rx="22" ry="5"
-                fill="rgba(59, 130, 246, 0.5)"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 0.1, repeat: Infinity, ease: "linear" }}
-                style={{ transformOrigin: "30px 70px" }}
-              />
-              <motion.ellipse
-                cx="170" cy="70" rx="22" ry="5"
-                fill="rgba(59, 130, 246, 0.5)"
-                animate={{ rotate: -360 }}
-                transition={{ duration: 0.1, repeat: Infinity, ease: "linear" }}
-                style={{ transformOrigin: "170px 70px" }}
-              />
-              <motion.ellipse
-                cx="30" cy="140" rx="22" ry="5"
-                fill="rgba(249, 115, 22, 0.5)"
-                animate={{ rotate: -360 }}
-                transition={{ duration: 0.1, repeat: Infinity, ease: "linear" }}
-                style={{ transformOrigin: "30px 140px" }}
-              />
-              <motion.ellipse
-                cx="170" cy="140" rx="22" ry="5"
-                fill="rgba(249, 115, 22, 0.5)"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 0.1, repeat: Infinity, ease: "linear" }}
-                style={{ transformOrigin: "170px 140px" }}
-              />
-
-              {/* LED Lights - Brighter */}
-              <motion.circle
-                cx="85" cy="100"
-                r="4"
-                fill="#22C55E"
-                animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
-                transition={{ duration: 1, repeat: Infinity }}
-              />
-              <motion.circle
-                cx="115" cy="100"
-                r="4"
-                fill="#EF4444"
-                animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
-                transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}
-              />
-
-              {/* Shadow under drone */}
-              <ellipse cx="100" cy="165" rx="50" ry="10" fill="#000" opacity="0.1" />
-              <defs>
-                <radialGradient id="glowGradient">
-                  <stop offset="0%" stopColor="#3B82F6" />
-                  <stop offset="100%" stopColor="transparent" />
-                </radialGradient>
-              </defs>
-            </svg>
-          </motion.div>
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-8 border border-dashed border-blue-300/50 rounded-full"
-          />
-        </motion.div>
+        {/* Animated decorative rings */}
+        <div className="absolute -top-6 -right-6 w-14 h-14 border-2 border-dashed border-blue-300/50 rounded-full animate-[spin_20s_linear_infinite] pointer-events-none" />
+        <div className="absolute -bottom-5 -left-5 w-10 h-10 border-2 border-dashed border-orange-300/50 rounded-full animate-[spin_15s_linear_infinite_reverse] pointer-events-none" />
       </div>
     </div>
   );

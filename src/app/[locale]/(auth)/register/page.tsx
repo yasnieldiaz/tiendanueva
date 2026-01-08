@@ -4,7 +4,6 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Mail, Lock, User, Eye, EyeOff, Loader2, ArrowLeft, Check, MapPin, Phone, Building2, ChevronDown } from "lucide-react";
 
@@ -260,55 +259,116 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex items-center justify-center py-8 px-4">
-      <div className="w-full max-w-xl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center py-8 px-4 relative overflow-hidden">
+      {/* Dynamic Particle Animations */}
+      <style>{`
+        @keyframes float-up {
+          0%, 100% { transform: translateY(0) translateX(0); }
+          25% { transform: translateY(-30px) translateX(10px); }
+          50% { transform: translateY(-15px) translateX(-5px); }
+          75% { transform: translateY(-40px) translateX(15px); }
+        }
+        @keyframes float-diagonal {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(20px, -25px) scale(1.2); }
+          66% { transform: translate(-15px, -35px) scale(0.9); }
+        }
+        @keyframes float-wave {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          25% { transform: translateY(-20px) rotate(90deg); }
+          50% { transform: translateY(-10px) rotate(180deg); }
+          75% { transform: translateY(-30px) rotate(270deg); }
+        }
+        @keyframes pulse-glow {
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(1.3); }
+        }
+        @keyframes orbit {
+          0% { transform: rotate(0deg) translateX(40px) rotate(0deg); }
+          100% { transform: rotate(360deg) translateX(40px) rotate(-360deg); }
+        }
+        @keyframes drift {
+          0%, 100% { transform: translate(0, 0); }
+          20% { transform: translate(25px, -15px); }
+          40% { transform: translate(-10px, -30px); }
+          60% { transform: translate(15px, -20px); }
+          80% { transform: translate(-20px, -10px); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(15px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .particle-1 { animation: float-up 6s ease-in-out infinite; }
+        .particle-2 { animation: float-diagonal 7s ease-in-out infinite; }
+        .particle-3 { animation: float-wave 5s ease-in-out infinite; }
+        .particle-4 { animation: drift 8s ease-in-out infinite; }
+        .particle-5 { animation: pulse-glow 4s ease-in-out infinite; }
+        .orbit-particle { animation: orbit 12s linear infinite; }
+      `}</style>
+
+      {/* Animated Particles - Various movements */}
+      <div className="fixed top-[10%] left-[8%] w-4 h-4 rounded-full bg-blue-400/50 particle-1" />
+      <div className="fixed top-[15%] right-[12%] w-5 h-5 rounded-full bg-orange-400/50 particle-2" />
+      <div className="fixed bottom-[25%] left-[15%] w-3 h-3 rounded-full bg-blue-300/40 particle-3" />
+      <div className="fixed bottom-[35%] right-[8%] w-4 h-4 rounded-full bg-orange-300/50 particle-4" />
+      <div className="fixed top-[45%] left-[5%] w-6 h-6 rounded-full bg-blue-400/30 particle-5" />
+      <div className="fixed top-[60%] right-[6%] w-3 h-3 rounded-full bg-orange-400/40 particle-1" style={{ animationDelay: '-2s' }} />
+      <div className="fixed top-[8%] left-[35%] w-3 h-3 rounded-full bg-gray-400/30 particle-2" style={{ animationDelay: '-1s' }} />
+      <div className="fixed bottom-[12%] right-[30%] w-4 h-4 rounded-full bg-blue-300/40 particle-4" style={{ animationDelay: '-3s' }} />
+      <div className="fixed top-[30%] left-[3%] w-5 h-5 rounded-full bg-orange-300/30 particle-3" style={{ animationDelay: '-1.5s' }} />
+      <div className="fixed top-[75%] right-[15%] w-3 h-3 rounded-full bg-blue-400/40 particle-1" style={{ animationDelay: '-4s' }} />
+      <div className="fixed bottom-[8%] left-[40%] w-4 h-4 rounded-full bg-gray-300/30 particle-2" style={{ animationDelay: '-2.5s' }} />
+      <div className="fixed top-[20%] right-[35%] w-3 h-3 rounded-full bg-orange-400/40 particle-4" style={{ animationDelay: '-0.5s' }} />
+
+      {/* Orbiting particles around center */}
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 pointer-events-none">
+        <div className="orbit-particle w-2 h-2 rounded-full bg-blue-500/60" />
+      </div>
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 pointer-events-none">
+        <div className="orbit-particle w-2 h-2 rounded-full bg-orange-500/60" style={{ animationDelay: '-6s', animationDuration: '15s' }} />
+      </div>
+
+      {/* Gradient orbs with pulse */}
+      <div className="fixed top-1/4 left-1/4 w-72 h-72 bg-blue-200/25 rounded-full particle-5 pointer-events-none" style={{ animationDuration: '6s' }} />
+      <div className="fixed bottom-1/4 right-1/4 w-72 h-72 bg-orange-200/25 rounded-full particle-5 pointer-events-none" style={{ animationDuration: '8s', animationDelay: '-2s' }} />
+
+      {/* Main Form Container */}
+      <div className="relative z-10 w-full max-w-xl animate-[fadeIn_0.4s_ease-out]">
+        {/* Card */}
+        <div className="bg-white/95 rounded-3xl shadow-xl border border-neutral-100 p-8">
           {/* Back Link */}
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-900 mb-6 transition-colors"
+            className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-900 mb-6 transition-colors text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
             {lt.backToStore}
           </Link>
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold">DP</span>
+          <Link href="/" className="flex items-center gap-3 mb-6 justify-center">
+            <div className="w-12 h-12 bg-neutral-900 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">DP</span>
             </div>
-            <span className="text-2xl font-semibold text-neutral-900">Drone-Partss</span>
+            <span className="text-2xl font-bold text-neutral-900">Drone-Partss</span>
           </Link>
 
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-2">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-neutral-900 mb-2">
               {lt.title}
             </h1>
-            <p className="text-neutral-500 mb-6">
+            <p className="text-neutral-500 text-sm">
               {lt.subtitle}
             </p>
-          </motion.div>
+          </div>
 
           {/* Form */}
-          <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            onSubmit={handleSubmit}
-            className="space-y-4"
-          >
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm"
-              >
+              <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
                 {error}
-              </motion.div>
+              </div>
             )}
 
             {/* Name Row */}
@@ -326,7 +386,7 @@ export default function RegisterPage() {
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="John"
                     required
-                    className="w-full pl-12 pr-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                    className="w-full pl-12 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
               </div>
@@ -342,7 +402,7 @@ export default function RegisterPage() {
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Doe"
                   required
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -360,7 +420,7 @@ export default function RegisterPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   required
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -376,7 +436,7 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowPhoneDropdown(!showPhoneDropdown)}
-                    className="flex items-center gap-2 px-3 py-3 bg-white border border-neutral-300 rounded-xl hover:bg-neutral-50 transition-colors min-w-[100px]"
+                    className="flex items-center gap-2 px-3 py-3 bg-neutral-50 border border-neutral-200 rounded-xl hover:bg-neutral-100 transition-colors min-w-[100px]"
                   >
                     <span className="text-xl">{selectedPhoneCountry.flag}</span>
                     <span className="text-sm font-medium">{selectedPhoneCountry.code}</span>
@@ -415,7 +475,7 @@ export default function RegisterPage() {
                     onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))}
                     placeholder="123 456 789"
                     required
-                    className="w-full pl-12 pr-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                    className="w-full pl-12 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
               </div>
@@ -434,7 +494,7 @@ export default function RegisterPage() {
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="ul. Przykladowa 123"
                   required
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -451,7 +511,7 @@ export default function RegisterPage() {
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="Warszawa"
                   required
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
               <div>
@@ -464,7 +524,7 @@ export default function RegisterPage() {
                   onChange={(e) => setPostalCode(e.target.value)}
                   placeholder="00-001"
                   required
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -478,7 +538,7 @@ export default function RegisterPage() {
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
                 required
-                className="w-full px-4 py-3 h-[50px] bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all appearance-none cursor-pointer"
+                className="w-full px-4 py-3 h-[50px] bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none cursor-pointer"
                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '20px' }}
               >
                 {countries.map((c) => (
@@ -501,7 +561,7 @@ export default function RegisterPage() {
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                   placeholder="Nazwa firmy"
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -516,7 +576,7 @@ export default function RegisterPage() {
                 value={taxId}
                 onChange={(e) => setTaxId(e.target.value)}
                 placeholder={lt.taxIdPlaceholder}
-                className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
 
@@ -536,7 +596,7 @@ export default function RegisterPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-12 pr-12 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full pl-12 pr-12 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
                 <button
                   type="button"
@@ -576,7 +636,7 @@ export default function RegisterPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -588,27 +648,25 @@ export default function RegisterPage() {
                 id="terms"
                 checked={acceptTerms}
                 onChange={(e) => setAcceptTerms(e.target.checked)}
-                className="mt-1 w-4 h-4 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900"
+                className="mt-1 w-4 h-4 rounded border-neutral-300 text-blue-600 focus:ring-blue-500"
               />
               <label htmlFor="terms" className="text-sm text-neutral-600">
                 {lt.acceptTerms}{" "}
-                <Link href={`/${locale}/legal/terms`} className="text-neutral-900 hover:underline">
+                <Link href={`/${locale}/legal/terms`} className="text-blue-600 hover:underline">
                   {lt.termsOfService}
                 </Link>{" "}
                 {lt.and}{" "}
-                <Link href={`/${locale}/legal/privacy`} className="text-neutral-900 hover:underline">
+                <Link href={`/${locale}/legal/privacy`} className="text-blue-600 hover:underline">
                   {lt.privacyPolicy}
                 </Link>
               </label>
             </div>
 
             {/* Submit Button */}
-            <motion.button
+            <button
               type="submit"
               disabled={isLoading}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              className="w-full py-4 bg-neutral-900 text-white font-semibold rounded-xl hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-4 bg-neutral-900 text-white font-semibold rounded-xl hover:bg-neutral-800 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg"
             >
               {isLoading ? (
                 <>
@@ -618,24 +676,30 @@ export default function RegisterPage() {
               ) : (
                 lt.createAccount
               )}
-            </motion.button>
-          </motion.form>
+            </button>
+          </form>
 
-        {/* Login Link */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-center mt-8 text-neutral-600"
-        >
-          {lt.alreadyHaveAccount}{" "}
-          <Link
-            href={`/${locale}/login`}
-            className="font-semibold text-neutral-900 hover:underline"
-          >
-            {lt.signIn}
+          {/* Divider */}
+          <div className="my-6 flex items-center gap-4">
+            <div className="flex-1 h-px bg-neutral-200" />
+            <span className="text-xs text-neutral-400 uppercase">{lt.alreadyHaveAccount}</span>
+            <div className="flex-1 h-px bg-neutral-200" />
+          </div>
+
+          {/* Login Link */}
+          <Link href={`/${locale}/login`} className="block">
+            <button
+              type="button"
+              className="w-full py-4 bg-white border-2 border-neutral-200 text-neutral-900 font-semibold rounded-xl hover:border-neutral-300 hover:bg-neutral-50 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
+              {lt.signIn}
+            </button>
           </Link>
-        </motion.p>
+        </div>
+
+        {/* Animated decorative rings */}
+        <div className="absolute -top-6 -right-6 w-14 h-14 border-2 border-dashed border-blue-300/50 rounded-full animate-[spin_20s_linear_infinite] pointer-events-none" />
+        <div className="absolute -bottom-5 -left-5 w-10 h-10 border-2 border-dashed border-orange-300/50 rounded-full animate-[spin_15s_linear_infinite_reverse] pointer-events-none" />
       </div>
     </div>
   );
