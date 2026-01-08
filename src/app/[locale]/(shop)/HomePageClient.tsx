@@ -222,7 +222,7 @@ export default function HomePageClient() {
                         alt={category.name}
                         width={140}
                         height={60}
-                        className="object-contain grayscale group-hover:grayscale-0 transition-all"
+                        className="object-contain"
                       />
                     </div>
                     <h3 className="font-semibold text-lg text-neutral-900 group-hover:text-blue-600 transition-colors">
