@@ -304,7 +304,7 @@ export default function Header() {
                   onKeyDown={handleSearchKeyDown}
                   onFocus={() => searchQuery.length >= 2 && setShowResults(true)}
                   placeholder={tNav("search")}
-                  className="w-full px-4 py-2.5 pl-10 pr-20 bg-neutral-100 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 pl-10 pr-20 bg-neutral-100 border border-neutral-200 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 {isSearching ? (
                   <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 animate-spin" />
@@ -514,7 +514,7 @@ export default function Header() {
                     onKeyDown={handleSearchKeyDown}
                     placeholder={tNav("search")}
                     autoFocus
-                    className="w-full px-4 py-2.5 pl-10 bg-neutral-100 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 pl-10 bg-neutral-100 border border-neutral-200 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 </div>
