@@ -27,10 +27,134 @@ async function getSettings(): Promise<Record<string, string>> {
   return settingsObj;
 }
 
-// GLS Poland Web API URL - Production
+// GLS Poland Web API URL - Production uses adeplus subdomain
 const GLS_API_URL = process.env.GLS_TEST_MODE === "true"
   ? "https://ade-test.gls-poland.com/adeplus/pm1/ade_webapi2.php"
-  : "https://ade.gls-poland.com/adeplus/pm1/ade_webapi2.php";
+  : "https://adeplus.gls-poland.com/adeplus/pm1/ade_webapi2.php";
+
+// Helper to escape XML special characters
+function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+// Build SOAP XML request for GLS Poland API
+function buildSoapRequest(
+  username: string,
+  password: string,
+  consignment: {
+    rname1: string;
+    rstreet: string;
+    rzipcode: string;
+    rcity: string;
+    rcountry: string;
+    rphone: string;
+    rcontact: string;
+    sname1: string;
+    sstreet: string;
+    szipcode: string;
+    scity: string;
+    scountry: string;
+    references: string;
+    weight: number;
+    quantity: number;
+    codAmount?: number;
+  }
+): string {
+  const codService = consignment.codAmount
+    ? `<srv_cod>
+        <cod_amount>${consignment.codAmount.toFixed(2)}</cod_amount>
+        <cod_reference>${escapeXml(consignment.references)}</cod_reference>
+      </srv_cod>`
+    : "";
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://www.gls-poland.com/webservices/">
+  <soap:Header>
+    <ws:AuthHeader>
+      <ws:user_name>${escapeXml(username)}</ws:user_name>
+      <ws:user_password>${escapeXml(password)}</ws:user_password>
+    </ws:AuthHeader>
+  </soap:Header>
+  <soap:Body>
+    <ws:adePreparingBox_Insert>
+      <ws:consign>
+        <ws:rname1>${escapeXml(consignment.rname1)}</ws:rname1>
+        <ws:rname2></ws:rname2>
+        <ws:rname3></ws:rname3>
+        <ws:rstreet>${escapeXml(consignment.rstreet)}</ws:rstreet>
+        <ws:rzipcode>${escapeXml(consignment.rzipcode)}</ws:rzipcode>
+        <ws:rcity>${escapeXml(consignment.rcity)}</ws:rcity>
+        <ws:rcountry>${escapeXml(consignment.rcountry)}</ws:rcountry>
+        <ws:rphone>${escapeXml(consignment.rphone)}</ws:rphone>
+        <ws:rcontact>${escapeXml(consignment.rcontact)}</ws:rcontact>
+        <ws:sname1>${escapeXml(consignment.sname1)}</ws:sname1>
+        <ws:sname2></ws:sname2>
+        <ws:sname3></ws:sname3>
+        <ws:sstreet>${escapeXml(consignment.sstreet)}</ws:sstreet>
+        <ws:szipcode>${escapeXml(consignment.szipcode)}</ws:szipcode>
+        <ws:scity>${escapeXml(consignment.scity)}</ws:scity>
+        <ws:scountry>${escapeXml(consignment.scountry)}</ws:scountry>
+        <ws:references>${escapeXml(consignment.references)}</ws:references>
+        <ws:weight>${consignment.weight}</ws:weight>
+        <ws:quantity>${consignment.quantity}</ws:quantity>
+        ${codService}
+      </ws:consign>
+    </ws:adePreparingBox_Insert>
+  </soap:Body>
+</soap:Envelope>`;
+}
+
+// Parse SOAP response from GLS
+function parseSoapResponse(xml: string): {
+  success: boolean;
+  trackingNumber?: string;
+  error?: string;
+} {
+  console.log("[GLS] Parsing SOAP response...");
+
+  // Check for SOAP Fault
+  const faultMatch = xml.match(/<faultstring>([^<]+)<\/faultstring>/);
+  if (faultMatch) {
+    return { success: false, error: faultMatch[1] };
+  }
+
+  // Check for error in response
+  const errorMatch = xml.match(/<error[^>]*>([^<]+)<\/error>/i);
+  if (errorMatch) {
+    return { success: false, error: errorMatch[1] };
+  }
+
+  // Try to extract tracking number (various possible field names)
+  const trackingPatterns = [
+    /<number>([^<]+)<\/number>/,
+    /<parcel_number>([^<]+)<\/parcel_number>/,
+    /<tracking_number>([^<]+)<\/tracking_number>/,
+    /<consig_id>([^<]+)<\/consig_id>/,
+    /<id>([^<]+)<\/id>/,
+  ];
+
+  for (const pattern of trackingPatterns) {
+    const match = xml.match(pattern);
+    if (match && match[1]) {
+      return { success: true, trackingNumber: match[1] };
+    }
+  }
+
+  // If we got a response without errors but no tracking number
+  if (xml.includes("InsertResult") || xml.includes("result")) {
+    return {
+      success: false,
+      error: "Respuesta recibida pero sin número de seguimiento",
+    };
+  }
+
+  return { success: false, error: "Respuesta no reconocida de GLS API" };
+}
 
 export async function createGLSShipment(data: ShipmentData): Promise<{
   success: boolean;
@@ -60,196 +184,83 @@ export async function createGLSShipment(data: ShipmentData): Promise<{
       return { success: false, error: "Faltan credenciales de GLS API" };
     }
 
-    // GLS uses SOAP-like XML requests
+    // Prepare consignment data
     const consignment = {
       rname1: data.receiver.name.substring(0, 40),
-      rname2: "",
-      rname3: "",
       rstreet: data.receiver.address.substring(0, 40),
       rzipcode: data.receiver.postCode.replace(/[^0-9]/g, ""),
       rcity: data.receiver.city.substring(0, 40),
       rcountry: data.receiver.countryCode || "PL",
       rphone: data.receiver.phone.replace(/[^0-9+]/g, ""),
       rcontact: data.receiver.name.substring(0, 40),
-
-      sname1: settings.gls_sender_name.substring(0, 40),
-      sname2: "",
-      sname3: "",
-      sstreet: settings.gls_sender_address.substring(0, 40),
-      szipcode: settings.gls_sender_postcode.replace(/[^0-9]/g, ""),
-      scity: settings.gls_sender_city.substring(0, 40),
+      sname1: (settings.gls_sender_name || "").substring(0, 40),
+      sstreet: (settings.gls_sender_address || "").substring(0, 40),
+      szipcode: (settings.gls_sender_postcode || "").replace(/[^0-9]/g, ""),
+      scity: (settings.gls_sender_city || "").substring(0, 40),
       scountry: settings.gls_sender_country || "PL",
-
       references: `ORDER-${data.orderNumber}`,
-      notes: "",
-      quantity: data.parcels.length,
       weight: data.parcels.reduce((sum, p) => sum + p.weight, 0),
-
-      ...(data.codAmount
-        ? {
-            srv_cod: {
-              amount: data.codAmount.toFixed(2),
-              reference: `ORDER-${data.orderNumber}`,
-            },
-          }
-        : {}),
+      quantity: data.parcels.length,
+      codAmount: data.codAmount,
     };
 
-    // Create request body for GLS API
-    const requestBody = {
-      username: settings.gls_api_username,
-      password: settings.gls_api_password,
-      consign: [consignment],
-    };
+    // Build SOAP request
+    const soapRequest = buildSoapRequest(
+      settings.gls_api_username,
+      settings.gls_api_password,
+      consignment
+    );
 
-    console.log("[GLS] Sending request to:", GLS_API_URL);
+    console.log("[GLS] Sending SOAP request to:", GLS_API_URL);
 
     const response = await fetch(GLS_API_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "text/xml; charset=utf-8",
+        SOAPAction: "http://www.gls-poland.com/webservices/adePreparingBox_Insert",
       },
-      body: JSON.stringify(requestBody),
+      body: soapRequest,
     });
 
     console.log("[GLS] Response status:", response.status);
 
+    const responseText = await response.text();
+    console.log("[GLS] Response body:", responseText.substring(0, 500));
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("[GLS] API error response:", errorText);
+      console.error("[GLS] HTTP error:", response.status);
       return {
         success: false,
         error: `Error de conexión con GLS API (HTTP ${response.status})`,
       };
     }
 
-    const result = await response.json();
-    console.log("[GLS] API response:", JSON.stringify(result, null, 2));
+    // Parse the SOAP response
+    const result = parseSoapResponse(responseText);
+    console.log("[GLS] Parsed result:", result);
 
-    if (result.status === "E") {
-      console.error("[GLS] API returned error:", result.error_description);
-      return {
-        success: false,
-        error: result.error_description || "Error de GLS API",
-      };
-    }
-
-    const trackingNumber = result.parcels?.[0]?.number || result.consig_id;
-
-    if (trackingNumber) {
+    if (result.success && result.trackingNumber) {
       // Update order with tracking number
       await prisma.order.update({
         where: { id: data.orderId },
         data: {
-          trackingNumber: trackingNumber,
+          trackingNumber: result.trackingNumber,
           carrier: "GLS",
         },
       });
+      console.log("[GLS] Order updated with tracking:", result.trackingNumber);
     }
 
-    return {
-      success: true,
-      trackingNumber: trackingNumber,
-      labelPdf: result.labels,
-    };
+    return result;
   } catch (error) {
-    console.error("GLS shipment error:", error);
+    console.error("[GLS] Shipment error:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Nieznany błąd",
+      error: error instanceof Error ? error.message : "Error desconocido",
     };
   }
 }
 
 export async function getGLSTrackingUrl(trackingNumber: string): Promise<string> {
   return `https://gls-group.eu/PL/pl/sledzenie-paczek?match=${trackingNumber}`;
-}
-
-// Alternative: GLS API via REST (newer version)
-export async function createGLSShipmentREST(data: ShipmentData): Promise<{
-  success: boolean;
-  trackingNumber?: string;
-  error?: string;
-}> {
-  try {
-    const settings = await getSettings();
-
-    if (settings.gls_api_enabled !== "true") {
-      return { success: false, error: "GLS API nie jest włączone" };
-    }
-
-    // GLS REST API endpoint (if available)
-    const GLS_REST_URL = "https://api.gls-group.eu/public/v1/shipments";
-
-    const shipmentPayload = {
-      shipperId: settings.gls_api_username,
-      shipmentType: "PARCEL",
-      labelFormat: "PDF",
-      consignee: {
-        name1: data.receiver.name,
-        street1: data.receiver.address,
-        zipCode: data.receiver.postCode,
-        city: data.receiver.city,
-        countryCode: data.receiver.countryCode || "PL",
-        phone: data.receiver.phone,
-        email: data.receiver.email,
-      },
-      shipper: {
-        name1: settings.gls_sender_name,
-        street1: settings.gls_sender_address,
-        zipCode: settings.gls_sender_postcode,
-        city: settings.gls_sender_city,
-        countryCode: settings.gls_sender_country || "PL",
-      },
-      parcels: data.parcels.map((p) => ({
-        weight: p.weight,
-      })),
-      references: [`ORDER-${data.orderNumber}`],
-    };
-
-    const authHeader = Buffer.from(
-      `${settings.gls_api_username}:${settings.gls_api_password}`
-    ).toString("base64");
-
-    const response = await fetch(GLS_REST_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${authHeader}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(shipmentPayload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      return {
-        success: false,
-        error: errorData.message || "Błąd API GLS",
-      };
-    }
-
-    const result = await response.json();
-    const trackingNumber = result.parcels?.[0]?.trackingNumber;
-
-    if (trackingNumber) {
-      await prisma.order.update({
-        where: { id: data.orderId },
-        data: {
-          trackingNumber: trackingNumber,
-          carrier: "GLS",
-        },
-      });
-    }
-
-    return {
-      success: true,
-      trackingNumber: trackingNumber,
-    };
-  } catch (error) {
-    console.error("GLS REST shipment error:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Nieznany błąd",
-    };
-  }
 }
